@@ -1559,6 +1559,11 @@
                     <p>Filières</p>
                 </div>
                 <div class="stat-card">
+                    <i class="fas fa-download"></i>
+                    <h3 id="download-count">0</h3>
+                    <p>Téléchargements</p>
+                </div>
+                <div class="stat-card">
                     <i class="fas fa-sync-alt"></i>
                     <h3 id="update-time">24h</h3>
                     <p>Prochaine mise à jour</p>
@@ -2288,6 +2293,7 @@
     const retryBtn = document.getElementById('retry-btn');
     const totalFilesElement = document.getElementById('total-files');
     const totalFilieresElement = document.getElementById('total-filieres');
+    const downloadCountElement = document.getElementById('download-count');
     const updateTimeElement = document.getElementById('update-time');
     const navLinks = document.querySelectorAll('.nav-link');
     const pageSections = document.querySelectorAll('.page-section');
@@ -2342,6 +2348,7 @@
         setupEventListeners();
         startAutoRefresh();
         initializeTheme();
+        updateDownloadCount();
     });
 
     // Configuration des écouteurs d'événements
@@ -2832,7 +2839,7 @@
 
             row.innerHTML = `
                 <td>
-                    <a href="${file.downloadLink}" class="file-link" download="${file.name}" onclick="showDonationModal()">
+                    <a href="${file.downloadLink}" class="file-link" download="${file.name}" onclick="trackDownload()">
                         <i class="${file.iconLink} file-icon"></i>
                         ${file.name}
                         ${file.isNew ? '<span class="file-badge new">Nouveau</span>' : ''}
@@ -2883,7 +2890,7 @@
                 </div>
                 <div class="file-card-footer">
                     <span>${formattedDate}</span>
-                    <a href="${file.downloadLink}" class="file-link" download="${file.name}" onclick="showDonationModal()">
+                    <a href="${file.downloadLink}" class="file-link" download="${file.name}" onclick="trackDownload()">
                         <i class="fas fa-download"></i> Télécharger
                     </a>
                 </div>
@@ -2993,6 +3000,29 @@
         errorElement.style.display = 'none';
         emptyStateElement.style.display = 'none';
         filesContentElement.style.display = 'block';
+    }
+
+    // NOUVELLE FONCTIONNALITÉ : Compteur de téléchargements
+    function getDownloadCount() {
+        return parseInt(localStorage.getItem('primeacademia_download_count') || '0');
+    }
+
+    function updateDownloadCount() {
+        const count = getDownloadCount();
+        downloadCountElement.textContent = count;
+    }
+
+    function incrementDownloadCount() {
+        const currentCount = getDownloadCount();
+        const newCount = currentCount + 1;
+        localStorage.setItem('primeacademia_download_count', newCount.toString());
+        updateDownloadCount();
+    }
+
+    // Fonction pour suivre les téléchargements
+    function trackDownload() {
+        incrementDownloadCount();
+        showDonationModal();
     }
     </script>
 </body>
