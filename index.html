@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <style>
-        /* Tous les styles CSS restent exactement les mêmes */
         :root {
             --primary: #2c3e50;
             --secondary: #34495e;
@@ -444,6 +443,7 @@
             align-items: center;
             gap: 8px;
             transition: var(--transition);
+            cursor: pointer;
         }
 
         .file-link:hover {
@@ -1306,9 +1306,15 @@
 
         .modal-actions {
             display: flex;
+            flex-direction: column;
             gap: 10px;
             justify-content: center;
             margin-top: 1.5rem;
+        }
+
+        .modal-actions .btn {
+            width: 100%;
+            justify-content: center;
         }
 
         .btn-cancel {
@@ -1411,11 +1417,13 @@
             </p>
             
             <div class="modal-actions">
-                <button class="btn btn-cancel" id="cancel-donation">Plus tard</button>
-                <a href="https://wa.me/22941733286?text=Bonjour%20!%20Je%20souhaite%20faire%20un%20don%20de%20%5BMONTANT%5D%20FCFA%20pour%20soutenir%20PrimeAcademia." 
-                   class="btn btn-whatsapp" id="whatsapp-donation" target="_blank" style="display: none;">
+                <a href="#" class="btn btn-whatsapp" id="whatsapp-donation" target="_blank" style="display: none;">
                     <i class="fab fa-whatsapp"></i> Faire un don via WhatsApp
                 </a>
+                <button class="btn btn-primary" id="download-without-donation">
+                    <i class="fas fa-download"></i> Télécharger sans faire de don
+                </button>
+                <button class="btn btn-cancel" id="cancel-download">Annuler</button>
             </div>
         </div>
     </div>
@@ -2360,7 +2368,8 @@
     // Éléments pour le modal de don
     const donationModal = document.getElementById('donation-modal');
     const modalClose = document.getElementById('modal-close');
-    const cancelDonation = document.getElementById('cancel-donation');
+    const cancelDownload = document.getElementById('cancel-download');
+    const downloadWithoutDonation = document.getElementById('download-without-donation');
     const donationOptions = document.querySelectorAll('.donation-option');
     const selectedAmount = document.getElementById('selected-amount');
     const amountValue = document.getElementById('amount-value');
@@ -2380,6 +2389,10 @@
         'privacy': 'privacy-page',
         'legal': 'legal-page'
     };
+
+    // Variables pour le téléchargement
+    let currentDownloadLink = '';
+    let currentFileName = '';
 
     // Initialisation
     document.addEventListener('DOMContentLoaded', function () {
@@ -2501,7 +2514,8 @@
 
         // Gestion du modal de don
         modalClose.addEventListener('click', closeDonationModal);
-        cancelDonation.addEventListener('click', closeDonationModal);
+        cancelDownload.addEventListener('click', closeDonationModal);
+        downloadWithoutDonation.addEventListener('click', proceedWithDownload);
         
         donationOptions.forEach(option => {
             option.addEventListener('click', function() {
@@ -2516,7 +2530,7 @@
                 
                 // Mettre à jour le lien WhatsApp
                 whatsappDonation.href = `https://wa.me/22941733286?text=Bonjour%20!%20Je%20souhaite%20faire%20un%20don%20de%20${amount}%20FCFA%20pour%20soutenir%20PrimeAcademia.`;
-                whatsappDonation.style.display = 'inline-flex';
+                whatsappDonation.style.display = 'block';
             });
         });
 
@@ -2526,6 +2540,16 @@
                 closeDonationModal();
             }
         });
+    }
+
+    // Fonction pour gérer le téléchargement avec demande de don
+    function handleFileDownload(downloadLink, fileName) {
+        // Stocker les informations de téléchargement
+        currentDownloadLink = downloadLink;
+        currentFileName = fileName;
+        
+        // Afficher le modal de don
+        showDonationModal();
     }
 
     // Fonctions pour le modal de don
@@ -2539,6 +2563,23 @@
 
     function closeDonationModal() {
         donationModal.style.display = 'none';
+        // Réinitialiser les variables de téléchargement
+        currentDownloadLink = '';
+        currentFileName = '';
+    }
+
+    function proceedWithDownload() {
+        if (currentDownloadLink && currentFileName) {
+            // Créer un lien de téléchargement temporaire
+            const tempLink = document.createElement('a');
+            tempLink.href = currentDownloadLink;
+            tempLink.download = currentFileName;
+            tempLink.target = '_blank';
+            document.body.appendChild(tempLink);
+            tempLink.click();
+            document.body.removeChild(tempLink);
+        }
+        closeDonationModal();
     }
 
     // Gestion du formulaire de contact SIMPLIFIÉE
@@ -2893,7 +2934,7 @@
 
             row.innerHTML = `
                 <td>
-                    <a href="${file.downloadLink}" class="file-link" download="${file.name}" target="_blank">
+                    <a href="#" class="file-link" onclick="handleFileDownload('${file.downloadLink}', '${file.name}')">
                         <i class="${file.iconLink} file-icon"></i>
                         ${file.name}
                         ${file.isNew ? '<span class="file-badge new">Nouveau</span>' : ''}
@@ -2946,7 +2987,7 @@
                 </div>
                 <div class="file-card-footer">
                     <span>${formattedDate}</span>
-                    <a href="${file.downloadLink}" class="file-link" download="${file.name}" target="_blank">
+                    <a href="#" class="file-link" onclick="handleFileDownload('${file.downloadLink}', '${file.name}')">
                         <i class="fas fa-download"></i> Télécharger
                     </a>
                 </div>
