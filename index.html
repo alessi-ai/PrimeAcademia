@@ -2699,7 +2699,7 @@
         }
     }
 
-    // API Google Drive pour les fichiers
+    // API Google Drive pour les fichiers - VERSION CORRIGÉE
     async function fetchDriveFiles() {
         filesData = [];
 
@@ -2722,7 +2722,7 @@
                                 data.files.forEach(file => {
                                     filesData.push({
                                         id: file.id,
-                                        name: file.name,
+                                        name: file.name, // CORRECTION : Utiliser le nom réel du fichier
                                         filiere: filiere,
                                         year: year,
                                         semestre: semestre,
