@@ -2395,23 +2395,18 @@
         apiKey: DRIVE_CONFIG.apiKey
     };
 
-    // CONFIGURATION AMÉLIORÉE POUR LES PUBLICITÉS
+    // CONFIGURATION SIMPLIFIÉE POUR LES PUBLICITÉS
     const AD_CONFIG = {
         driveFolderId: '1jJjzp5QXHff62638bspkBKT2zwhNPzdd',
         apiKey: DRIVE_CONFIG.apiKey,
-        interval: 300000, // 5 minutes entre chaque publicité
+        interval: 20000, // 20 secondes entre chaque publicité
         notificationTime: 5000, // 5 secondes d'avertissement avant la pub
         currentAdIndex: 0,
         isAdActive: false,
         isNotificationActive: false,
         adInterval: null,
         notificationInterval: null,
-        adImages: [],
-        userPreferences: {
-            adsEnabled: true,
-            showNotifications: true,
-            minInterval: 300000 // 5 minutes minimum
-        }
+        adImages: []
     };
 
     // Variables globales
@@ -2495,114 +2490,11 @@
         initializeTheme();
     });
 
-    // FONCTIONS POUR LES PUBLICITÉS AMÉLIORÉES
-
-    // FONCTION POUR SAUVEGARDER LES PRÉFÉRENCES
-    function saveAdPreferences() {
-        localStorage.setItem('adPreferences', JSON.stringify(AD_CONFIG.userPreferences));
-    }
-
-    // FONCTION POUR CHARGER LES PRÉFÉRENCES
-    function loadAdPreferences() {
-        const saved = localStorage.getItem('adPreferences');
-        if (saved) {
-            AD_CONFIG.userPreferences = { ...AD_CONFIG.userPreferences, ...JSON.parse(saved) };
-        }
-    }
-
-    // MODAL DE CONTRÔLE DES PUBLICITÉS
-    function createAdControlModal() {
-        const modalHTML = `
-            <div id="ad-control-modal" class="modal" style="display: none;">
-                <div class="modal-content" style="max-width: 500px;">
-                    <button class="modal-close" id="ad-control-close">&times;</button>
-                    <div class="modal-icon">
-                        <i class="fas fa-ad"></i>
-                    </div>
-                    <h2>Paramètres des Publicités</h2>
-                    <p>Contrôlez l'affichage des publicités sur PrimeAcademia</p>
-                    
-                    <div style="text-align: left; margin: 1.5rem 0;">
-                        <label style="display: flex; align-items: center; margin-bottom: 1rem; cursor: pointer;">
-                            <input type="checkbox" id="ads-enabled" ${AD_CONFIG.userPreferences.adsEnabled ? 'checked' : ''} style="margin-right: 10px;">
-                            <span>Afficher les publicités</span>
-                        </label>
-                        
-                        <label style="display: flex; align-items: center; margin-bottom: 1rem; cursor: pointer;">
-                            <input type="checkbox" id="show-notifications" ${AD_CONFIG.userPreferences.showNotifications ? 'checked' : ''} style="margin-right: 10px;">
-                            <span>Avertir avant les publicités</span>
-                        </label>
-                        
-                        <div style="margin-top: 1rem;">
-                            <label>Fréquence minimale entre les publicités :</label>
-                            <select id="ad-frequency" style="width: 100%; margin-top: 0.5rem;">
-                                <option value="120000" ${AD_CONFIG.userPreferences.minInterval === 120000 ? 'selected' : ''}>2 minutes</option>
-                                <option value="300000" ${AD_CONFIG.userPreferences.minInterval === 300000 ? 'selected' : ''}>5 minutes</option>
-                                <option value="600000" ${AD_CONFIG.userPreferences.minInterval === 600000 ? 'selected' : ''}>10 minutes</option>
-                                <option value="900000" ${AD_CONFIG.userPreferences.minInterval === 900000 ? 'selected' : ''}>15 minutes</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div class="modal-actions">
-                        <button class="btn btn-primary" id="save-ad-settings">
-                            <i class="fas fa-save"></i> Enregistrer
-                        </button>
-                        <button class="btn btn-cancel" id="close-ad-settings">
-                            Annuler
-                        </button>
-                    </div>
-                    
-                    <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--input-border); font-size: 0.85rem; color: var(--gray);">
-                        <p><i class="fas fa-info-circle"></i> Les publicités nous aident à maintenir la plateforme gratuite pour tous les étudiants.</p>
-                    </div>
-                </div>
-            </div>
-        `;
-        
-        document.body.insertAdjacentHTML('beforeend', modalHTML);
-        setupAdControlModal();
-    }
-
-    // CONFIGURATION DU MODAL DE CONTRÔLE
-    function setupAdControlModal() {
-        const modal = document.getElementById('ad-control-modal');
-        const closeBtn = document.getElementById('ad-control-close');
-        const saveBtn = document.getElementById('save-ad-settings');
-        const cancelBtn = document.getElementById('close-ad-settings');
-        
-        closeBtn.addEventListener('click', () => modal.style.display = 'none');
-        cancelBtn.addEventListener('click', () => modal.style.display = 'none');
-        
-        saveBtn.addEventListener('click', function() {
-            AD_CONFIG.userPreferences.adsEnabled = document.getElementById('ads-enabled').checked;
-            AD_CONFIG.userPreferences.showNotifications = document.getElementById('show-notifications').checked;
-            AD_CONFIG.userPreferences.minInterval = parseInt(document.getElementById('ad-frequency').value);
-            
-            AD_CONFIG.interval = AD_CONFIG.userPreferences.minInterval;
-            
-            saveAdPreferences();
-            modal.style.display = 'none';
-            
-            // Redémarrer le système de publicités avec les nouveaux paramètres
-            restartAdSystem();
-            
-            showToast('Paramètres des publicités enregistrés !', 'success');
-        });
-        
-        modal.addEventListener('click', function(e) {
-            if (e.target === modal) modal.style.display = 'none';
-        });
-    }
-
-    // FONCTION POUR OUVIR LE PANEL DE CONTRÔLE
-    function openAdSettings() {
-        document.getElementById('ad-control-modal').style.display = 'flex';
-    }
+    // FONCTIONS POUR LES PUBLICITÉS AUTOMATIQUES
 
     // NOTIFICATION AVANT LA PUBLICITÉ
     function showAdNotification() {
-        if (!AD_CONFIG.userPreferences.showNotifications || AD_CONFIG.isNotificationActive) return;
+        if (AD_CONFIG.isNotificationActive) return;
         
         AD_CONFIG.isNotificationActive = true;
         
@@ -2614,14 +2506,9 @@
                     <i class="fas fa-ad" style="color: var(--accent); margin-right: 10px;"></i>
                     <span>Publicité dans <strong id="ad-countdown">5</strong> secondes</span>
                 </div>
-                <div>
-                    <button id="skip-ad" style="background: none; border: none; color: var(--gray); cursor: pointer; margin-right: 10px;" title="Passer cette publicité">
-                        <i class="fas fa-times"></i>
-                    </button>
-                    <button id="ad-settings-btn" style="background: none; border: none; color: var(--gray); cursor: pointer;" title="Paramètres">
-                        <i class="fas fa-cog"></i>
-                    </button>
-                </div>
+                <button id="skip-ad" style="background: none; border: none; color: var(--gray); cursor: pointer;" title="Passer cette publicité">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
         `;
         
@@ -2636,7 +2523,7 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
             border-left: 4px solid var(--accent);
             z-index: 10000;
-            max-width: 350px;
+            max-width: 300px;
             font-size: 0.9rem;
             transition: transform 0.3s ease;
         `;
@@ -2661,15 +2548,6 @@
             clearInterval(countdownInterval);
             closeAdNotification();
             AD_CONFIG.isNotificationActive = false;
-            showToast('Publicité passée', 'info');
-        });
-        
-        // Bouton pour les paramètres
-        document.getElementById('ad-settings-btn').addEventListener('click', function() {
-            clearInterval(countdownInterval);
-            closeAdNotification();
-            AD_CONFIG.isNotificationActive = false;
-            openAdSettings();
         });
         
         AD_CONFIG.notificationInterval = countdownInterval;
@@ -2688,85 +2566,34 @@
         AD_CONFIG.isNotificationActive = false;
     }
 
-    // FONCTION POUR LES TOASTS (NOTIFICATIONS TEMPORAIRES)
-    function showToast(message, type = 'info') {
-        const toast = document.createElement('div');
-        toast.textContent = message;
-        toast.style.cssText = `
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: ${type === 'success' ? 'var(--success)' : type === 'error' ? 'var(--danger)' : 'var(--accent)'};
-            color: white;
-            padding: 12px 20px;
-            border-radius: var(--border-radius);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            z-index: 10000;
-            font-size: 0.9rem;
-            transition: transform 0.3s ease, opacity 0.3s ease;
-            transform: translateY(100px);
-            opacity: 0;
-        `;
-        
-        document.body.appendChild(toast);
-        
-        // Animation d'entrée
-        setTimeout(() => {
-            toast.style.transform = 'translateY(0)';
-            toast.style.opacity = '1';
-        }, 100);
-        
-        // Disparaître après 3 secondes
-        setTimeout(() => {
-            toast.style.transform = 'translateY(100px)';
-            toast.style.opacity = '0';
-            setTimeout(() => {
-                if (toast.parentNode) {
-                    toast.parentNode.removeChild(toast);
-                }
-            }, 300);
-        }, 3000);
-    }
-
-    // SYSTÈME DE PUBLICITÉS AMÉLIORÉ
+    // SYSTÈME DE PUBLICITÉS AUTOMATIQUE
     function startAdRotation() {
-        if (!AD_CONFIG.userPreferences.adsEnabled || AD_CONFIG.adImages.length === 0) {
-            console.log("🔇 Publicités désactivées par l'utilisateur");
+        if (AD_CONFIG.adImages.length === 0) {
+            console.log("❌ Aucune publicité à afficher");
             return;
         }
 
-        console.log("🔄 Démarrage de la rotation des publicités");
+        console.log("🔄 Démarrage de la rotation des publicités - 20 secondes");
 
         if (AD_CONFIG.adInterval) {
             clearInterval(AD_CONFIG.adInterval);
         }
 
-        // Première publicité après un délai aléatoire entre 2 et 5 minutes
-        const firstAdDelay = Math.random() * 180000 + 120000; // 2-5 minutes
-        console.log(`⏰ Première publicité dans ${Math.round(firstAdDelay / 1000)} secondes`);
-        
+        // Première publicité après 30 secondes
         setTimeout(() => {
-            if (AD_CONFIG.userPreferences.showNotifications) {
-                showAdNotification();
-            } else {
-                showNextAd();
-            }
-        }, firstAdDelay);
+            showAdNotification();
+        }, 30000);
 
-        // Publicités suivantes avec l'intervalle configuré
+        // Publicités suivantes toutes les 20 secondes
         AD_CONFIG.adInterval = setInterval(() => {
             if (!AD_CONFIG.isAdActive && !AD_CONFIG.isNotificationActive) {
-                if (AD_CONFIG.userPreferences.showNotifications) {
-                    showAdNotification();
-                } else {
-                    showNextAd();
-                }
+                showAdNotification();
             }
         }, AD_CONFIG.interval);
     }
 
     function showNextAd() {
-        if (!AD_CONFIG.userPreferences.adsEnabled || AD_CONFIG.adImages.length === 0) return;
+        if (AD_CONFIG.adImages.length === 0) return;
         if (AD_CONFIG.isAdActive) return;
 
         const ad = AD_CONFIG.adImages[AD_CONFIG.currentAdIndex];
@@ -2851,36 +2678,6 @@
         }
     }
 
-    function restartAdSystem() {
-        if (AD_CONFIG.adInterval) {
-            clearInterval(AD_CONFIG.adInterval);
-        }
-        if (AD_CONFIG.notificationInterval) {
-            clearInterval(AD_CONFIG.notificationInterval);
-        }
-        
-        AD_CONFIG.isAdActive = false;
-        AD_CONFIG.isNotificationActive = false;
-        
-        if (AD_CONFIG.userPreferences.adsEnabled && AD_CONFIG.adImages.length > 0) {
-            startAdRotation();
-        }
-    }
-
-    // AJOUTER UN BOUTON DE CONTRÔLE DANS LE HEADER
-    function addAdControlButton() {
-        const headerActions = document.querySelector('.header-actions');
-        const adControlButton = document.createElement('button');
-        adControlButton.innerHTML = '<i class="fas fa-ad"></i>';
-        adControlButton.title = 'Paramètres des publicités';
-        adControlButton.className = 'theme-toggle';
-        adControlButton.style.marginRight = '10px';
-        
-        adControlButton.addEventListener('click', openAdSettings);
-        
-        headerActions.insertBefore(adControlButton, themeToggle);
-    }
-
     // FONCTION POUR CHARGER LES PUBLICITÉS DEPUIS GOOGLE DRIVE
     async function loadAdsFromDrive() {
         try {
@@ -2918,7 +2715,6 @@
                 
                 if (AD_CONFIG.adImages.length > 0) {
                     startAdRotation();
-                    showToast(`${AD_CONFIG.adImages.length} publicité(s) chargée(s)`, 'success');
                 } else {
                     loadDefaultAds();
                 }
@@ -2958,9 +2754,6 @@
     // INITIALISATION DES PUBLICITÉS
     function initializeAds() {
         console.log("🔄 Initialisation du système de publicités...");
-        loadAdPreferences();
-        createAdControlModal();
-        addAdControlButton();
         loadAdsFromDrive();
     }
 
@@ -3618,4 +3411,5 @@
 </html>
 
    
+
 
