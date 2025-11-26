@@ -2,7 +2,8 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- Modification pour permettre le zoom -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PrimeAcademia - Plateforme d'Épreuves Académiques</title>
     <meta name="description" content="PrimeAcademia - Plateforme éducative offrant gratuitement des épreuves académiques organisées par filière et année. Outils de préparation et conseils pour la réussite étudiante.">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -38,11 +39,11 @@
             padding: 0;
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
-            -webkit-touch-callout: none;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
+            /* Activation du zoom et sélection de texte */
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+            user-select: text;
         }
 
         html {
@@ -57,6 +58,7 @@
             background-color: var(--light);
             transition: var(--transition);
             overflow-x: hidden;
+            /* Autoriser le zoom */
             touch-action: manipulation;
             min-height: 100vh;
         }
@@ -94,20 +96,6 @@
 
         .logo i {
             font-size: 1.5rem;
-        }
-
-        nav {
-            position: relative;
-        }
-
-        .nav-toggle {
-            display: none;
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: var(--primary);
-            padding: 5px;
         }
 
         nav ul {
@@ -1320,15 +1308,6 @@
             justify-content: center;
         }
 
-        /* Protection contre l'inspection */
-        .no-inspect {
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-            -webkit-touch-callout: none;
-        }
-
         /* Responsive */
         @media (max-width: 768px) {
             html {
@@ -1336,38 +1315,20 @@
             }
             
             .header-content {
-                flex-direction: row;
+                flex-direction: column;
                 padding: 0.8rem 0;
-            }
-            
-            .nav-toggle {
-                display: block;
+                gap: 1rem;
             }
             
             nav ul {
-                display: none;
-                position: absolute;
-                top: 100%;
-                left: 0;
-                width: 100%;
-                background: var(--white);
-                flex-direction: column;
-                gap: 0;
-                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-                border-radius: 0 0 10px 10px;
-                overflow: hidden;
-                z-index: 1001;
-            }
-            
-            nav ul.active {
-                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 0.8rem;
             }
             
             nav a {
-                display: block;
-                padding: 1rem;
-                border-radius: 0;
-                border-bottom: 1px solid var(--light);
+                padding: 0.4rem 0.6rem;
+                font-size: 0.85rem;
             }
             
             .logo {
@@ -1710,7 +1671,7 @@
         }
     </style>
 </head>
-<body class="no-inspect">
+<body>
     <!-- Modal de don -->
     <div class="modal" id="donation-modal">
         <div class="modal-content">
@@ -1808,9 +1769,6 @@
                     <span>PrimeAcademia</span>
                 </div>
                 <nav>
-                    <button class="nav-toggle" id="nav-toggle">
-                        <i class="fas fa-bars"></i>
-                    </button>
                     <ul id="nav-menu">
                         <li><a href="#" class="nav-link active" data-page="home">Accueil</a></li>
                         <li><a href="#" class="nav-link" data-page="articles">Articles</a></li>
@@ -3168,7 +3126,6 @@
         const navLinks = document.querySelectorAll('.nav-link');
         const pageSections = document.querySelectorAll('.page-section');
         const themeToggle = document.getElementById('theme-toggle');
-        const navToggle = document.getElementById('nav-toggle');
         const navMenu = document.getElementById('nav-menu');
 
         // Contact
@@ -3264,11 +3221,6 @@
                     const page = this.getAttribute('data-page');
                     switchPage(page);
                     setActiveNavLink(this);
-                    
-                    // Fermer le menu mobile après clic
-                    if (navMenu && navMenu.classList.contains('active')) {
-                        navMenu.classList.remove('active');
-                    }
                 });
             });
 
@@ -3281,21 +3233,6 @@
                     const mainNavLink = document.querySelector(`nav [data-page="${page}"]`);
                     if (mainNavLink) setActiveNavLink(mainNavLink);
                 });
-            });
-
-            // Menu mobile
-            if (navToggle && navMenu) {
-                navToggle.addEventListener('click', function() {
-                    navMenu.classList.toggle('active');
-                });
-            }
-
-            // Fermer le menu mobile en cliquant à l'extérieur
-            document.addEventListener('click', function(e) {
-                if (navMenu && navMenu.classList.contains('active') && 
-                    !e.target.closest('nav') && !e.target.closest('.nav-toggle')) {
-                    navMenu.classList.remove('active');
-                }
             });
         }
 
