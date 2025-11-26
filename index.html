@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>PrimeAcademia - Plateforme d'Épreuves Académiques</title>
     <meta name="description" content="PrimeAcademia - Plateforme éducative offrant gratuitement des épreuves académiques organisées par filière et année. Outils de préparation et conseils pour la réussite étudiante.">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -37,10 +37,17 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
         }
 
         html {
             font-size: 16px;
+            -webkit-text-size-adjust: 100%;
         }
 
         body {
@@ -50,6 +57,8 @@
             background-color: var(--light);
             transition: var(--transition);
             overflow-x: hidden;
+            touch-action: manipulation;
+            min-height: 100vh;
         }
 
         .container {
@@ -98,6 +107,7 @@
             font-size: 1.5rem;
             cursor: pointer;
             color: var(--primary);
+            padding: 5px;
         }
 
         nav ul {
@@ -1310,6 +1320,15 @@
             justify-content: center;
         }
 
+        /* Protection contre l'inspection */
+        .no-inspect {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-touch-callout: none;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             html {
@@ -1413,6 +1432,71 @@
             .table-view th, .table-view td {
                 padding: 0.6rem;
             }
+            
+            .filter-group {
+                flex-direction: column;
+            }
+            
+            select {
+                width: 100%;
+            }
+            
+            .view-toggle {
+                align-self: center;
+            }
+            
+            .stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .files-container, .about-content, .donation-content, .contact-content, .privacy-content, .legal-content {
+                padding: 1rem;
+            }
+            
+            .article-detail {
+                padding: 1rem;
+            }
+            
+            .article-header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .article-meta-large {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .books-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .donation-methods {
+                grid-template-columns: 1fr;
+            }
+            
+            .modal-content, .share-modal-content {
+                padding: 1rem;
+            }
+            
+            .donation-options {
+                flex-direction: column;
+            }
+            
+            .donation-option {
+                width: 100%;
+            }
+            
+            .share-options {
+                grid-template-columns: 1fr;
+            }
+            
+            footer {
+                padding: 1.5rem 0 0.8rem;
+            }
+            
+            .footer-section {
+                margin-bottom: 1rem;
+            }
         }
 
         @media (max-width: 480px) {
@@ -1500,10 +1584,133 @@
             .footer-section {
                 margin-bottom: 1rem;
             }
+            
+            /* Améliorations pour les très petits écrans */
+            .header-content {
+                padding: 0.5rem 0;
+            }
+            
+            .logo {
+                font-size: 0.9rem;
+            }
+            
+            .page-title h1 {
+                font-size: 1.4rem;
+            }
+            
+            .page-title i {
+                font-size: 1.8rem;
+            }
+            
+            .intro-collapsed, .intro-expanded {
+                padding: 1rem;
+            }
+            
+            .stat-card {
+                padding: 1rem;
+            }
+            
+            .stat-card i {
+                font-size: 2rem;
+            }
+            
+            .stat-card h3 {
+                font-size: 1.5rem;
+            }
+            
+            .file-card-header, .file-card-body, .file-card-footer {
+                padding: 0.8rem;
+            }
+            
+            .article-card {
+                margin-bottom: 1rem;
+            }
+            
+            .article-image {
+                padding: 1rem;
+            }
+            
+            .article-content {
+                padding: 1rem;
+            }
+            
+            .contact-item {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .form-group input, .form-group textarea {
+                padding: 8px 10px;
+            }
+            
+            .btn {
+                padding: 8px 16px;
+                font-size: 0.85rem;
+            }
+            
+            .modal-content, .share-modal-content {
+                padding: 1rem;
+            }
+            
+            .footer-links {
+                gap: 1rem;
+            }
+            
+            .footer-section {
+                margin-bottom: 1.5rem;
+            }
+        }
+
+        @media (max-width: 360px) {
+            html {
+                font-size: 12px;
+            }
+            
+            .container {
+                padding: 0 8px;
+            }
+            
+            .header-content {
+                padding: 0.4rem 0;
+            }
+            
+            .logo {
+                font-size: 0.85rem;
+            }
+            
+            .page-title h1 {
+                font-size: 1.3rem;
+            }
+            
+            .page-title i {
+                font-size: 1.6rem;
+            }
+            
+            .files-container, .about-content, .donation-content, .contact-content, .privacy-content, .legal-content {
+                padding: 0.8rem;
+            }
+            
+            .article-detail {
+                padding: 0.8rem;
+            }
+            
+            .article-header h1 {
+                font-size: 1.3rem;
+            }
+            
+            .modal-content, .share-modal-content {
+                padding: 0.8rem;
+            }
+            
+            .btn {
+                padding: 7px 14px;
+                font-size: 0.8rem;
+            }
         }
     </style>
 </head>
-<body>
+<body class="no-inspect">
     <!-- Modal de don -->
     <div class="modal" id="donation-modal">
         <div class="modal-content">
@@ -2424,7 +2631,7 @@
                     <h2>Routines d'entretien</h2>
                     <p>Un espace en désordre peut nuire à votre concentration. Adoptez ces habitudes :</p>
                     <ul>
-                        <li><strong>Rangez votre bureau à la fin de chaque session</strong> : Cela crée un environnement accueillant pour la prochaine séance</li>
+                        <li><strong>Rangez votre bureau à la fin de chaque session</strong> : Cela crée un environnement accueillin pour la prochaine séance</li>
                         <li><strong>Nettoyez régulièrement votre espace</strong> : Un espace propre améliore la clarté mentale</li>
                         <li><strong>Évitez l'accumulation de papiers inutiles</strong> : Numérisez les documents importants et recyclez les autres</li>
                         <li><strong>Utilisez le numérique pour réduire l'encombrement</strong> : Privilégiez les versions numériques des livres et documents quand c'est possible</li>
@@ -4058,6 +4265,59 @@
         // Fonctions qui doivent être accessibles globalement
         window.handleFileDownload = handleFileDownload;
         window.proceedWithDownload = proceedWithDownload;
+
+        // =============================================
+        // PROTECTION CONTRE L'INSPECTION
+        // =============================================
+
+        // Empêcher l'ouverture des outils de développement
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+            return false;
+        });
+
+        document.addEventListener('keydown', function(e) {
+            // Empêcher F12
+            if (e.key === 'F12') {
+                e.preventDefault();
+                return false;
+            }
+            
+            // Empêcher Ctrl+Shift+I
+            if (e.ctrlKey && e.shiftKey && e.key === 'I') {
+                e.preventDefault();
+                return false;
+            }
+            
+            // Empêcher Ctrl+Shift+J
+            if (e.ctrlKey && e.shiftKey && e.key === 'J') {
+                e.preventDefault();
+                return false;
+            }
+            
+            // Empêcher Ctrl+Shift+C
+            if (e.ctrlKey && e.shiftKey && e.key === 'C') {
+                e.preventDefault();
+                return false;
+            }
+            
+            // Empêcher Ctrl+U
+            if (e.ctrlKey && e.key === 'u') {
+                e.preventDefault();
+                return false;
+            }
+        });
+
+        // Détection de la réduction de la fenêtre (technique utilisée par certains outils de développement)
+        setInterval(function() {
+            const widthThreshold = window.outerWidth - window.innerWidth > 160;
+            const heightThreshold = window.outerHeight - window.innerHeight > 160;
+            
+            if (widthThreshold || heightThreshold) {
+                // Rediriger ou afficher un message d'avertissement
+                document.body.innerHTML = '<div style="display:flex; justify-content:center; align-items:center; height:100vh; font-family:Arial, sans-serif;"><h1>Outils de développement détectés. Veuillez les fermer pour accéder au site.</h1></div>';
+            }
+        }, 1000);
 
         console.log("✅ JavaScript PrimeAcademia chargé avec succès");
     </script>
