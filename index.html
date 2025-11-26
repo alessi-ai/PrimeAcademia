@@ -2318,7 +2318,7 @@
     </footer>
 
 
-    <script>
+  <script>
     // Configuration EmailJS
     const EMAILJS_CONFIG = {
         serviceId: 'service_aowa00e',
@@ -2401,7 +2401,7 @@
     const AD_CONFIG = {
         driveFolderId: '1jJjzp5QXHff62638bspkBKT2zwhNPzdd',
         apiKey: DRIVE_CONFIG.apiKey,
-        interval: 20000, // 20 secondes entre chaque publicité
+        interval: 30000, // 30 secondes entre chaque publicité
         currentAdIndex: 0,
         isAdActive: false,
         adInterval: null,
@@ -2606,7 +2606,7 @@
         });
     }
 
-    // SYSTÈME DE PUBLICITÉS AVEC GOOGLE DRIVE
+    // SYSTÈME DE PUBLICITÉS CORRIGÉ
     function initializeAds() {
         console.log("🔄 Initialisation du système de publicités...");
         loadAdsFromDrive();
@@ -2620,37 +2620,41 @@
                 `https://www.googleapis.com/drive/v3/files?q='${AD_CONFIG.driveFolderId}' in parents and trashed=false&key=${AD_CONFIG.apiKey}&fields=files(id,name,mimeType,webViewLink)`
             );
 
-            if (!response.ok) throw new Error('Erreur API Drive pour les publicités');
+            if (!response.ok) {
+                throw new Error(`Erreur API Drive: ${response.status}`);
+            }
 
             const data = await response.json();
             
             if (data.files && data.files.length > 0) {
+                console.log(`📸 ${data.files.length} fichier(s) trouvé(s) dans le dossier publicité`);
+                
                 AD_CONFIG.ads = data.files.map(file => ({
                     id: file.id,
                     name: file.name,
-                    imageUrl: `https://drive.google.com/uc?export=view&id=${file.id}`,
-                    link: "#" // Vous pouvez ajouter des liens spécifiques si besoin
+                    // URL corrigée pour Google Drive
+                    imageUrl: `https://lh3.googleusercontent.com/d/${file.id}=s500?authuser=0`,
+                    link: "#"
                 }));
                 
-                console.log(`✅ ${AD_CONFIG.ads.length} publicité(s) chargée(s) depuis Google Drive`);
+                console.log("✅ Publicités chargées:", AD_CONFIG.ads);
                 
-                // Démarrer la rotation après 10 secondes
+                // Démarrer la rotation après 5 secondes
                 setTimeout(() => {
                     startAdRotation();
-                }, 10000);
+                }, 5000);
             } else {
                 console.log("❌ Aucune publicité trouvée dans le dossier");
-                // Utiliser des images de secours
                 setupFallbackAds();
             }
         } catch (error) {
             console.error('❌ Erreur lors du chargement des publicités:', error);
-            // Utiliser des images de secours en cas d'erreur
             setupFallbackAds();
         }
     }
 
     function setupFallbackAds() {
+        console.log("🔄 Configuration des publicités de secours...");
         AD_CONFIG.ads = [
             {
                 name: "Publicité Éducation",
@@ -2664,11 +2668,10 @@
             }
         ];
         
-        console.log("🔄 Utilisation des publicités de secours");
-        
+        // Démarrer la rotation après 5 secondes
         setTimeout(() => {
             startAdRotation();
-        }, 10000);
+        }, 5000);
     }
 
     function startAdRotation() {
@@ -2702,6 +2705,12 @@
         const ad = AD_CONFIG.ads[AD_CONFIG.currentAdIndex];
         console.log(`🖼️ Tentative d'affichage de la publicité: ${ad.name}`);
 
+        // TEST : Vérifier si l'élément countdown existe
+        if (!adCountdown) {
+            console.error("❌ Élément adCountdown non trouvé");
+            return;
+        }
+
         // Créer une image pour précharger et tester
         const img = new Image();
         
@@ -2712,11 +2721,11 @@
         };
         
         img.onerror = function() {
-            console.error(`❌ Erreur de chargement de la publicité: ${ad.name}`);
+            console.error(`❌ Erreur de chargement de la publicité: ${ad.name}`, ad.imageUrl);
             // Passer à la publicité suivante en cas d'erreur
             AD_CONFIG.currentAdIndex = (AD_CONFIG.currentAdIndex + 1) % AD_CONFIG.ads.length;
-            // Réessayer avec la suivante
-            setTimeout(() => showNextAd(), 1000);
+            // Réessayer avec la suivante après 2 secondes
+            setTimeout(() => showNextAd(), 2000);
         };
         
         img.src = ad.imageUrl;
@@ -2733,19 +2742,25 @@
         adCountdown.textContent = `Publicité dans ${countdown}s`;
         adClose.style.display = 'none';
 
+        console.log(`⏱️ Début du compte à rebours: ${countdown} secondes`);
+
         // Démarrer le compte à rebours
         AD_CONFIG.countdownInterval = setInterval(() => {
             countdown--;
             adCountdown.textContent = `Publicité dans ${countdown}s`;
+            console.log(`⏱️ Compte à rebours: ${countdown}s`);
             
             if (countdown <= 0) {
                 clearInterval(AD_CONFIG.countdownInterval);
+                console.log("🎯 Compte à rebours terminé, affichage de la publicité");
                 showAdAfterCountdown(ad);
             }
         }, 1000);
     }
 
     function showAdAfterCountdown(ad) {
+        console.log(`🎯 Affichage de la publicité: ${ad.name}`);
+        
         // Afficher l'image de la publicité
         adImage.src = ad.imageUrl;
         adImage.alt = ad.name;
@@ -2756,11 +2771,10 @@
         adCountdown.style.display = 'none';
         adClose.style.display = 'block';
         
-        console.log(`🎯 Publicité affichée: ${ad.name}`);
-        
         // Fermer automatiquement après 8 secondes
         setTimeout(() => {
             if (AD_CONFIG.isAdActive) {
+                console.log("⏰ Fermeture automatique de la publicité");
                 closeAd();
             }
         }, 8000);
@@ -2781,6 +2795,7 @@
         }
     }
 
+    // [RESTE DU CODE IDENTIQUE...]
     // Gestion du téléchargement avec demande de don
     function handleFileDownload(downloadLink, fileName) {
         currentDownloadLink = downloadLink;
@@ -3324,3 +3339,4 @@
 </script>
 </body>
 </html>
+
