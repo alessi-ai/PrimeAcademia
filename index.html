@@ -2,7 +2,6 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <!-- Modification pour permettre le zoom -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PrimeAcademia - Plateforme d'Épreuves Académiques</title>
     <meta name="description" content="PrimeAcademia - Plateforme éducative offrant gratuitement des épreuves académiques organisées par filière et année. Outils de préparation et conseils pour la réussite étudiante.">
@@ -39,7 +38,6 @@
             padding: 0;
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
-            /* Activation du zoom et sélection de texte */
             -webkit-user-select: text;
             -moz-user-select: text;
             -ms-user-select: text;
@@ -58,7 +56,6 @@
             background-color: var(--light);
             transition: var(--transition);
             overflow-x: hidden;
-            /* Autoriser le zoom */
             touch-action: manipulation;
             min-height: 100vh;
         }
@@ -3997,10 +3994,11 @@
 
         function proceedWithDownload() {
             if (currentDownloadLink && currentFileName) {
+                // Créer un lien temporaire pour forcer le téléchargement
                 const tempLink = document.createElement('a');
                 tempLink.href = currentDownloadLink;
-                tempLink.download = currentFileName;
-                tempLink.target = '_blank';
+                tempLink.setAttribute('download', currentFileName);
+                tempLink.setAttribute('target', '_blank');
                 document.body.appendChild(tempLink);
                 tempLink.click();
                 document.body.removeChild(tempLink);
@@ -4203,59 +4201,39 @@
         window.proceedWithDownload = proceedWithDownload;
 
         // =============================================
-        // PROTECTION CONTRE L'INSPECTION
+        // CORRECTIONS SPÉCIFIQUES POUR LES PROBLÈMES IDENTIFIÉS
         // =============================================
 
-        // Empêcher l'ouverture des outils de développement
+        // SUPPRESSION DE LA PROTECTION CONTRE L'INSPECTION QUI CAUSE DES PROBLÈMES SUR IPHONE
+        // Cette protection était trop agressive et bloquait l'accès sur certains appareils
+        // Elle est maintenant remplacée par une version plus légère et compatible
+
+        // Protection légère contre l'inspection - Version compatible
         document.addEventListener('contextmenu', function(e) {
-            e.preventDefault();
-            return false;
+            // Autoriser le menu contextuel sur mobile pour une meilleure expérience utilisateur
+            if (window.innerWidth > 768) { // Seulement sur desktop
+                e.preventDefault();
+            }
         });
 
+        // Protection légère contre les raccourcis clavier - Version compatible
         document.addEventListener('keydown', function(e) {
-            // Empêcher F12
-            if (e.key === 'F12') {
+            // Empêcher F12 uniquement sur desktop
+            if (window.innerWidth > 768 && e.key === 'F12') {
                 e.preventDefault();
-                return false;
             }
             
-            // Empêcher Ctrl+Shift+I
-            if (e.ctrlKey && e.shiftKey && e.key === 'I') {
+            // Empêcher Ctrl+Shift+I uniquement sur desktop
+            if (window.innerWidth > 768 && e.ctrlKey && e.shiftKey && e.key === 'I') {
                 e.preventDefault();
-                return false;
-            }
-            
-            // Empêcher Ctrl+Shift+J
-            if (e.ctrlKey && e.shiftKey && e.key === 'J') {
-                e.preventDefault();
-                return false;
-            }
-            
-            // Empêcher Ctrl+Shift+C
-            if (e.ctrlKey && e.shiftKey && e.key === 'C') {
-                e.preventDefault();
-                return false;
-            }
-            
-            // Empêcher Ctrl+U
-            if (e.ctrlKey && e.key === 'u') {
-                e.preventDefault();
-                return false;
             }
         });
 
-        // Détection de la réduction de la fenêtre (technique utilisée par certains outils de développement)
-        setInterval(function() {
-            const widthThreshold = window.outerWidth - window.innerWidth > 160;
-            const heightThreshold = window.outerHeight - window.innerHeight > 160;
-            
-            if (widthThreshold || heightThreshold) {
-                // Rediriger ou afficher un message d'avertissement
-                document.body.innerHTML = '<div style="display:flex; justify-content:center; align-items:center; height:100vh; font-family:Arial, sans-serif;"><h1>Outils de développement détectés. Veuillez les fermer pour accéder au site.</h1></div>';
-            }
-        }, 1000);
+        // DÉSACTIVATION DE LA DÉTECTION DE RÉDUCTION DE FENÊTRE
+        // Cette fonctionnalité causait des problèmes sur iPhone et autres appareils mobiles
+        // Elle est maintenant complètement désactivée pour une meilleure compatibilité
 
-        console.log("✅ JavaScript PrimeAcademia chargé avec succès");
+        console.log("✅ JavaScript PrimeAcademia chargé avec succès - Version corrigée");
     </script>
 </body>
 </html>
