@@ -1151,6 +1151,11 @@
             display: block;
             cursor: pointer;
             object-fit: contain;
+            transition: transform 0.3s ease;
+        }
+
+        #ad-image:hover {
+            transform: scale(1.02);
         }
 
         /* Styles pour le compte à rebours des publicités */
@@ -1202,6 +1207,32 @@
             display: block;
             font-size: 30px;
             margin-bottom: 10px;
+        }
+
+        /* Styles pour le message de clic sur les publicités */
+        .ad-click-message {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            z-index: 10001;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            border: 2px solid var(--accent);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            animation: pulse 2s infinite;
+            display: none;
+        }
+
+        .ad-click-message i {
+            margin-right: 8px;
+            color: #ffd700;
         }
 
         /* Modal de partage */
@@ -1455,6 +1486,12 @@
             .footer-section {
                 margin-bottom: 1rem;
             }
+
+            .ad-click-message {
+                font-size: 14px;
+                padding: 10px 16px;
+                bottom: 15px;
+            }
         }
 
         @media (max-width: 480px) {
@@ -1618,6 +1655,12 @@
             .footer-section {
                 margin-bottom: 1.5rem;
             }
+
+            .ad-click-message {
+                font-size: 12px;
+                padding: 8px 14px;
+                bottom: 10px;
+            }
         }
 
         @media (max-width: 360px) {
@@ -1755,6 +1798,12 @@
             </div>
             <!-- Élément pour le compte à rebours -->
             <div id="ad-countdown" style="display: none;"></div>
+            
+            <!-- Message pour inviter à cliquer sur l'image -->
+            <div class="ad-click-message" id="ad-click-message">
+                <i class="fas fa-hand-pointer"></i>
+                Cliquez sur l'image pour découvrir l'offre
+            </div>
         </div>
     </div>
 
@@ -3054,7 +3103,15 @@
             adInterval: null,
             countdownInterval: null,
             countdownTime: 5, // Compte à rebours de 5 secondes
-            ads: []
+            ads: [],
+            // NOUVEAU: Mapping des liens par nom de fichier
+            adLinks: {
+                // EXEMPLE - REMPLACEZ PAR VOS FICHIERS RÉELS
+                'Ice_zone.jpg': 'https://icezone.netlify.app',
+                'nom_de_votre_image2.png': 'https://votre-lien2.com',
+                'publicite_special.pdf': 'https://votre-site.com/offre',
+                'banniere_promo.jpg': 'https://example.com/promotion'
+            }
         };
 
         // Configuration des pages
@@ -3169,6 +3226,7 @@
         const adImage = document.getElementById('ad-image');
         const adCountdown = document.getElementById('ad-countdown');
         const adLoading = document.getElementById('ad-loading');
+        const adClickMessage = document.getElementById('ad-click-message');
 
         // =============================================
         // INITIALISATION
@@ -3360,11 +3418,7 @@
             }
             if (adImage) {
                 adImage.addEventListener('click', function() {
-                    const currentAd = AD_CONFIG.ads[AD_CONFIG.currentAdIndex];
-                    if (currentAd && currentAd.link && currentAd.link !== '#') {
-                        window.open(currentAd.link, '_blank');
-                        closeAd();
-                    }
+                    handleAdClick();
                 });
             }
         }
@@ -3773,15 +3827,19 @@
                     // Filtrer uniquement les images
                     AD_CONFIG.ads = data.files
                         .filter(file => file.mimeType && file.mimeType.startsWith('image/'))
-                        .map(file => ({
-                            id: file.id,
-                            name: file.name,
-                            // URL directe pour l'affichage
-                            imageUrl: `https://lh3.googleusercontent.com/d/${file.id}=w800`,
-                            // URL alternative
-                            imageUrlAlt: `https://drive.google.com/uc?export=view&id=${file.id}`,
-                            link: "#" // Vous pouvez ajouter des liens personnalisés si nécessaire
-                        }));
+                        .map(file => {
+                            // Récupérer le lien correspondant au nom du fichier
+                            const link = AD_CONFIG.adLinks[file.name] || '#';
+                            console.log(`🔗 Publicité "${file.name}" -> Lien: ${link}`);
+                            
+                            return {
+                                id: file.id,
+                                name: file.name,
+                                imageUrl: `https://lh3.googleusercontent.com/d/${file.id}=w800`,
+                                imageUrlAlt: `https://drive.google.com/uc?export=view&id=${file.id}`,
+                                link: link // Lien cliquable
+                            };
+                        });
                     
                     console.log("✅ Publicités chargées avec succès:", AD_CONFIG.ads);
                     
@@ -3849,6 +3907,7 @@
             adImage.style.display = 'none';
             adCountdown.style.display = 'none';
             adClose.style.display = 'none';
+            adClickMessage.style.display = 'none';
 
             // Créer une image pour précharger et tester
             const img = new Image();
@@ -3884,7 +3943,7 @@
             // Afficher le compte à rebours avec le message demandé - AVANT l'image
             adCountdown.style.display = 'block';
             adCountdown.innerHTML = `
-                <div style="font-size: 20px; margin-bottom: 10px;"></div>
+                <div style="font-size: 20px; margin-bottom: 10px;">Pause publicitaire dans...</div>
                 <div style="font-size: 36px; margin: 15px 0; font-weight: bold;">${countdown}s</div>
             `;
 
@@ -3908,6 +3967,7 @@
 
         function showAdAfterCountdown(ad) {
             console.log(`🎯 Affichage de la publicité: ${ad.name}`);
+            console.log(`🔗 Lien associé: ${ad.link}`);
             
             // Cacher le compte à rebours
             adCountdown.style.display = 'none';
@@ -3916,7 +3976,21 @@
             adImage.src = ad.imageUrl;
             adImage.alt = ad.name;
             adImage.style.display = 'block';
-            adImage.style.cursor = ad.link && ad.link !== '#' ? 'pointer' : 'default';
+            
+            // Rendre l'image cliquable seulement si le lien n'est pas '#'
+            if (ad.link && ad.link !== '#') {
+                adImage.style.cursor = 'pointer';
+                adImage.title = `Cliquer pour visiter ${ad.link}`;
+                
+                // Afficher le message invitant à cliquer
+                adClickMessage.style.display = 'block';
+                
+                // Stocker l'index actuel pour le clic
+                adImage.setAttribute('data-ad-index', AD_CONFIG.currentAdIndex);
+            } else {
+                adImage.style.cursor = 'default';
+                adClickMessage.style.display = 'none';
+            }
             
             // Afficher le bouton fermer
             adClose.style.display = 'block';
@@ -3933,6 +4007,20 @@
             AD_CONFIG.currentAdIndex = (AD_CONFIG.currentAdIndex + 1) % AD_CONFIG.ads.length;
         }
 
+        function handleAdClick() {
+            // Récupérer l'index de la pub actuellement affichée
+            const currentAdIndex = (AD_CONFIG.currentAdIndex - 1 + AD_CONFIG.ads.length) % AD_CONFIG.ads.length;
+            const currentAd = AD_CONFIG.ads[currentAdIndex];
+            
+            if (currentAd && currentAd.link && currentAd.link !== '#') {
+                console.log(`🔗 Clic sur la publicité - Ouverture: ${currentAd.link}`);
+                window.open(currentAd.link, '_blank');
+                closeAd();
+            } else {
+                console.log("ℹ️ Publicité sans lien ou lien non défini");
+            }
+        }
+
         function closeAd() {
             console.log("🔒 Fermeture de la publicité");
             adContainer.style.display = 'none';
@@ -3941,6 +4029,7 @@
             adImage.style.display = 'none';
             adLoading.style.display = 'block';
             adCountdown.style.display = 'none';
+            adClickMessage.style.display = 'none';
             
             // Nettoyer l'intervalle de compte à rebours s'il existe
             if (AD_CONFIG.countdownInterval) {
@@ -4236,4 +4325,3 @@
     </script>
 </body>
 </html>
-
