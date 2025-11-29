@@ -3905,7 +3905,7 @@
                     // Démarrer la rotation après 5 secondes
                     setTimeout(() => {
                         startAdRotation();
-                    }, 40000);
+                    }, 5000);
                 } else {
                     console.log("❌ Aucune publicité trouvée dans le dossier");
                 }
@@ -3980,7 +3980,7 @@
                     closeAd();
                     // Réessayer avec la suivante après 2 secondes
                     setTimeout(() => showNextAd(), 2000);
-                }, 20000);
+                }, 2000);
             };
             
             // Essayer d'abord l'URL principale, puis l'alternative en cas d'échec
@@ -4013,7 +4013,7 @@
                     console.log("🎯 Compte à rebours terminé, affichage de la publicité");
                     showAdAfterCountdown(ad);
                 }
-            }, 10000);
+            }, 1000);
         }
 
         function showAdAfterCountdown(ad) {
