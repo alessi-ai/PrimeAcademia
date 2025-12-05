@@ -649,6 +649,9 @@
             margin-top: auto;
             padding-top: 1rem;
             border-top: 1px solid rgba(74, 111, 165, 0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
         }
 
         /* ===== PAGINATION ===== */
@@ -1252,6 +1255,215 @@
             box-shadow: 0 8px 25px rgba(107, 142, 35, 0.4);
         }
 
+        .btn-share {
+            background: linear-gradient(135deg, var(--accent4), #9B59B6);
+            box-shadow: 0 4px 15px rgba(138, 43, 226, 0.3);
+        }
+
+        .btn-share:hover {
+            background: linear-gradient(135deg, #9B59B6, var(--accent4));
+            box-shadow: 0 8px 25px rgba(138, 43, 226, 0.4);
+        }
+
+        .btn-share-alt {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        .btn-share-alt:hover {
+            background: linear-gradient(135deg, #2980b9, #3498db);
+            box-shadow: 0 8px 25px rgba(52, 152, 219, 0.4);
+        }
+
+        /* ===== MODAL DE PARTAGE ===== */
+        .share-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+            backdrop-filter: blur(5px);
+        }
+
+        .share-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .share-modal-content {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 2.5rem;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: fadeIn 0.5s ease-out;
+            position: relative;
+            border: 3px solid var(--primary);
+        }
+
+        .share-modal-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .share-modal-header i {
+            font-size: 3.5rem;
+            color: var(--accent);
+            margin-bottom: 1rem;
+            display: inline-block;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .share-modal-header h2 {
+            color: var(--dark);
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .share-modal-header p {
+            color: var(--dark2);
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .share-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .share-option {
+            background: var(--light);
+            border-radius: var(--radius);
+            padding: 1.5rem 1rem;
+            text-align: center;
+            transition: var(--transition);
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .share-option:hover {
+            transform: translateY(-5px);
+            background: white;
+            box-shadow: var(--shadow-hover);
+            border-color: var(--accent);
+        }
+
+        .share-option i {
+            font-size: 2.5rem;
+            margin-bottom: 0.8rem;
+            display: inline-block;
+        }
+
+        .share-option.whatsapp i {
+            color: #25D366;
+        }
+
+        .share-option.facebook i {
+            color: #1877F2;
+        }
+
+        .share-option.telegram i {
+            color: #0088cc;
+        }
+
+        .share-option.twitter i {
+            color: #1DA1F2;
+        }
+
+        .share-option.copy i {
+            color: var(--primary);
+        }
+
+        .share-option span {
+            display: block;
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 0.9rem;
+        }
+
+        .share-url-container {
+            margin-bottom: 2rem;
+        }
+
+        .share-url-input {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .share-url-input input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid var(--light2);
+            border-radius: var(--radius);
+            font-size: 0.9rem;
+            background: var(--light);
+            color: var(--dark);
+        }
+
+        .share-url-input button {
+            padding: 12px 20px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+
+        .share-url-input button:hover {
+            background: var(--accent2);
+            transform: translateY(-2px);
+        }
+
+        .share-modal-footer {
+            text-align: center;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--light2);
+        }
+
+        .share-modal-footer p {
+            color: var(--dark2);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .close-share-modal {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--light);
+            border: none;
+            color: var(--dark);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-share-modal:hover {
+            background: var(--error);
+            color: white;
+            transform: rotate(90deg);
+        }
+
         /* ===== FOOTER ===== */
         footer {
             background: linear-gradient(135deg, var(--dark), #1A2530);
@@ -1354,6 +1566,11 @@
             
             .files-grid {
                 grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            }
+            
+            .share-modal-content {
+                width: 95%;
+                padding: 2rem;
             }
         }
 
@@ -1480,6 +1697,20 @@
             
             .files-container {
                 padding: 1rem;
+            }
+            
+            /* Share modal responsive */
+            .share-modal-content {
+                padding: 1.5rem;
+                margin: 1rem;
+            }
+            
+            .share-options {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .share-url-input {
+                flex-direction: column;
             }
             
             /* Footer centré pour mobile */
@@ -1627,6 +1858,19 @@
             .footer-section a, .footer-section p {
                 font-size: 0.9rem;
             }
+            
+            /* Share modal mobile */
+            .share-options {
+                grid-template-columns: 1fr;
+            }
+            
+            .share-option {
+                padding: 1rem;
+            }
+            
+            .share-modal-header h2 {
+                font-size: 1.5rem;
+            }
         }
 
         @media (max-width: 360px) {
@@ -1705,6 +1949,65 @@
 <body>
     <!-- Overlay pour menu burger -->
     <div class="menu-overlay" id="menuOverlay"></div>
+
+    <!-- Modal de partage -->
+    <div class="share-modal" id="shareModal">
+        <div class="share-modal-content">
+            <button class="close-share-modal" id="closeShareModal">
+                <i class="fas fa-times"></i>
+            </button>
+            
+            <div class="share-modal-header">
+                <i class="fas fa-share-alt"></i>
+                <h2>Partagez PrimeAcademia !</h2>
+                <p>Aidez d'autres étudiants à bénéficier de ressources gratuites. Partagez cette plateforme avec vos amis et collègues.</p>
+            </div>
+            
+            <div class="share-options">
+                <div class="share-option whatsapp" data-platform="whatsapp">
+                    <i class="fab fa-whatsapp"></i>
+                    <span>WhatsApp</span>
+                </div>
+                
+                <div class="share-option facebook" data-platform="facebook">
+                    <i class="fab fa-facebook"></i>
+                    <span>Facebook</span>
+                </div>
+                
+                <div class="share-option telegram" data-platform="telegram">
+                    <i class="fab fa-telegram"></i>
+                    <span>Telegram</span>
+                </div>
+                
+                <div class="share-option twitter" data-platform="twitter">
+                    <i class="fab fa-twitter"></i>
+                    <span>Twitter</span>
+                </div>
+                
+                <div class="share-option copy" data-platform="copy">
+                    <i class="fas fa-copy"></i>
+                    <span>Copier le lien</span>
+                </div>
+            </div>
+            
+            <div class="share-url-container">
+                <p style="margin-bottom: 0.8rem; color: var(--dark); font-weight: 600;">Lien à partager :</p>
+                <div class="share-url-input">
+                    <input type="text" id="shareUrl" readonly value="https://primeacademia.com">
+                    <button id="copyUrlBtn">
+                        <i class="fas fa-copy"></i> Copier
+                    </button>
+                </div>
+            </div>
+            
+            <div class="share-modal-footer">
+                <p>Merci de contribuer à rendre l'éducation plus accessible !</p>
+                <button class="btn btn-primary" id="closeAndDownload">
+                    <i class="fas fa-download"></i> Continuer vers le téléchargement
+                </button>
+            </div>
+        </div>
+    </div>
 
     <header>
         <div class="container">
@@ -2938,6 +3241,14 @@
             'legal': 'legal-page'
         };
 
+        // Configuration du partage
+        const SHARE_CONFIG = {
+            url: window.location.href,
+            title: 'PrimeAcademia - Plateforme d\'Épreuves Académiques',
+            description: 'Accédez gratuitement à des épreuves académiques organisées par filière et année. Outils de préparation et conseils pour la réussite étudiante.',
+            hashtags: 'PrimeAcademia,Éducation,Gratuit,Épreuves,Étudiants,Réussite'
+        };
+
         // =============================================
         // VARIABLES GLOBALES
         // =============================================
@@ -2948,8 +3259,15 @@
         
         // Variables pour la pagination
         let currentPage = 1;
-        const itemsPerPage = 12; // 12 fichiers par page pour la grille
+        const itemsPerPage = 12;
         let filteredFiles = [];
+
+        // Variables pour le téléchargement avec partage
+        let pendingDownload = {
+            fileId: null,
+            fileName: null,
+            action: null
+        };
 
         // =============================================
         // ÉLÉMENTS DOM
@@ -3008,6 +3326,14 @@
         const lastPageBtn = document.getElementById('last-page');
         const pageInfo = document.getElementById('page-info');
 
+        // Modal de partage
+        const shareModal = document.getElementById('shareModal');
+        const closeShareModal = document.getElementById('closeShareModal');
+        const shareUrl = document.getElementById('shareUrl');
+        const copyUrlBtn = document.getElementById('copyUrlBtn');
+        const closeAndDownloadBtn = document.getElementById('closeAndDownload');
+        const shareOptions = document.querySelectorAll('.share-option');
+
         // =============================================
         // INITIALISATION
         // =============================================
@@ -3032,6 +3358,9 @@
             
             // Initialisation de la pagination
             setupPagination();
+            
+            // Initialisation du modal de partage
+            setupShareModal();
             
             console.log("✅ PrimeAcademia initialisé avec succès");
         });
@@ -3194,6 +3523,43 @@
             });
         }
 
+        function setupShareModal() {
+            // Bouton de fermeture
+            if (closeShareModal) {
+                closeShareModal.addEventListener('click', closeShareModalHandler);
+            }
+            
+            // Bouton copier URL
+            if (copyUrlBtn) {
+                copyUrlBtn.addEventListener('click', copyShareUrl);
+            }
+            
+            // Bouton continuer vers téléchargement
+            if (closeAndDownloadBtn) {
+                closeAndDownloadBtn.addEventListener('click', closeAndDownload);
+            }
+            
+            // Options de partage
+            shareOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    const platform = this.getAttribute('data-platform');
+                    shareOnPlatform(platform);
+                });
+            });
+            
+            // Fermer avec la touche Echap
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && shareModal.classList.contains('active')) {
+                    closeShareModalHandler();
+                }
+            });
+            
+            // Mettre à jour l'URL dans le modal
+            if (shareUrl) {
+                shareUrl.value = SHARE_CONFIG.url;
+            }
+        }
+
         // =============================================
         // FONCTIONNALITÉS PRINCIPALES
         // =============================================
@@ -3247,7 +3613,7 @@
             try {
                 showLoading();
                 await fetchDriveFiles();
-                filterFiles(); // Appliquer les filtres et pagination
+                filterFiles();
                 updateStats();
 
                 if (filesData.length === 0) {
@@ -3326,13 +3692,11 @@
                 return matchesSearch && matchesFiliere && matchesYear && matchesSemestre;
             });
 
-            // Réinitialiser à la première page après filtrage
             currentPage = 1;
             displayFiles();
         }
 
         function displayFiles() {
-            // Calculer les fichiers à afficher pour la page actuelle
             const startIndex = (currentPage - 1) * itemsPerPage;
             const endIndex = startIndex + itemsPerPage;
             const filesToDisplay = filteredFiles.slice(startIndex, endIndex);
@@ -3383,8 +3747,11 @@
                             <i class="far fa-calendar"></i> Ajouté le ${formattedDate}
                         </div>
                         <div class="file-actions">
-                            <button class="btn btn-primary" onclick="handleFileDownload('${file.id}', '${file.name}')">
+                            <button class="btn btn-primary" onclick="promptShare('${file.id}', '${file.name}', 'download')">
                                 <i class="fas fa-download"></i> Télécharger
+                            </button>
+                            <button class="btn btn-share" onclick="promptShare('${file.id}', '${file.name}', 'preview')">
+                                <i class="fas fa-share-alt"></i> Partager le site
                             </button>
                         </div>
                     </div>
@@ -3397,23 +3764,19 @@
         function updatePagination() {
             const totalPages = Math.ceil(filteredFiles.length / itemsPerPage);
             
-            // Afficher ou masquer la pagination
             if (totalPages > 1) {
                 paginationElement.style.display = 'flex';
             } else {
                 paginationElement.style.display = 'none';
             }
             
-            // Mettre à jour l'information de page
             pageInfo.textContent = `Page ${currentPage} sur ${totalPages}`;
             
-            // Activer/désactiver les boutons
             firstPageBtn.disabled = currentPage === 1;
             prevPageBtn.disabled = currentPage === 1;
             nextPageBtn.disabled = currentPage === totalPages;
             lastPageBtn.disabled = currentPage === totalPages;
             
-            // Ajouter/supprimer la classe disabled
             firstPageBtn.classList.toggle('disabled', currentPage === 1);
             prevPageBtn.classList.toggle('disabled', currentPage === 1);
             nextPageBtn.classList.toggle('disabled', currentPage === totalPages);
@@ -3429,7 +3792,6 @@
             currentPage = page;
             displayFiles();
             
-            // Faire défiler vers le haut de la grille
             filesGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
@@ -3439,11 +3801,10 @@
             const uniqueFilieres = new Set(filesData.map(file => file.filiere));
             totalFilieresElement.textContent = uniqueFilieres.size;
             
-            // Mise à jour du temps de mise à jour
             updateCounter--;
             if (updateCounter <= 0) {
                 updateCounter = 24 * 60 * 60;
-                loadFiles(); // Recharger les fichiers après 24h
+                loadFiles();
             }
             
             const hours = Math.floor(updateCounter / 3600);
@@ -3452,17 +3813,36 @@
         }
 
         // =============================================
-        // FONCTIONNALITÉS DE TÉLÉCHARGEMENT
+        // FONCTIONNALITÉS DE TÉLÉCHARGEMENT AVEC PARTAGE
         // =============================================
+
+        function promptShare(fileId, fileName, action) {
+            // Stocker les informations de téléchargement
+            pendingDownload = {
+                fileId: fileId,
+                fileName: fileName,
+                action: action
+            };
+            
+            // Afficher le modal de partage
+            openShareModal();
+            
+            // Mettre à jour le texte du bouton selon l'action
+            if (closeAndDownloadBtn) {
+                if (action === 'download') {
+                    closeAndDownloadBtn.innerHTML = '<i class="fas fa-download"></i> Continuer vers le téléchargement';
+                } else if (action === 'preview') {
+                    closeAndDownloadBtn.innerHTML = '<i class="fas fa-eye"></i> Continuer vers la prévisualisation';
+                }
+            }
+        }
 
         async function handleFileDownload(fileId, fileName) {
             try {
                 console.log(`📥 Tentative de téléchargement: ${fileName} (ID: ${fileId})`);
                 
-                // Afficher un indicateur de chargement
                 showDownloadLoading(fileName);
                 
-                // Méthode directe
                 const directDownloadUrl = `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&key=${DRIVE_CONFIG.apiKey}`;
                 
                 const response = await fetch(directDownloadUrl, {
@@ -3519,43 +3899,118 @@
             hideDownloadLoading();
         }
 
-        function showDownloadLoading(fileName) {
-            const loadingOverlay = document.createElement('div');
-            loadingOverlay.id = 'download-loading';
-            loadingOverlay.style.cssText = `
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0,0,0,0.7);
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                z-index: 10000;
-                color: white;
-                font-size: 1rem;
-                flex-direction: column;
-                padding: 20px;
-            `;
-            
-            loadingOverlay.innerHTML = `
-                <div style="text-align: center; max-width: 300px;">
-                    <i class="fas fa-spinner fa-spin" style="font-size: 2.5rem; margin-bottom: 1rem; color: var(--accent);"></i>
-                    <p>Préparation du téléchargement...</p>
-                    <p style="word-break: break-word;"><strong>${fileName}</strong></p>
-                    <p style="font-size: 0.85rem; margin-top: 1rem; opacity: 0.8;">Veuillez patienter</p>
-                </div>
-            `;
-            
-            document.body.appendChild(loadingOverlay);
+        function handleFilePreview(fileId, fileName) {
+            const previewUrl = `https://drive.google.com/file/d/${fileId}/view`;
+            window.open(previewUrl, '_blank');
         }
 
-        function hideDownloadLoading() {
-            const loadingOverlay = document.getElementById('download-loading');
-            if (loadingOverlay) {
-                loadingOverlay.remove();
+        // =============================================
+        // MODAL DE PARTAGE
+        // =============================================
+
+        function openShareModal() {
+            if (shareModal) {
+                shareModal.classList.add('active');
+                document.body.style.overflow = 'hidden';
             }
+        }
+
+        function closeShareModalHandler() {
+            if (shareModal) {
+                shareModal.classList.remove('active');
+                document.body.style.overflow = '';
+                
+                // Réinitialiser le téléchargement en attente
+                pendingDownload = {
+                    fileId: null,
+                    fileName: null,
+                    action: null
+                };
+            }
+        }
+
+        function closeAndDownload() {
+            closeShareModalHandler();
+            
+            // Exécuter l'action après un court délai
+            setTimeout(() => {
+                if (pendingDownload.fileId && pendingDownload.fileName) {
+                    if (pendingDownload.action === 'download') {
+                        handleFileDownload(pendingDownload.fileId, pendingDownload.fileName);
+                    } else if (pendingDownload.action === 'preview') {
+                        handleFilePreview(pendingDownload.fileId, pendingDownload.fileName);
+                    }
+                }
+            }, 300);
+        }
+
+        function shareOnPlatform(platform) {
+            const shareUrl = SHARE_CONFIG.url;
+            const shareTitle = SHARE_CONFIG.title;
+            const shareDescription = SHARE_CONFIG.description;
+            
+            let shareLink = '';
+            
+            switch(platform) {
+                case 'whatsapp':
+                    shareLink = `https://wa.me/?text=${encodeURIComponent(shareTitle + ' - ' + shareDescription + ' ' + shareUrl)}`;
+                    break;
+                    
+                case 'facebook':
+                    shareLink = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(shareDescription)}`;
+                    break;
+                    
+                case 'telegram':
+                    shareLink = `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareTitle + ' - ' + shareDescription)}`;
+                    break;
+                    
+                case 'twitter':
+                    shareLink = `https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareTitle)}&hashtags=${SHARE_CONFIG.hashtags}`;
+                    break;
+                    
+                case 'copy':
+                    copyShareUrl();
+                    return;
+            }
+            
+            if (shareLink) {
+                window.open(shareLink, '_blank', 'width=600,height=400');
+            }
+        }
+
+        function copyShareUrl() {
+            if (shareUrl) {
+                shareUrl.select();
+                shareUrl.setSelectionRange(0, 99999);
+                
+                try {
+                    navigator.clipboard.writeText(shareUrl.value).then(() => {
+                        showCopySuccess();
+                    }).catch(() => {
+                        fallbackCopy();
+                    });
+                } catch (error) {
+                    fallbackCopy();
+                }
+            }
+        }
+
+        function fallbackCopy() {
+            if (shareUrl) {
+                document.execCommand('copy');
+                showCopySuccess();
+            }
+        }
+
+        function showCopySuccess() {
+            const originalText = copyUrlBtn.innerHTML;
+            copyUrlBtn.innerHTML = '<i class="fas fa-check"></i> Copié !';
+            copyUrlBtn.style.background = 'var(--success)';
+            
+            setTimeout(() => {
+                copyUrlBtn.innerHTML = originalText;
+                copyUrlBtn.style.background = '';
+            }, 2000);
         }
 
         // =============================================
@@ -3757,6 +4212,45 @@
             return semestreNames[semestre] || semestre;
         }
 
+        function showDownloadLoading(fileName) {
+            const loadingOverlay = document.createElement('div');
+            loadingOverlay.id = 'download-loading';
+            loadingOverlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.7);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 10000;
+                color: white;
+                font-size: 1rem;
+                flex-direction: column;
+                padding: 20px;
+            `;
+            
+            loadingOverlay.innerHTML = `
+                <div style="text-align: center; max-width: 300px;">
+                    <i class="fas fa-spinner fa-spin" style="font-size: 2.5rem; margin-bottom: 1rem; color: var(--accent);"></i>
+                    <p>Préparation du téléchargement...</p>
+                    <p style="word-break: break-word;"><strong>${fileName}</strong></p>
+                    <p style="font-size: 0.85rem; margin-top: 1rem; opacity: 0.8;">Veuillez patienter</p>
+                </div>
+            `;
+            
+            document.body.appendChild(loadingOverlay);
+        }
+
+        function hideDownloadLoading() {
+            const loadingOverlay = document.getElementById('download-loading');
+            if (loadingOverlay) {
+                loadingOverlay.remove();
+            }
+        }
+
         // Gestion des états d'affichage
         function showLoading() {
             if (loadingElement) loadingElement.style.display = 'block';
@@ -3819,19 +4313,18 @@
         // =============================================
 
         window.handleFileDownload = handleFileDownload;
+        window.promptShare = promptShare;
 
         // =============================================
         // MISE À JOUR AUTOMATIQUE
         // =============================================
 
-        // Mettre à jour le compteur toutes les secondes
         setInterval(updateStats, 1000);
 
         // =============================================
         // GESTION DU RESPONSIVE
         // =============================================
 
-        // Fermer le menu burger quand la fenêtre est redimensionnée au-dessus de 768px
         window.addEventListener('resize', function() {
             if (window.innerWidth > 768 && mainNav.classList.contains('active')) {
                 closeBurgerMenu();
