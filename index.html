@@ -496,7 +496,6 @@
             box-shadow: var(--shadow);
             border: 1px solid rgba(74, 111, 165, 0.1);
             width: 100%;
-            overflow-x: auto;
         }
 
         .loading, .error, .empty-state {
@@ -532,74 +531,89 @@
             color: var(--dark);
         }
 
-        /* ===== TABLE VIEW ===== */
-        .table-view {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
+        /* ===== FILE GRID VIEW ===== */
+        .files-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
             margin-top: 1rem;
-            font-size: 0.9rem;
-            background: white;
-            border-radius: var(--radius);
-            overflow: hidden;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-            min-width: 600px;
+            width: 100%;
         }
 
-        .table-view th {
+        .file-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            border: 1px solid rgba(74, 111, 165, 0.1);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .file-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: var(--shadow-hover);
+            border-color: var(--primary);
+        }
+
+        .file-card-header {
             background: linear-gradient(135deg, var(--primary), var(--accent3));
             color: white;
-            padding: 1rem;
-            text-align: left;
-            font-weight: 600;
-            white-space: nowrap;
-            font-size: 0.9rem;
+            padding: 1.2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
         }
 
-        .table-view td {
-            padding: 1rem;
-            border-bottom: 1px solid rgba(74, 111, 165, 0.1);
-            transition: var(--transition);
-            white-space: nowrap;
+        .file-card-header i {
+            font-size: 1.5rem;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
         }
 
-        .table-view tr {
-            transition: var(--transition);
+        .file-card-body {
+            padding: 1.5rem;
+            flex-grow: 1;
         }
 
-        .table-view tr:hover {
-            background: rgba(74, 111, 165, 0.05);
+        .file-card-body h3 {
+            margin-bottom: 1rem;
+            color: var(--dark);
+            font-size: 1.1rem;
+            line-height: 1.4;
+            word-break: break-word;
         }
 
-        .file-link {
-            color: var(--primary);
-            text-decoration: none;
+        .file-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .file-meta span {
             display: flex;
             align-items: center;
-            gap: 8px;
-            transition: var(--transition);
-            font-weight: 600;
-            padding: 6px 10px;
-            border-radius: var(--radius-sm);
-            white-space: normal;
+            gap: 10px;
+            color: var(--dark2);
             font-size: 0.9rem;
         }
 
-        .file-link:hover {
-            background: rgba(74, 111, 165, 0.1);
-            color: var(--accent2);
-            transform: translateX(5px);
-        }
-
-        .file-icon {
-            font-size: 1rem;
+        .file-meta i {
             color: var(--accent);
-            transition: var(--transition);
+            width: 16px;
             flex-shrink: 0;
         }
 
-        .file-link:hover .file-icon {
-            transform: scale(1.2) rotate(10deg);
+        .file-card-footer {
+            padding: 1.2rem;
+            background: var(--light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid rgba(74, 111, 165, 0.1);
         }
 
         .file-badge {
@@ -607,7 +621,6 @@
             border-radius: 20px;
             font-size: 0.7rem;
             font-weight: 600;
-            margin-left: 8px;
             white-space: nowrap;
         }
 
@@ -1174,7 +1187,6 @@
             padding: 3rem 0 1.5rem;
             margin-top: 3rem;
             width: 100%;
-            overflow: hidden;
         }
 
         .footer-links {
@@ -1186,7 +1198,6 @@
 
         .footer-section {
             min-width: 0;
-            overflow: hidden;
         }
 
         .footer-section h3 {
@@ -1216,7 +1227,6 @@
             padding: 6px 0;
             font-size: 0.95rem;
             word-wrap: break-word;
-            overflow-wrap: break-word;
         }
 
         .footer-section a:hover {
@@ -1261,6 +1271,10 @@
         @media (max-width: 1024px) {
             .page-title h1 {
                 font-size: 1.8rem;
+            }
+            
+            .files-grid {
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             }
             
             .footer-links {
@@ -1349,12 +1363,12 @@
                 grid-template-columns: 1fr;
             }
             
-            .table-view {
-                font-size: 0.8rem;
+            .files-grid {
+                grid-template-columns: 1fr;
             }
             
-            .table-view th, .table-view td {
-                padding: 0.8rem;
+            .file-card-body h3 {
+                font-size: 1rem;
             }
             
             .article-detail {
@@ -1437,15 +1451,10 @@
                 font-size: 2rem;
             }
             
-            .table-view th,
-            .table-view td {
-                padding: 0.8rem 0.5rem;
-                font-size: 0.75rem;
-            }
-            
-            .file-link {
-                font-size: 0.75rem;
-                padding: 4px 6px;
+            .file-card-header,
+            .file-card-body,
+            .file-card-footer {
+                padding: 1rem;
             }
             
             .article-card {
@@ -1530,13 +1539,8 @@
                 font-size: 1rem;
             }
             
-            .table-view th, .table-view td {
-                padding: 0.6rem 0.4rem;
-                font-size: 0.7rem;
-            }
-            
-            .file-link {
-                font-size: 0.7rem;
+            .file-card-body h3 {
+                font-size: 0.95rem;
             }
             
             .article-content h3 {
@@ -1664,7 +1668,6 @@
                     <li><strong>Années académiques</strong> : Année 1, Année 2, Année 3 pour l'université - 6ème à Terminale pour le collège</li>
                     <li><strong>Semestres</strong> : Semestre 1 et Semestre 2 pour chaque année universitaire</li>
                     <li><strong>Recherche textuelle</strong> : Trouvez rapidement un document spécifique</li>
-                    <li><strong>Affichage personnalisable</strong> : Tableau ou cartes selon vos préférences</li>
                 </ul>
                 
                 <h3>Mise à Jour Automatique</h3>
@@ -1756,7 +1759,7 @@
                     <i class="fas fa-exclamation-triangle"></i>
                     <h2>Erreur de chargement</h2>
                     <p>Impossible de récupérer les fichiers depuis Google Drive.</p>
-                    <button id="retry-btn" class="btn btn-primary" style="margin-top: 15px;">
+                    <button id="retry-btn" class="btn" style="margin-top: 15px;">
                         <i class="fas fa-redo"></i> Réessayer
                     </button>
                 </div>
@@ -1767,22 +1770,8 @@
                     <p>Les fichiers apparaîtront ici une fois ajoutés à Google Drive.</p>
                 </div>
 
-                <div id="files-content" style="display: none;">
-                    <table class="table-view" id="table-view">
-                        <thead>
-                            <tr>
-                                <th>Nom du fichier</th>
-                                <th>Filière</th>
-                                <th>Année</th>
-                                <th>Semestre</th>
-                                <th>Type</th>
-                                <th>Ajouté</th>
-                            </tr>
-                        </thead>
-                        <tbody id="files-table-body">
-                            <!-- Les fichiers seront ajoutés ici dynamiquement -->
-                        </tbody>
-                    </table>
+                <div class="files-grid" id="files-grid">
+                    <!-- Les fichiers seront ajoutés ici dynamiquement -->
                 </div>
             </div>
         </div>
@@ -1917,7 +1906,7 @@
                     <i class="fas fa-exclamation-triangle"></i>
                     <h2>Erreur de chargement</h2>
                     <p>Impossible de récupérer les livres depuis Google Drive.</p>
-                    <button id="books-retry-btn" class="btn btn-primary" style="margin-top: 15px;">
+                    <button id="books-retry-btn" class="btn" style="margin-top: 15px;">
                         <i class="fas fa-redo"></i> Réessayer
                     </button>
                 </div>
@@ -2080,7 +2069,7 @@
                             <textarea id="message" name="message" required></textarea>
                         </div>
 
-                        <button type="submit" class="btn btn-primary">
+                        <button type="submit" class="btn">
                             <i class="fas fa-paper-plane"></i> Envoyer le Message
                         </button>
                     </form>
@@ -2837,8 +2826,7 @@
         const loadingElement = document.getElementById('loading');
         const errorElement = document.getElementById('error');
         const emptyStateElement = document.getElementById('empty-state');
-        const filesContentElement = document.getElementById('files-content');
-        const filesTableBody = document.getElementById('files-table-body');
+        const filesGrid = document.getElementById('files-grid');
         const totalFilesElement = document.getElementById('total-files');
         const totalFilieresElement = document.getElementById('total-filieres');
         const updateTimeElement = document.getElementById('update-time');
@@ -2863,7 +2851,7 @@
         const contactError = document.getElementById('contact-error');
 
         // Librairie
-        const booksGrid = document.getElementById('books-grid');
+        const booksGridElement = document.getElementById('books-grid');
         const booksEmptyState = document.getElementById('books-empty-state');
         const booksLoading = document.getElementById('books-loading');
         const booksError = document.getElementById('books-error');
@@ -3186,28 +3174,19 @@
         }
 
         function displayFiles(files) {
-            displayFilesAsTable(files);
-        }
-
-        function displayFilesAsTable(files) {
-            filesTableBody.innerHTML = '';
+            filesGrid.innerHTML = '';
 
             if (files.length === 0) {
-                filesTableBody.innerHTML = `
-                    <tr>
-                        <td colspan="6" style="text-align: center; padding: 2rem;">
-                            <i class="fas fa-search" style="font-size: 2rem; margin-bottom: 1rem; color: var(--accent3);"></i>
-                            <p style="color: var(--dark2); font-size: 1rem;">Aucun fichier trouvé avec ces critères.</p>
-                        </td>
-                    </tr>
+                filesGrid.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 2rem;">
+                        <i class="fas fa-search" style="font-size: 2rem; margin-bottom: 1rem; color: var(--accent3);"></i>
+                        <p style="color: var(--dark2); font-size: 1rem;">Aucun fichier trouvé avec ces critères.</p>
+                    </div>
                 `;
                 return;
             }
 
             files.forEach(file => {
-                const row = document.createElement('tr');
-                if (file.isNew) row.classList.add('new-file');
-
                 const createdDate = new Date(file.createdTime);
                 const formattedDate = createdDate.toLocaleDateString('fr-FR', {
                     day: '2-digit',
@@ -3215,21 +3194,32 @@
                     year: 'numeric'
                 });
 
-                row.innerHTML = `
-                    <td>
+                const card = document.createElement('div');
+                card.className = 'file-card';
+                if (file.isNew) card.classList.add('new-file');
+
+                card.innerHTML = `
+                    <div class="file-card-header">
+                        <i class="${file.iconLink}"></i>
+                        <span>${file.type}</span>
+                        ${file.isNew ? '<span class="file-badge new">Nouveau</span>' : ''}
+                    </div>
+                    <div class="file-card-body">
+                        <h3>${file.name}</h3>
+                        <div class="file-meta">
+                            <span><i class="fas fa-graduation-cap"></i> ${formatFiliere(file.filiere)}</span>
+                            <span><i class="fas fa-calendar"></i> ${formatYear(file.year)}</span>
+                            <span><i class="fas fa-book"></i> ${formatSemestre(file.semestre)}</span>
+                        </div>
+                    </div>
+                    <div class="file-card-footer">
+                        <span>${formattedDate}</span>
                         <a href="#" class="file-link" onclick="handleFileDownload('${file.id}', '${file.name}')">
-                            <i class="${file.iconLink} file-icon"></i>
-                            <span style="overflow: hidden; text-overflow: ellipsis;">${file.name}</span>
-                            ${file.isNew ? '<span class="file-badge new">Nouveau</span>' : ''}
+                            <i class="fas fa-download"></i> Télécharger
                         </a>
-                    </td>
-                    <td>${formatFiliere(file.filiere)}</td>
-                    <td>${formatYear(file.year)}</td>
-                    <td>${formatSemestre(file.semestre)}</td>
-                    <td><span style="padding: 4px 10px; background: rgba(74, 111, 165, 0.1); border-radius: 20px; font-weight: 500; font-size: 0.85rem;">${file.type}</span></td>
-                    <td>${formattedDate}</td>
+                    </div>
                 `;
-                filesTableBody.appendChild(row);
+                filesGrid.appendChild(card);
             });
         }
 
@@ -3421,7 +3411,7 @@
         }
 
         function displayBooks() {
-            booksGrid.innerHTML = '';
+            booksGridElement.innerHTML = '';
 
             booksData.forEach(book => {
                 const bookCard = document.createElement('div');
@@ -3448,7 +3438,7 @@
                         </div>
                     </div>
                 `;
-                booksGrid.appendChild(bookCard);
+                booksGridElement.appendChild(bookCard);
             });
         }
 
@@ -3566,56 +3556,56 @@
             if (loadingElement) loadingElement.style.display = 'block';
             if (errorElement) errorElement.style.display = 'none';
             if (emptyStateElement) emptyStateElement.style.display = 'none';
-            if (filesContentElement) filesContentElement.style.display = 'none';
+            if (filesGrid) filesGrid.style.display = 'none';
         }
 
         function showError() {
             if (loadingElement) loadingElement.style.display = 'none';
             if (errorElement) errorElement.style.display = 'block';
             if (emptyStateElement) emptyStateElement.style.display = 'none';
-            if (filesContentElement) filesContentElement.style.display = 'none';
+            if (filesGrid) filesGrid.style.display = 'none';
         }
 
         function showEmptyState() {
             if (loadingElement) loadingElement.style.display = 'none';
             if (errorElement) errorElement.style.display = 'none';
             if (emptyStateElement) emptyStateElement.style.display = 'block';
-            if (filesContentElement) filesContentElement.style.display = 'none';
+            if (filesGrid) filesGrid.style.display = 'none';
         }
 
         function showContent() {
             if (loadingElement) loadingElement.style.display = 'none';
             if (errorElement) errorElement.style.display = 'none';
             if (emptyStateElement) emptyStateElement.style.display = 'none';
-            if (filesContentElement) filesContentElement.style.display = 'block';
+            if (filesGrid) filesGrid.style.display = 'grid';
         }
 
         function showBooksLoading() {
             if (booksLoading) booksLoading.style.display = 'block';
             if (booksError) booksError.style.display = 'none';
             if (booksEmptyState) booksEmptyState.style.display = 'none';
-            if (booksGrid) booksGrid.style.display = 'none';
+            if (booksGridElement) booksGridElement.style.display = 'none';
         }
 
         function showBooksError() {
             if (booksLoading) booksLoading.style.display = 'none';
             if (booksError) booksError.style.display = 'block';
             if (booksEmptyState) booksEmptyState.style.display = 'none';
-            if (booksGrid) booksGrid.style.display = 'none';
+            if (booksGridElement) booksGridElement.style.display = 'none';
         }
 
         function showBooksEmptyState() {
             if (booksLoading) booksLoading.style.display = 'none';
             if (booksError) booksError.style.display = 'none';
             if (booksEmptyState) booksEmptyState.style.display = 'block';
-            if (booksGrid) booksGrid.style.display = 'none';
+            if (booksGridElement) booksGridElement.style.display = 'none';
         }
 
         function showBooksContent() {
             if (booksLoading) booksLoading.style.display = 'none';
             if (booksError) booksError.style.display = 'none';
             if (booksEmptyState) booksEmptyState.style.display = 'none';
-            if (booksGrid) booksGrid.style.display = 'grid';
+            if (booksGridElement) booksGridElement.style.display = 'grid';
         }
 
         // =============================================
