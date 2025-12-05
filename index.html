@@ -532,90 +532,123 @@
             color: var(--dark);
         }
 
-        /* ===== TABLE VIEW ===== */
-        .table-view {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
+        /* ===== FILES GRID ===== */
+        .files-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
             margin-top: 1rem;
-            font-size: 0.9rem;
+            width: 100%;
+        }
+
+        .file-card {
             background: white;
-            border-radius: var(--radius);
+            border-radius: var(--radius-lg);
             overflow: hidden;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-            min-width: 600px;
-        }
-
-        .table-view th {
-            background: linear-gradient(135deg, var(--primary), var(--accent3));
-            color: white;
-            padding: 1rem;
-            text-align: left;
-            font-weight: 600;
-            white-space: nowrap;
-            font-size: 0.9rem;
-        }
-
-        .table-view td {
-            padding: 1rem;
-            border-bottom: 1px solid rgba(74, 111, 165, 0.1);
+            box-shadow: var(--shadow);
             transition: var(--transition);
-            white-space: nowrap;
-        }
-
-        .table-view tr {
-            transition: var(--transition);
-        }
-
-        .table-view tr:hover {
-            background: rgba(74, 111, 165, 0.05);
-        }
-
-        .file-link {
-            color: var(--primary);
-            text-decoration: none;
+            border: 1px solid rgba(74, 111, 165, 0.1);
+            position: relative;
             display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: var(--transition);
-            font-weight: 600;
-            padding: 6px 10px;
-            border-radius: var(--radius-sm);
-            white-space: normal;
-            font-size: 0.9rem;
+            flex-direction: column;
         }
 
-        .file-link:hover {
-            background: rgba(74, 111, 165, 0.1);
-            color: var(--accent2);
-            transform: translateX(5px);
+        .file-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-hover);
+            border-color: var(--accent);
         }
 
-        .file-icon {
-            font-size: 1rem;
-            color: var(--accent);
-            transition: var(--transition);
-            flex-shrink: 0;
-        }
-
-        .file-link:hover .file-icon {
-            transform: scale(1.2) rotate(10deg);
-        }
-
-        .file-badge {
-            padding: 3px 10px;
+        .file-card.new-file::before {
+            content: 'Nouveau';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: linear-gradient(135deg, var(--success), #2ECC71);
+            color: white;
+            padding: 4px 12px;
             border-radius: 20px;
             font-size: 0.7rem;
             font-weight: 600;
-            margin-left: 8px;
-            white-space: nowrap;
+            z-index: 2;
+            animation: pulse 2s infinite;
+            box-shadow: 0 3px 10px rgba(39, 174, 96, 0.3);
         }
 
-        .file-badge.new {
-            background: linear-gradient(135deg, var(--success), #2ECC71);
+        .file-header {
+            background: linear-gradient(135deg, var(--primary), var(--accent3));
+            padding: 1.5rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .file-header i {
+            font-size: 2.5rem;
             color: white;
-            box-shadow: 0 3px 10px rgba(39, 174, 96, 0.3);
-            animation: pulse 2s infinite;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .file-content {
+            padding: 1.5rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .file-content h3 {
+            margin-bottom: 1rem;
+            color: var(--dark);
+            font-size: 1.1rem;
+            line-height: 1.4;
+            flex: 1;
+        }
+
+        .file-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .file-meta span {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--dark2);
+            font-size: 0.9rem;
+        }
+
+        .file-meta i {
+            color: var(--accent);
+            width: 16px;
+        }
+
+        .file-type {
+            display: inline-block;
+            padding: 4px 12px;
+            background: rgba(74, 111, 165, 0.1);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--primary);
+            margin-top: 0.5rem;
+        }
+
+        .file-date {
+            font-size: 0.85rem;
+            color: var(--dark2);
+            margin-top: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .file-actions {
+            margin-top: auto;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(74, 111, 165, 0.1);
         }
 
         /* ===== PAGINATION ===== */
@@ -1318,6 +1351,10 @@
             .footer-links {
                 grid-template-columns: repeat(2, 1fr);
             }
+            
+            .files-grid {
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            }
         }
 
         @media (max-width: 768px) {
@@ -1401,12 +1438,8 @@
                 grid-template-columns: 1fr;
             }
             
-            .table-view {
-                font-size: 0.8rem;
-            }
-            
-            .table-view th, .table-view td {
-                padding: 0.8rem;
+            .files-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
             }
             
             .article-detail {
@@ -1505,15 +1538,25 @@
                 font-size: 2rem;
             }
             
-            .table-view th,
-            .table-view td {
-                padding: 0.8rem 0.5rem;
-                font-size: 0.75rem;
+            .files-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
             }
             
-            .file-link {
-                font-size: 0.75rem;
-                padding: 4px 6px;
+            .file-card {
+                margin-bottom: 0.5rem;
+            }
+            
+            .file-header {
+                padding: 1.2rem;
+            }
+            
+            .file-content {
+                padding: 1.2rem;
+            }
+            
+            .file-content h3 {
+                font-size: 1rem;
             }
             
             .article-card {
@@ -1599,13 +1642,12 @@
                 font-size: 1rem;
             }
             
-            .table-view th, .table-view td {
-                padding: 0.6rem 0.4rem;
-                font-size: 0.7rem;
+            .files-grid {
+                grid-template-columns: 1fr;
             }
             
-            .file-link {
-                font-size: 0.7rem;
+            .file-content h3 {
+                font-size: 0.95rem;
             }
             
             .article-content h3 {
@@ -1837,21 +1879,10 @@
                 </div>
 
                 <div id="files-content" style="display: none;">
-                    <table class="table-view" id="table-view">
-                        <thead>
-                            <tr>
-                                <th>Nom du fichier</th>
-                                <th>Filière</th>
-                                <th>Année</th>
-                                <th>Semestre</th>
-                                <th>Type</th>
-                                <th>Ajouté</th>
-                            </tr>
-                        </thead>
-                        <tbody id="files-table-body">
-                            <!-- Les fichiers seront ajoutés ici dynamiquement -->
-                        </tbody>
-                    </table>
+                    <!-- Grille de fichiers -->
+                    <div class="files-grid" id="files-grid">
+                        <!-- Les fichiers seront ajoutés ici dynamiquement -->
+                    </div>
                     
                     <!-- Pagination -->
                     <div class="pagination" id="pagination" style="display: none;">
@@ -2917,7 +2948,7 @@
         
         // Variables pour la pagination
         let currentPage = 1;
-        const itemsPerPage = 10;
+        const itemsPerPage = 12; // 12 fichiers par page pour la grille
         let filteredFiles = [];
 
         // =============================================
@@ -2929,7 +2960,7 @@
         const errorElement = document.getElementById('error');
         const emptyStateElement = document.getElementById('empty-state');
         const filesContentElement = document.getElementById('files-content');
-        const filesTableBody = document.getElementById('files-table-body');
+        const filesGrid = document.getElementById('files-grid');
         const totalFilesElement = document.getElementById('total-files');
         const totalFilieresElement = document.getElementById('total-filieres');
         const updateTimeElement = document.getElementById('update-time');
@@ -3306,28 +3337,28 @@
             const endIndex = startIndex + itemsPerPage;
             const filesToDisplay = filteredFiles.slice(startIndex, endIndex);
             
-            displayFilesAsTable(filesToDisplay);
+            displayFilesAsGrid(filesToDisplay);
             updatePagination();
         }
 
-        function displayFilesAsTable(files) {
-            filesTableBody.innerHTML = '';
+        function displayFilesAsGrid(files) {
+            filesGrid.innerHTML = '';
 
             if (files.length === 0) {
-                filesTableBody.innerHTML = `
-                    <tr>
-                        <td colspan="6" style="text-align: center; padding: 2rem;">
-                            <i class="fas fa-search" style="font-size: 2rem; margin-bottom: 1rem; color: var(--accent3);"></i>
-                            <p style="color: var(--dark2); font-size: 1rem;">Aucun fichier trouvé avec ces critères.</p>
-                        </td>
-                    </tr>
+                filesGrid.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 3rem 1rem;">
+                        <i class="fas fa-search" style="font-size: 2.5rem; margin-bottom: 1rem; color: var(--accent3);"></i>
+                        <h3 style="color: var(--dark); margin-bottom: 0.5rem;">Aucun fichier trouvé</h3>
+                        <p style="color: var(--dark2);">Essayez de modifier vos critères de recherche</p>
+                    </div>
                 `;
                 return;
             }
 
             files.forEach(file => {
-                const row = document.createElement('tr');
-                if (file.isNew) row.classList.add('new-file');
+                const fileCard = document.createElement('div');
+                fileCard.className = 'file-card';
+                if (file.isNew) fileCard.classList.add('new-file');
 
                 const createdDate = new Date(file.createdTime);
                 const formattedDate = createdDate.toLocaleDateString('fr-FR', {
@@ -3336,21 +3367,29 @@
                     year: 'numeric'
                 });
 
-                row.innerHTML = `
-                    <td>
-                        <a href="#" class="file-link" onclick="handleFileDownload('${file.id}', '${file.name}')">
-                            <i class="${file.iconLink} file-icon"></i>
-                            <span style="overflow: hidden; text-overflow: ellipsis;">${file.name}</span>
-                            ${file.isNew ? '<span class="file-badge new">Nouveau</span>' : ''}
-                        </a>
-                    </td>
-                    <td>${formatFiliere(file.filiere)}</td>
-                    <td>${formatYear(file.year)}</td>
-                    <td>${formatSemestre(file.semestre)}</td>
-                    <td><span style="padding: 4px 10px; background: rgba(74, 111, 165, 0.1); border-radius: 20px; font-weight: 500; font-size: 0.85rem;">${file.type}</span></td>
-                    <td>${formattedDate}</td>
+                fileCard.innerHTML = `
+                    <div class="file-header">
+                        <i class="${file.iconLink}"></i>
+                    </div>
+                    <div class="file-content">
+                        <h3>${file.name}</h3>
+                        <div class="file-meta">
+                            <span><i class="fas fa-graduation-cap"></i> ${formatFiliere(file.filiere)}</span>
+                            <span><i class="fas fa-calendar-alt"></i> ${formatYear(file.year)}</span>
+                            <span><i class="fas fa-book"></i> ${formatSemestre(file.semestre)}</span>
+                        </div>
+                        <span class="file-type">${file.type}</span>
+                        <div class="file-date">
+                            <i class="far fa-calendar"></i> Ajouté le ${formattedDate}
+                        </div>
+                        <div class="file-actions">
+                            <button class="btn btn-primary" onclick="handleFileDownload('${file.id}', '${file.name}')">
+                                <i class="fas fa-download"></i> Télécharger
+                            </button>
+                        </div>
+                    </div>
                 `;
-                filesTableBody.appendChild(row);
+                filesGrid.appendChild(fileCard);
             });
         }
 
@@ -3390,8 +3429,8 @@
             currentPage = page;
             displayFiles();
             
-            // Faire défiler vers le haut du tableau
-            filesTableBody.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            // Faire défiler vers le haut de la grille
+            filesGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
         // STATISTIQUES
