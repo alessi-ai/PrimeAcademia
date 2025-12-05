@@ -52,6 +52,8 @@
             transition: var(--transition);
             overflow-x: hidden;
             min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
         .container {
@@ -207,6 +209,7 @@
         main {
             min-height: calc(100vh - 200px);
             padding: 2rem 0;
+            flex: 1;
         }
 
         .page-section {
@@ -629,6 +632,72 @@
             color: white;
             box-shadow: 0 3px 10px rgba(39, 174, 96, 0.3);
             animation: pulse 2s infinite;
+        }
+
+        /* ===== PAGINATION ===== */
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(74, 111, 165, 0.1);
+            width: 100%;
+        }
+
+        .pagination {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .pagination-btn {
+            min-width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            border: 1px solid rgba(74, 111, 165, 0.2);
+            border-radius: var(--radius-sm);
+            color: var(--dark);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            padding: 0 12px;
+        }
+
+        .pagination-btn:hover:not(.disabled):not(.active) {
+            background: var(--light);
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .pagination-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(74, 111, 165, 0.3);
+        }
+
+        .pagination-btn.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .pagination-dots {
+            display: flex;
+            align-items: center;
+            padding: 0 8px;
+            color: var(--dark2);
+        }
+
+        .pagination-info {
+            margin-left: 1.5rem;
+            color: var(--dark2);
+            font-size: 0.9rem;
+            white-space: nowrap;
         }
 
         /* ===== ARTICLES ===== */
@@ -1185,19 +1254,29 @@
             background: linear-gradient(135deg, var(--dark), #1A2530);
             color: white;
             padding: 3rem 0 1.5rem;
-            margin-top: 3rem;
+            margin-top: auto;
             width: 100%;
+        }
+
+        .footer-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
         }
 
         .footer-links {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 2rem;
             margin-bottom: 2rem;
+            width: 100%;
+            justify-items: center;
         }
 
         .footer-section {
-            min-width: 0;
+            width: 100%;
+            max-width: 300px;
         }
 
         .footer-section h3 {
@@ -1206,13 +1285,15 @@
             font-size: 1.2rem;
             position: relative;
             padding-bottom: 10px;
+            text-align: center;
         }
 
         .footer-section h3::after {
             content: '';
             position: absolute;
             bottom: 0;
-            left: 0;
+            left: 50%;
+            transform: translateX(-50%);
             width: 40px;
             height: 3px;
             background: var(--accent);
@@ -1227,6 +1308,7 @@
             padding: 6px 0;
             font-size: 0.95rem;
             word-wrap: break-word;
+            text-align: center;
         }
 
         .footer-section a:hover {
@@ -1240,6 +1322,7 @@
             gap: 1.5rem;
             margin-bottom: 2rem;
             flex-wrap: wrap;
+            width: 100%;
         }
 
         .legal-links a {
@@ -1369,6 +1452,16 @@
             
             .file-card-body h3 {
                 font-size: 1rem;
+            }
+            
+            .pagination-container {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+            
+            .pagination-info {
+                margin-left: 0;
             }
             
             .article-detail {
@@ -1773,6 +1866,14 @@
                 <div class="files-grid" id="files-grid">
                     <!-- Les fichiers seront ajoutés ici dynamiquement -->
                 </div>
+                
+                <!-- Pagination -->
+                <div class="pagination-container" id="pagination-container" style="display: none;">
+                    <div class="pagination" id="pagination">
+                        <!-- Les boutons de pagination seront ajoutés ici dynamiquement -->
+                    </div>
+                    <div class="pagination-info" id="pagination-info"></div>
+                </div>
             </div>
         </div>
 
@@ -1919,6 +2020,14 @@
 
                 <div class="books-grid" id="books-grid">
                     <!-- Les livres seront ajoutés ici dynamiquement -->
+                </div>
+                
+                <!-- Pagination pour les livres -->
+                <div class="pagination-container" id="books-pagination-container" style="display: none;">
+                    <div class="pagination" id="books-pagination">
+                        <!-- Les boutons de pagination seront ajoutés ici dynamiquement -->
+                    </div>
+                    <div class="pagination-info" id="books-pagination-info"></div>
                 </div>
             </div>
         </div>
@@ -2672,40 +2781,42 @@
 
     <footer>
         <div class="container">
-            <div class="footer-links">
-                <div class="footer-section">
-                    <h3>PrimeAcademia</h3>
-                    <p>Plateforme éducative de partage de ressources académiques pour les étudiants. Accès gratuit aux épreuves organisées par filière, année et semestre.</p>
+            <div class="footer-content">
+                <div class="footer-links">
+                    <div class="footer-section">
+                        <h3>PrimeAcademia</h3>
+                        <p>Plateforme éducative de partage de ressources académiques pour les étudiants. Accès gratuit aux épreuves organisées par filière, année et semestre.</p>
+                    </div>
+                    <div class="footer-section">
+                        <h3>Navigation</h3>
+                        <a href="#" class="nav-link" data-page="home">Accueil</a>
+                        <a href="#" class="nav-link" data-page="articles">Articles</a>
+                        <a href="#" class="nav-link" data-page="librairie">Librairie</a>
+                        <a href="#" class="nav-link" data-page="about">À propos</a>
+                        <a href="#" class="nav-link" data-page="contact">Contact</a>
+                    </div>
+                    <div class="footer-section">
+                        <h3>Légal</h3>
+                        <a href="#" class="nav-link" data-page="privacy">Politique de confidentialité</a>
+                        <a href="#" class="nav-link" data-page="legal">Mentions légales</a>
+                    </div>
+                    <div class="footer-section">
+                        <h3>Contact</h3>
+                        <a href="mailto:primeacademia071@gmail.com">primeacademia071@gmail.com</a>
+                        <a href="https://wa.me/22941733286" target="_blank">WhatsApp: +229 41733286</a>
+                        <p>Support étudiant dédié</p>
+                    </div>
                 </div>
-                <div class="footer-section">
-                    <h3>Navigation</h3>
-                    <a href="#" class="nav-link" data-page="home">Accueil</a>
-                    <a href="#" class="nav-link" data-page="articles">Articles</a>
-                    <a href="#" class="nav-link" data-page="librairie">Librairie</a>
-                    <a href="#" class="nav-link" data-page="about">À propos</a>
-                    <a href="#" class="nav-link" data-page="contact">Contact</a>
-                </div>
-                <div class="footer-section">
-                    <h3>Légal</h3>
+                
+                <div class="legal-links">
                     <a href="#" class="nav-link" data-page="privacy">Politique de confidentialité</a>
                     <a href="#" class="nav-link" data-page="legal">Mentions légales</a>
+                    <a href="#" class="nav-link" data-page="contact">Contact</a>
                 </div>
-                <div class="footer-section">
-                    <h3>Contact</h3>
-                    <a href="mailto:primeacademia071@gmail.com">primeacademia071@gmail.com</a>
-                    <a href="https://wa.me/22941733286" target="_blank">WhatsApp: +229 41733286</a>
-                    <p>Support étudiant dédié</p>
+                
+                <div class="copyright">
+                    <p>&copy; 2025 PrimeAcademia. Tous droits réservés. | Plateforme éducative à but non lucratif</p>
                 </div>
-            </div>
-            
-            <div class="legal-links">
-                <a href="#" class="nav-link" data-page="privacy">Politique de confidentialité</a>
-                <a href="#" class="nav-link" data-page="legal">Mentions légales</a>
-                <a href="#" class="nav-link" data-page="contact">Contact</a>
-            </div>
-            
-            <div class="copyright">
-                <p>&copy; 2025 PrimeAcademia. Tous droits réservés. | Plateforme éducative à but non lucratif</p>
             </div>
         </div>
     </footer>
@@ -2817,6 +2928,12 @@
         let filesData = [];
         let booksData = [];
         let updateCounter = 24 * 60 * 60;
+        
+        // Variables pour la pagination
+        let currentPage = 1;
+        let itemsPerPage = 9;
+        let currentBooksPage = 1;
+        let booksItemsPerPage = 8;
 
         // =============================================
         // ÉLÉMENTS DOM
@@ -2865,6 +2982,14 @@
 
         // Logo pour navigation
         const logo = document.querySelector('.logo');
+
+        // Pagination
+        const paginationContainer = document.getElementById('pagination-container');
+        const paginationElement = document.getElementById('pagination');
+        const paginationInfo = document.getElementById('pagination-info');
+        const booksPaginationContainer = document.getElementById('books-pagination-container');
+        const booksPaginationElement = document.getElementById('books-pagination');
+        const booksPaginationInfo = document.getElementById('books-pagination-info');
 
         // =============================================
         // INITIALISATION
@@ -3098,6 +3223,7 @@
                     showEmptyState();
                 } else {
                     showContent();
+                    filterFiles(); // Appliquer les filtres et la pagination
                 }
             } catch (error) {
                 console.error('Erreur lors du chargement des fichiers:', error);
@@ -3154,7 +3280,7 @@
             }));
         }
 
-        // FILTRAGE ET AFFICHAGE
+        // FILTRAGE ET AFFICHAGE AVEC PAGINATION
         function filterFiles() {
             const searchTerm = searchInput.value.toLowerCase();
             const selectedFiliere = filiereFilter.value;
@@ -3170,12 +3296,13 @@
                 return matchesSearch && matchesFiliere && matchesYear && matchesSemestre;
             });
 
-            displayFiles(filteredFiles);
+            currentPage = 1; // Réinitialiser à la première page lors du filtrage
+            displayFilesWithPagination(filteredFiles);
         }
 
-        function displayFiles(files) {
-            filesGrid.innerHTML = '';
-
+        function displayFilesWithPagination(files) {
+            const totalPages = Math.ceil(files.length / itemsPerPage);
+            
             if (files.length === 0) {
                 filesGrid.innerHTML = `
                     <div style="grid-column: 1 / -1; text-align: center; padding: 2rem;">
@@ -3183,8 +3310,20 @@
                         <p style="color: var(--dark2); font-size: 1rem;">Aucun fichier trouvé avec ces critères.</p>
                     </div>
                 `;
+                paginationContainer.style.display = 'none';
                 return;
             }
+
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const paginatedFiles = files.slice(startIndex, endIndex);
+
+            displayFiles(paginatedFiles);
+            setupPagination(files.length, totalPages);
+        }
+
+        function displayFiles(files) {
+            filesGrid.innerHTML = '';
 
             files.forEach(file => {
                 const createdDate = new Date(file.createdTime);
@@ -3223,8 +3362,93 @@
             });
         }
 
-        function updateFileDisplay() {
-            filterFiles();
+        function setupPagination(totalItems, totalPages) {
+            if (totalPages <= 1) {
+                paginationContainer.style.display = 'none';
+                return;
+            }
+
+            paginationContainer.style.display = 'flex';
+            paginationElement.innerHTML = '';
+            
+            // Bouton précédent
+            const prevButton = document.createElement('button');
+            prevButton.className = 'pagination-btn' + (currentPage === 1 ? ' disabled' : '');
+            prevButton.innerHTML = '<i class="fas fa-chevron-left"></i>';
+            prevButton.addEventListener('click', () => {
+                if (currentPage > 1) {
+                    currentPage--;
+                    filterFiles();
+                }
+            });
+            paginationElement.appendChild(prevButton);
+
+            // Première page
+            if (currentPage > 2) {
+                const firstPageBtn = document.createElement('button');
+                firstPageBtn.className = 'pagination-btn';
+                firstPageBtn.textContent = '1';
+                firstPageBtn.addEventListener('click', () => {
+                    currentPage = 1;
+                    filterFiles();
+                });
+                paginationElement.appendChild(firstPageBtn);
+
+                if (currentPage > 3) {
+                    const dots = document.createElement('span');
+                    dots.className = 'pagination-dots';
+                    dots.textContent = '...';
+                    paginationElement.appendChild(dots);
+                }
+            }
+
+            // Pages autour de la page actuelle
+            for (let i = Math.max(1, currentPage - 1); i <= Math.min(totalPages, currentPage + 1); i++) {
+                const pageBtn = document.createElement('button');
+                pageBtn.className = 'pagination-btn' + (i === currentPage ? ' active' : '');
+                pageBtn.textContent = i;
+                pageBtn.addEventListener('click', () => {
+                    currentPage = i;
+                    filterFiles();
+                });
+                paginationElement.appendChild(pageBtn);
+            }
+
+            // Dernière page
+            if (currentPage < totalPages - 1) {
+                if (currentPage < totalPages - 2) {
+                    const dots = document.createElement('span');
+                    dots.className = 'pagination-dots';
+                    dots.textContent = '...';
+                    paginationElement.appendChild(dots);
+                }
+
+                const lastPageBtn = document.createElement('button');
+                lastPageBtn.className = 'pagination-btn';
+                lastPageBtn.textContent = totalPages;
+                lastPageBtn.addEventListener('click', () => {
+                    currentPage = totalPages;
+                    filterFiles();
+                });
+                paginationElement.appendChild(lastPageBtn);
+            }
+
+            // Bouton suivant
+            const nextButton = document.createElement('button');
+            nextButton.className = 'pagination-btn' + (currentPage === totalPages ? ' disabled' : '');
+            nextButton.innerHTML = '<i class="fas fa-chevron-right"></i>';
+            nextButton.addEventListener('click', () => {
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    filterFiles();
+                }
+            });
+            paginationElement.appendChild(nextButton);
+
+            // Info de pagination
+            const startItem = ((currentPage - 1) * itemsPerPage) + 1;
+            const endItem = Math.min(currentPage * itemsPerPage, totalItems);
+            paginationInfo.textContent = `Affichage de ${startItem} à ${endItem} sur ${totalItems} fichiers`;
         }
 
         // STATISTIQUES
@@ -3353,14 +3577,14 @@
         }
 
         // =============================================
-        // GESTION DE LA LIBRAIRIE
+        // GESTION DE LA LIBRAIRIE AVEC PAGINATION
         // =============================================
 
         async function loadBooks() {
             try {
                 showBooksLoading();
                 await fetchBooks();
-                displayBooks();
+                displayBooksWithPagination();
 
                 if (booksData.length === 0) {
                     showBooksEmptyState();
@@ -3410,10 +3634,27 @@
             }
         }
 
-        function displayBooks() {
+        function displayBooksWithPagination() {
+            const totalPages = Math.ceil(booksData.length / booksItemsPerPage);
+            
+            if (booksData.length === 0) {
+                booksGridElement.innerHTML = '';
+                booksPaginationContainer.style.display = 'none';
+                return;
+            }
+
+            const startIndex = (currentBooksPage - 1) * booksItemsPerPage;
+            const endIndex = startIndex + booksItemsPerPage;
+            const paginatedBooks = booksData.slice(startIndex, endIndex);
+
+            displayBooks(paginatedBooks);
+            setupBooksPagination(booksData.length, totalPages);
+        }
+
+        function displayBooks(books) {
             booksGridElement.innerHTML = '';
 
-            booksData.forEach(book => {
+            books.forEach(book => {
                 const bookCard = document.createElement('div');
                 bookCard.className = 'book-card';
                 if (book.isNew) bookCard.classList.add('new-file');
@@ -3440,6 +3681,57 @@
                 `;
                 booksGridElement.appendChild(bookCard);
             });
+        }
+
+        function setupBooksPagination(totalItems, totalPages) {
+            if (totalPages <= 1) {
+                booksPaginationContainer.style.display = 'none';
+                return;
+            }
+
+            booksPaginationContainer.style.display = 'flex';
+            booksPaginationElement.innerHTML = '';
+            
+            // Bouton précédent
+            const prevButton = document.createElement('button');
+            prevButton.className = 'pagination-btn' + (currentBooksPage === 1 ? ' disabled' : '');
+            prevButton.innerHTML = '<i class="fas fa-chevron-left"></i>';
+            prevButton.addEventListener('click', () => {
+                if (currentBooksPage > 1) {
+                    currentBooksPage--;
+                    displayBooksWithPagination();
+                }
+            });
+            booksPaginationElement.appendChild(prevButton);
+
+            // Pages
+            for (let i = 1; i <= totalPages; i++) {
+                const pageBtn = document.createElement('button');
+                pageBtn.className = 'pagination-btn' + (i === currentBooksPage ? ' active' : '');
+                pageBtn.textContent = i;
+                pageBtn.addEventListener('click', () => {
+                    currentBooksPage = i;
+                    displayBooksWithPagination();
+                });
+                booksPaginationElement.appendChild(pageBtn);
+            }
+
+            // Bouton suivant
+            const nextButton = document.createElement('button');
+            nextButton.className = 'pagination-btn' + (currentBooksPage === totalPages ? ' disabled' : '');
+            nextButton.innerHTML = '<i class="fas fa-chevron-right"></i>';
+            nextButton.addEventListener('click', () => {
+                if (currentBooksPage < totalPages) {
+                    currentBooksPage++;
+                    displayBooksWithPagination();
+                }
+            });
+            booksPaginationElement.appendChild(nextButton);
+
+            // Info de pagination
+            const startItem = ((currentBooksPage - 1) * booksItemsPerPage) + 1;
+            const endItem = Math.min(currentBooksPage * booksItemsPerPage, totalItems);
+            booksPaginationInfo.textContent = `Affichage de ${startItem} à ${endItem} sur ${totalItems} livres`;
         }
 
         // =============================================
@@ -3557,6 +3849,7 @@
             if (errorElement) errorElement.style.display = 'none';
             if (emptyStateElement) emptyStateElement.style.display = 'none';
             if (filesGrid) filesGrid.style.display = 'none';
+            if (paginationContainer) paginationContainer.style.display = 'none';
         }
 
         function showError() {
@@ -3564,6 +3857,7 @@
             if (errorElement) errorElement.style.display = 'block';
             if (emptyStateElement) emptyStateElement.style.display = 'none';
             if (filesGrid) filesGrid.style.display = 'none';
+            if (paginationContainer) paginationContainer.style.display = 'none';
         }
 
         function showEmptyState() {
@@ -3571,6 +3865,7 @@
             if (errorElement) errorElement.style.display = 'none';
             if (emptyStateElement) emptyStateElement.style.display = 'block';
             if (filesGrid) filesGrid.style.display = 'none';
+            if (paginationContainer) paginationContainer.style.display = 'none';
         }
 
         function showContent() {
@@ -3585,6 +3880,7 @@
             if (booksError) booksError.style.display = 'none';
             if (booksEmptyState) booksEmptyState.style.display = 'none';
             if (booksGridElement) booksGridElement.style.display = 'none';
+            if (booksPaginationContainer) booksPaginationContainer.style.display = 'none';
         }
 
         function showBooksError() {
@@ -3592,6 +3888,7 @@
             if (booksError) booksError.style.display = 'block';
             if (booksEmptyState) booksEmptyState.style.display = 'none';
             if (booksGridElement) booksGridElement.style.display = 'none';
+            if (booksPaginationContainer) booksPaginationContainer.style.display = 'none';
         }
 
         function showBooksEmptyState() {
@@ -3599,6 +3896,7 @@
             if (booksError) booksError.style.display = 'none';
             if (booksEmptyState) booksEmptyState.style.display = 'block';
             if (booksGridElement) booksGridElement.style.display = 'none';
+            if (booksPaginationContainer) booksPaginationContainer.style.display = 'none';
         }
 
         function showBooksContent() {
