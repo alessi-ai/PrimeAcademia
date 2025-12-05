@@ -8,91 +8,135 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <style>
+        /* ===== VARIABLES DE COULEURS PROFESSIONNELLES ===== */
         :root {
-            --primary: #2c3e50;
-            --secondary: #34495e;
-            --accent: #3498db;
-            --light: #ecf0f1;
-            --dark: #2c3e50;
-            --success: #27ae60;
-            --warning: #f39c12;
-            --error: #e74c3c;
-            --gray: #95a5a6;
-            --white: #ffffff;
-            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            --transition: all 0.3s ease;
+            --primary: #4A6FA5; /* Bleu académique */
+            --secondary: #6B8E23; /* Vert olive */
+            --accent: #D4A017; /* Or académique */
+            --accent2: #8B4513; /* Brun chaleureux */
+            --accent3: #5D7B93; /* Bleu gris */
+            --accent4: #8A2BE2; /* Violet moderne */
+            --light: #F5F7FA;
+            --light2: #E8EEF4;
+            --dark: #2C3E50;
+            --dark2: #34495E;
+            --success: #27AE60;
+            --warning: #F39C12;
+            --error: #E74C3C;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --shadow-hover: 0 15px 40px rgba(0, 0, 0, 0.12);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --radius: 12px;
+            --radius-lg: 20px;
+            --radius-sm: 8px;
         }
 
         .dark-theme {
-            --primary: #ecf0f1;
-            --secondary: #bdc3c7;
-            --accent: #3498db;
-            --light: #2c3e50;
-            --dark: #ecf0f1;
-            --gray: #7f8c8d;
-            --white: #34495e;
+            --primary: #5D8CD4;
+            --secondary: #8BC34A;
+            --accent: #FFD700;
+            --accent2: #CD853F;
+            --accent3: #7A9EBB;
+            --accent4: #9C6FE4;
+            --light: #1A2A3A;
+            --light2: #2C3E50;
+            --dark: #ECF0F1;
+            --dark2: #BDC3C7;
         }
 
+        /* ===== RESET & BASE STYLES ===== */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
-            -webkit-user-select: text;
-            -moz-user-select: text;
-            -ms-user-select: text;
-            user-select: text;
         }
 
         html {
             font-size: 16px;
-            -webkit-text-size-adjust: 100%;
+            scroll-behavior: smooth;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            color: var(--primary);
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.7;
+            color: var(--dark);
             background-color: var(--light);
             transition: var(--transition);
             overflow-x: hidden;
-            touch-action: manipulation;
             min-height: 100vh;
         }
 
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 0 15px;
+            padding: 0 20px;
         }
 
-        /* Header Styles */
+        /* ===== ANIMATIONS ===== */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(-20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* ===== HEADER ===== */
         header {
-            background: var(--white);
+            background: var(--light);
             box-shadow: var(--shadow);
             position: sticky;
             top: 0;
             z-index: 1000;
+            border-bottom: 3px solid var(--primary);
         }
 
         .header-content {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 1rem 0;
+            padding: 1.2rem 0;
         }
 
         .logo {
             display: flex;
             align-items: center;
-            gap: 10px;
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: var(--accent);
+            gap: 12px;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .logo:hover {
+            color: var(--accent2);
+            transform: translateX(5px);
         }
 
         .logo i {
-            font-size: 1.5rem;
+            font-size: 1.8rem;
+            color: var(--accent);
+            animation: float 3s ease-in-out infinite;
         }
 
         nav ul {
@@ -103,89 +147,128 @@
 
         nav a {
             text-decoration: none;
-            color: var(--primary);
-            font-weight: 500;
-            padding: 0.5rem 0.8rem;
-            border-radius: 5px;
+            color: var(--dark);
+            font-weight: 600;
+            padding: 0.7rem 1.3rem;
+            border-radius: 50px;
             transition: var(--transition);
-            font-size: 0.9rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        nav a::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(74, 111, 165, 0.1), transparent);
+            transition: var(--transition);
+        }
+
+        nav a:hover::before {
+            left: 100%;
         }
 
         nav a:hover, nav a.active {
-            background: var(--accent);
-            color: var(--white);
+            background: var(--primary);
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(74, 111, 165, 0.3);
         }
 
         .header-actions {
             display: flex;
             gap: 1rem;
+            align-items: center;
         }
 
         .theme-toggle {
-            background: none;
+            background: var(--primary);
             border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
             font-size: 1.2rem;
             cursor: pointer;
-            color: var(--primary);
-            padding: 0.5rem;
-            border-radius: 50%;
+            color: white;
             transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .theme-toggle:hover {
-            background: var(--light);
+            background: var(--accent2);
+            transform: rotate(15deg) scale(1.1);
+            box-shadow: 0 5px 15px rgba(139, 69, 19, 0.3);
         }
 
-        /* Main Content */
+        /* ===== MAIN CONTENT ===== */
         main {
             min-height: calc(100vh - 200px);
-            padding: 1.5rem 0;
+            padding: 2.5rem 0;
         }
 
         .page-section {
             display: none;
+            animation: fadeIn 0.6s ease-out;
         }
 
         .page-section.active {
             display: block;
-            animation: fadeIn 0.5s ease-in;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
         }
 
         .page-title {
             text-align: center;
-            margin-bottom: 2rem;
+            margin-bottom: 3rem;
+            position: relative;
+            padding-bottom: 1.5rem;
+        }
+
+        .page-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            border-radius: 2px;
         }
 
         .page-title i {
-            font-size: 2.5rem;
-            color: var(--accent);
-            margin-bottom: 1rem;
+            font-size: 3.5rem;
+            margin-bottom: 1.2rem;
+            color: var(--primary);
+            display: inline-block;
+            animation: float 4s ease-in-out infinite;
         }
 
         .page-title h1 {
-            font-size: 2rem;
-            color: var(--primary);
+            font-size: 2.5rem;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+            font-weight: 700;
         }
 
-        /* Introduction Section */
+        /* ===== INTRODUCTION ===== */
         .intro-collapsed, .intro-expanded {
-            background: var(--white);
-            border-radius: 10px;
-            padding: 1.2rem;
-            margin-bottom: 1.5rem;
+            background: var(--light2);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            margin-bottom: 2.5rem;
             box-shadow: var(--shadow);
-            cursor: pointer;
             transition: var(--transition);
+            border-left: 5px solid var(--accent);
         }
 
         .intro-collapsed:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+            border-left-color: var(--accent4);
         }
 
         .intro-collapsed-header {
@@ -194,689 +277,793 @@
             align-items: center;
         }
 
+        .intro-collapsed-header h2 {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: var(--dark);
+        }
+
+        .intro-collapsed-header h2 i {
+            color: var(--accent);
+            font-size: 1.8rem;
+        }
+
         .intro-toggle {
-            background: none;
+            background: var(--primary);
             border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
             font-size: 1.2rem;
             cursor: pointer;
-            color: var(--accent);
+            color: white;
             transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .intro-toggle:hover {
+            background: var(--accent2);
+            transform: rotate(180deg);
         }
 
         .intro-expanded h2 {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid rgba(74, 111, 165, 0.1);
         }
 
-        /* Controls */
+        .intro-expanded h2 i {
+            color: var(--accent);
+        }
+
+        .intro-expanded h3 {
+            color: var(--primary);
+            margin: 1.8rem 0 1rem;
+            padding-left: 1rem;
+            border-left: 4px solid var(--secondary);
+        }
+
+        .intro-expanded ul {
+            margin: 1rem 0 1.5rem 2rem;
+        }
+
+        .intro-expanded li {
+            margin-bottom: 0.8rem;
+            position: relative;
+        }
+
+        .intro-expanded li::before {
+            content: '✓';
+            position: absolute;
+            left: -1.5rem;
+            color: var(--success);
+            font-weight: bold;
+        }
+
+        /* ===== CONTROLS ===== */
         .controls {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
+            background: var(--light2);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            margin-bottom: 2.5rem;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(74, 111, 165, 0.1);
         }
 
         .search-box {
             position: relative;
-            width: 100%;
+            margin-bottom: 1.5rem;
         }
 
         .search-box i {
             position: absolute;
-            left: 15px;
+            left: 20px;
             top: 50%;
             transform: translateY(-50%);
-            color: var(--gray);
+            color: var(--accent3);
+            z-index: 1;
         }
 
         .search-box input {
             width: 100%;
-            padding: 12px 15px 12px 45px;
-            border: 2px solid var(--gray);
-            border-radius: 8px;
+            padding: 16px 20px 16px 50px;
+            border: 2px solid var(--light2);
+            border-radius: var(--radius);
             font-size: 1rem;
             transition: var(--transition);
+            background: white;
+            color: var(--dark);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
         }
 
         .search-box input:focus {
-            border-color: var(--accent);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(74, 111, 165, 0.2);
             outline: none;
         }
 
         .filter-group {
             display: flex;
             flex-wrap: wrap;
-            gap: 0.8rem;
+            gap: 1rem;
+            align-items: center;
         }
 
         select {
-            padding: 12px 15px;
-            border: 2px solid var(--gray);
-            border-radius: 8px;
-            background: var(--white);
-            color: var(--primary);
+            flex: 1;
+            min-width: 180px;
+            padding: 14px 20px;
+            border: 2px solid var(--light2);
+            border-radius: var(--radius);
+            background: white;
+            color: var(--dark);
             font-size: 1rem;
             cursor: pointer;
             transition: var(--transition);
-            flex: 1;
-            min-width: 120px;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%234A6FA5' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 16px;
         }
 
         select:focus {
-            border-color: var(--accent);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(74, 111, 165, 0.2);
             outline: none;
         }
 
         .view-toggle {
             display: flex;
-            gap: 5px;
-            background: var(--white);
-            padding: 5px;
-            border-radius: 8px;
-            border: 2px solid var(--gray);
+            gap: 8px;
+            background: white;
+            padding: 8px;
+            border-radius: var(--radius);
+            border: 2px solid var(--light2);
         }
 
         .view-toggle button {
-            padding: 10px 15px;
+            padding: 10px 20px;
             border: none;
             background: none;
             cursor: pointer;
-            border-radius: 5px;
+            border-radius: var(--radius-sm);
             transition: var(--transition);
+            color: var(--dark);
+            font-weight: 600;
         }
 
         .view-toggle button.active {
-            background: var(--accent);
-            color: var(--white);
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 15px rgba(74, 111, 165, 0.3);
         }
 
-        /* Stats */
+        .view-toggle button:hover:not(.active) {
+            background: rgba(74, 111, 165, 0.1);
+        }
+
+        /* ===== STATS ===== */
         .stats {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 1rem;
-            margin-bottom: 1.5rem;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
         }
 
         .stat-card {
-            background: var(--white);
-            padding: 1.5rem;
-            border-radius: 10px;
+            background: white;
+            padding: 2rem;
+            border-radius: var(--radius-lg);
             text-align: center;
             box-shadow: var(--shadow);
             transition: var(--transition);
+            border-top: 5px solid var(--primary);
+            position: relative;
+            overflow: hidden;
         }
 
         .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-hover);
         }
+
+        .stat-card:nth-child(1) { border-top-color: var(--primary); }
+        .stat-card:nth-child(2) { border-top-color: var(--secondary); }
+        .stat-card:nth-child(3) { border-top-color: var(--accent); }
 
         .stat-card i {
-            font-size: 2.5rem;
-            color: var(--accent);
-            margin-bottom: 1rem;
+            font-size: 3rem;
+            margin-bottom: 1.2rem;
+            display: inline-block;
+            animation: float 3s ease-in-out infinite;
         }
+
+        .stat-card:nth-child(1) i { color: var(--primary); }
+        .stat-card:nth-child(2) i { color: var(--secondary); }
+        .stat-card:nth-child(3) i { color: var(--accent); }
 
         .stat-card h3 {
-            font-size: 2rem;
-            color: var(--primary);
+            font-size: 2.8rem;
+            color: var(--dark);
             margin-bottom: 0.5rem;
+            font-weight: 700;
         }
 
-        /* Files Container */
+        /* ===== FILES CONTAINER ===== */
         .files-container {
-            background: var(--white);
-            border-radius: 10px;
-            padding: 1.5rem;
+            background: var(--light2);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
             box-shadow: var(--shadow);
+            border: 1px solid rgba(74, 111, 165, 0.1);
         }
 
         .loading, .error, .empty-state {
             text-align: center;
-            padding: 2rem;
+            padding: 4rem 2rem;
         }
 
         .loading i, .error i, .empty-state i {
-            font-size: 3rem;
-            color: var(--accent);
-            margin-bottom: 1rem;
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            display: inline-block;
         }
 
-        .loading h2, .error h2, .empty-state h2 {
-            margin-bottom: 1rem;
+        .loading i {
             color: var(--primary);
+            animation: pulse 1.5s ease-in-out infinite;
         }
 
-        /* Table View */
+        .error i {
+            color: var(--error);
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        .empty-state i {
+            color: var(--accent3);
+            animation: float 3s ease-in-out infinite;
+        }
+
+        /* ===== TABLE VIEW ===== */
         .table-view {
             width: 100%;
-            border-collapse: collapse;
+            border-collapse: separate;
+            border-spacing: 0;
             margin-top: 1rem;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
+            background: white;
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
         }
 
         .table-view th {
-            background: var(--accent);
-            color: var(--white);
-            padding: 0.8rem;
+            background: linear-gradient(135deg, var(--primary), var(--accent3));
+            color: white;
+            padding: 1.2rem;
             text-align: left;
             font-weight: 600;
+            position: sticky;
+            top: 0;
         }
 
         .table-view td {
-            padding: 0.8rem;
-            border-bottom: 1px solid var(--gray);
-        }
-
-        .table-view tr:hover {
-            background: var(--light);
-        }
-
-        .file-link {
-            color: var(--accent);
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            padding: 1.2rem;
+            border-bottom: 1px solid rgba(74, 111, 165, 0.1);
             transition: var(--transition);
         }
 
-        .file-link:hover {
+        .table-view tr {
+            transition: var(--transition);
+        }
+
+        .table-view tr:hover {
+            background: rgba(74, 111, 165, 0.05);
+        }
+
+        .file-link {
             color: var(--primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: var(--transition);
+            font-weight: 600;
+            padding: 8px 12px;
+            border-radius: var(--radius-sm);
+        }
+
+        .file-link:hover {
+            background: rgba(74, 111, 165, 0.1);
+            color: var(--accent2);
+            transform: translateX(5px);
         }
 
         .file-icon {
-            font-size: 1rem;
+            font-size: 1.2rem;
+            color: var(--accent);
+            transition: var(--transition);
+        }
+
+        .file-link:hover .file-icon {
+            transform: scale(1.2) rotate(10deg);
         }
 
         .file-badge {
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 0.7rem;
-            font-weight: bold;
-            margin-left: 8px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 10px;
         }
 
         .file-badge.new {
-            background: var(--success);
-            color: var(--white);
+            background: linear-gradient(135deg, var(--success), #2ECC71);
+            color: white;
+            box-shadow: 0 3px 10px rgba(39, 174, 96, 0.3);
+            animation: pulse 2s infinite;
         }
 
-        /* Card View */
+        /* ===== CARD VIEW ===== */
         .card-view {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 1.2rem;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.8rem;
             margin-top: 1rem;
         }
 
         .file-card {
-            background: var(--white);
-            border-radius: 10px;
+            background: white;
+            border-radius: var(--radius-lg);
             overflow: hidden;
             box-shadow: var(--shadow);
             transition: var(--transition);
-            border: 1px solid var(--gray);
+            border: 1px solid rgba(74, 111, 165, 0.1);
+            position: relative;
         }
 
         .file-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: var(--shadow-hover);
+            border-color: var(--primary);
         }
 
         .file-card-header {
-            background: var(--accent);
-            color: var(--white);
-            padding: 1rem;
+            background: linear-gradient(135deg, var(--primary), var(--accent3));
+            color: white;
+            padding: 1.5rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            position: relative;
+        }
+
+        .file-card-header i {
+            font-size: 1.8rem;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
         }
 
         .file-card-body {
-            padding: 1.2rem;
+            padding: 1.8rem;
         }
 
         .file-card-body h3 {
-            margin-bottom: 1rem;
-            color: var(--primary);
-            font-size: 1.1rem;
+            margin-bottom: 1.2rem;
+            color: var(--dark);
+            font-size: 1.3rem;
+            line-height: 1.5;
         }
 
         .file-meta {
             display: flex;
             flex-direction: column;
-            gap: 0.5rem;
+            gap: 1rem;
         }
 
         .file-meta span {
             display: flex;
             align-items: center;
-            gap: 8px;
-            color: var(--gray);
-            font-size: 0.9rem;
+            gap: 12px;
+            color: var(--dark2);
+            font-size: 0.95rem;
+        }
+
+        .file-meta i {
+            color: var(--accent);
+            width: 18px;
         }
 
         .file-card-footer {
-            padding: 1rem 1.2rem;
+            padding: 1.5rem;
             background: var(--light);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border-top: 1px solid rgba(74, 111, 165, 0.1);
         }
 
-        /* Buttons */
+        /* ===== BUTTONS ===== */
         .btn {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            padding: 10px 20px;
+            gap: 10px;
+            padding: 14px 28px;
             border: none;
-            border-radius: 8px;
-            font-size: 0.9rem;
+            border-radius: var(--radius);
+            font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
             text-decoration: none;
             transition: var(--transition);
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 15px rgba(74, 111, 165, 0.3);
         }
 
-        .btn-primary {
-            background: var(--accent);
-            color: var(--white);
-        }
-
-        .btn-primary:hover {
-            background: #2980b9;
-            transform: translateY(-2px);
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(74, 111, 165, 0.4);
+            background: linear-gradient(135deg, var(--primary), var(--accent3));
         }
 
         .btn-whatsapp {
-            background: #25D366;
-            color: var(--white);
+            background: linear-gradient(135deg, #25D366, #128C7E);
+            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
         }
 
         .btn-whatsapp:hover {
-            background: #128C7E;
-            transform: translateY(-2px);
+            background: linear-gradient(135deg, #128C7E, #25D366);
+            box-shadow: 0 8px 25px rgba(37, 211, 102, 0.4);
         }
 
-        .btn-cancel {
-            background: var(--gray);
-            color: var(--white);
+        .btn-secondary {
+            background: var(--secondary);
+            box-shadow: 0 4px 15px rgba(107, 142, 35, 0.3);
         }
 
-        .btn-cancel:hover {
-            background: #7f8c8d;
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, var(--secondary), #8BC34A);
+            box-shadow: 0 8px 25px rgba(107, 142, 35, 0.4);
         }
 
-        /* Articles */
+        /* ===== ARTICLES ===== */
         .articles-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 2.2rem;
         }
 
         .article-card {
-            background: var(--white);
-            border-radius: 10px;
+            background: white;
+            border-radius: var(--radius-lg);
             overflow: hidden;
             box-shadow: var(--shadow);
             transition: var(--transition);
+            border: 1px solid rgba(74, 111, 165, 0.1);
+            position: relative;
         }
 
         .article-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-hover);
+            border-color: var(--accent);
         }
 
         .article-image {
-            background: var(--accent);
-            padding: 1.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--accent3));
+            padding: 2.5rem;
             text-align: center;
+            position: relative;
+            overflow: hidden;
         }
 
         .article-image i {
-            font-size: 2.5rem;
-            color: var(--white);
+            font-size: 3.5rem;
+            color: white;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+            animation: float 3s ease-in-out infinite;
         }
 
         .article-content {
-            padding: 1.2rem;
+            padding: 2rem;
         }
 
         .article-content h3 {
-            margin-bottom: 1rem;
-            color: var(--primary);
-            font-size: 1.2rem;
+            margin-bottom: 1.2rem;
+            color: var(--dark);
+            font-size: 1.4rem;
+            line-height: 1.5;
         }
 
         .article-meta {
             display: flex;
-            gap: 1rem;
-            margin-bottom: 1rem;
-            color: var(--gray);
-            font-size: 0.85rem;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .article-meta span {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(74, 111, 165, 0.1);
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            color: var(--primary);
+            font-weight: 500;
         }
 
         .article-content p {
-            margin-bottom: 1rem;
-            color: var(--secondary);
-            font-size: 0.95rem;
+            margin-bottom: 1.8rem;
+            color: var(--dark2);
+            line-height: 1.8;
         }
 
         .read-more {
-            color: var(--accent);
+            color: var(--primary);
             text-decoration: none;
             font-weight: 600;
             display: inline-flex;
             align-items: center;
-            gap: 5px;
-            font-size: 0.9rem;
+            gap: 10px;
+            font-size: 1rem;
+            transition: var(--transition);
+            padding: 10px 20px;
+            border-radius: 50px;
+            background: rgba(74, 111, 165, 0.1);
         }
 
-        /* Article Detail */
+        .read-more:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateX(5px);
+            box-shadow: 0 4px 15px rgba(74, 111, 165, 0.3);
+        }
+
+        /* ===== ARTICLE DETAIL ===== */
         .back-to-articles {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            color: var(--accent);
+            gap: 10px;
+            color: var(--primary);
             text-decoration: none;
-            margin-bottom: 1.5rem;
+            margin-bottom: 2rem;
             font-weight: 600;
+            padding: 12px 24px;
+            border-radius: 50px;
+            background: rgba(74, 111, 165, 0.1);
+            transition: var(--transition);
+        }
+
+        .back-to-articles:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateX(-5px);
         }
 
         .article-detail {
-            background: var(--white);
-            border-radius: 10px;
-            padding: 1.5rem;
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 3rem;
             box-shadow: var(--shadow);
+            border: 1px solid rgba(74, 111, 165, 0.1);
         }
 
         .article-header {
             text-align: center;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1.5rem;
-            border-bottom: 2px solid var(--light);
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 2px solid rgba(74, 111, 165, 0.1);
         }
 
         .article-header h1 {
-            font-size: 2rem;
-            color: var(--primary);
-            margin-bottom: 1rem;
+            font-size: 2.5rem;
+            color: var(--dark);
+            margin-bottom: 1.5rem;
+            line-height: 1.3;
         }
 
         .article-meta-large {
             display: flex;
             justify-content: center;
-            gap: 1.5rem;
-            color: var(--gray);
+            gap: 2.5rem;
+            color: var(--dark2);
             flex-wrap: wrap;
+        }
+
+        .article-meta-large span {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
         }
 
         .article-body h2 {
             color: var(--primary);
-            margin: 1.5rem 0 1rem 0;
-            padding-bottom: 0.5rem;
-            border-bottom: 1px solid var(--light);
+            margin: 2.5rem 0 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid rgba(74, 111, 165, 0.1);
+            font-size: 1.8rem;
         }
 
         .article-body h3 {
             color: var(--secondary);
-            margin: 1.2rem 0 0.5rem 0;
+            margin: 2rem 0 1rem;
+            font-size: 1.4rem;
         }
 
         .article-body p {
-            margin-bottom: 1rem;
-            line-height: 1.8;
+            margin-bottom: 1.5rem;
+            line-height: 1.9;
+            color: var(--dark2);
         }
 
         .article-body ul {
-            margin: 1rem 0;
-            padding-left: 1.5rem;
+            margin: 1.5rem 0;
+            padding-left: 2rem;
         }
 
         .article-body li {
-            margin-bottom: 0.5rem;
-        }
-
-        .article-body blockquote {
-            background: var(--light);
-            border-left: 4px solid var(--accent);
-            padding: 1.2rem;
-            margin: 1.2rem 0;
-            font-style: italic;
-            border-radius: 0 8px 8px 0;
-        }
-
-        .article-body .highlight-box {
-            background: linear-gradient(135deg, var(--accent), #2980b9);
-            color: white;
-            padding: 1.5rem;
-            border-radius: 10px;
-            margin: 1.5rem 0;
-            text-align: center;
-        }
-
-        /* About Page */
-        .about-content, .donation-content, .contact-content, .privacy-content, .legal-content {
-            background: var(--white);
-            border-radius: 10px;
-            padding: 1.5rem;
-            box-shadow: var(--shadow);
-        }
-
-        .about-section, .donation-section {
-            margin-bottom: 2rem;
-        }
-
-        .about-section h2, .donation-section h2 {
-            color: var(--primary);
             margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .about-section p, .donation-section p {
-            margin-bottom: 1rem;
+            position: relative;
+            padding-left: 1.5rem;
             line-height: 1.8;
         }
 
+        .article-body li::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+            font-size: 1.5rem;
+        }
+
+        .article-body blockquote {
+            background: linear-gradient(135deg, var(--light), var(--light2));
+            border-left: 5px solid var(--accent);
+            padding: 2rem;
+            margin: 2rem 0;
+            font-style: italic;
+            border-radius: 0 var(--radius) var(--radius) 0;
+            color: var(--dark);
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+
+        .article-body .highlight-box {
+            background: linear-gradient(135deg, var(--primary), var(--accent3));
+            color: white;
+            padding: 2.5rem;
+            border-radius: var(--radius-lg);
+            margin: 2.5rem 0;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(74, 111, 165, 0.3);
+        }
+
+        /* ===== ABOUT PAGE ===== */
+        .about-content, .contact-content, .privacy-content, .legal-content {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 3rem;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(74, 111, 165, 0.1);
+        }
+
+        .about-section {
+            margin-bottom: 3rem;
+        }
+
+        .about-section h2 {
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 1.8rem;
+        }
+
+        .about-section h2 i {
+            color: var(--accent);
+            font-size: 2rem;
+        }
+
+        .about-section p {
+            margin-bottom: 1.5rem;
+            line-height: 1.9;
+            color: var(--dark2);
+        }
+
         .about-section ul {
-            margin: 1rem 0;
-            padding-left: 1.5rem;
+            margin: 1.5rem 0 2rem 2rem;
         }
 
         .about-section li {
-            margin-bottom: 0.5rem;
+            margin-bottom: 1rem;
+            position: relative;
+            padding-left: 1.5rem;
+            line-height: 1.8;
+        }
+
+        .about-section li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+            font-weight: bold;
         }
 
         .features-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.2rem;
-            margin-top: 1.2rem;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
         }
 
         .feature-card {
             background: var(--light);
-            padding: 1.2rem;
-            border-radius: 8px;
+            padding: 2rem;
+            border-radius: var(--radius-lg);
             text-align: center;
+            transition: var(--transition);
+            border: 1px solid rgba(74, 111, 165, 0.1);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            background: white;
+            box-shadow: var(--shadow-hover);
+            border-color: var(--accent);
         }
 
         .feature-card h3 {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-            margin-bottom: 1rem;
-            color: var(--primary);
-        }
-
-        /* Donation Page */
-        .donation-methods {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.5rem;
-            margin-top: 1.5rem;
-        }
-
-        .donation-method {
-            background: var(--light);
-            padding: 1.5rem;
-            border-radius: 10px;
-            text-align: center;
-        }
-
-        .donation-method i {
-            font-size: 2.5rem;
-            color: var(--accent);
-            margin-bottom: 1rem;
-        }
-
-        .donation-method h3 {
-            margin-bottom: 1rem;
-            color: var(--primary);
-        }
-
-        .payment-instructions {
-            text-align: left;
-            margin: 1.2rem 0;
-        }
-
-        .payment-instructions h4 {
-            margin-bottom: 1rem;
-            color: var(--primary);
-        }
-
-        .payment-instructions ol {
-            padding-left: 1.2rem;
-        }
-
-        .payment-instructions li {
-            margin-bottom: 0.5rem;
-        }
-
-        .whatsapp-contact {
-            margin-top: 1.2rem;
-        }
-
-        /* Contact Page */
-        .contact-content {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 2rem;
-        }
-
-        .contact-info h2 {
-            color: var(--primary);
+            gap: 12px;
             margin-bottom: 1.2rem;
+            color: var(--primary);
+            font-size: 1.2rem;
         }
 
-        .contact-item {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-            padding: 1.2rem;
-            background: var(--light);
-            border-radius: 8px;
-        }
-
-        .contact-icon {
-            font-size: 1.3rem;
+        .feature-card h3 i {
             color: var(--accent);
         }
 
-        .contact-item h3 {
-            margin-bottom: 0.5rem;
-            color: var(--primary);
-        }
-
-        .contact-form h2 {
-            color: var(--primary);
-            margin-bottom: 1.2rem;
-        }
-
-        .form-group {
-            margin-bottom: 1.2rem;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: var(--primary);
-            font-weight: 600;
-        }
-
-        .form-group input, .form-group textarea {
-            width: 100%;
-            padding: 10px 12px;
-            border: 2px solid var(--gray);
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: var(--transition);
-            background: var(--white);
-            color: var(--primary);
-        }
-
-        .form-group input:focus, .form-group textarea:focus {
-            border-color: var(--accent);
-            outline: none;
-        }
-
-        .form-group textarea {
-            min-height: 120px;
-            resize: vertical;
-        }
-
-        .alert {
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 1.2rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .alert-success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .alert-error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        /* Librairie */
+        /* ===== LIBRAIRIE ===== */
         .books-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 1.5rem;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2.2rem;
         }
 
         .book-card {
-            background: var(--white);
-            border-radius: 10px;
+            background: white;
+            border-radius: var(--radius-lg);
             overflow: hidden;
             box-shadow: var(--shadow);
             transition: var(--transition);
+            border: 1px solid rgba(74, 111, 165, 0.1);
+            position: relative;
         }
 
         .book-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: var(--shadow-hover);
+            border-color: var(--secondary);
         }
 
         .book-image {
-            height: 180px;
+            height: 220px;
             overflow: hidden;
+            position: relative;
         }
 
         .book-image img {
@@ -887,508 +1074,296 @@
         }
 
         .book-card:hover .book-image img {
-            transform: scale(1.05);
+            transform: scale(1.1);
         }
 
         .book-content {
-            padding: 1.2rem;
+            padding: 2rem;
         }
 
         .book-content h3 {
-            margin-bottom: 1rem;
-            color: var(--primary);
-            font-size: 1.1rem;
+            margin-bottom: 1.2rem;
+            color: var(--dark);
+            font-size: 1.3rem;
+            line-height: 1.5;
         }
 
         .book-meta {
             display: flex;
             flex-direction: column;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
         }
 
         .book-meta span {
             display: flex;
             align-items: center;
-            gap: 8px;
-            color: var(--gray);
-            font-size: 0.85rem;
+            gap: 10px;
+            color: var(--dark2);
+            font-size: 0.95rem;
         }
 
         .book-price {
-            font-size: 1.3rem;
-            font-weight: bold;
-            color: var(--accent);
-            margin: 1rem 0;
-        }
-
-        .book-actions {
-            margin-top: 1rem;
-        }
-
-        /* Modal */
-        .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            padding: 15px;
-        }
-
-        .modal-content {
-            background: var(--white);
-            border-radius: 15px;
-            padding: 1.5rem;
-            max-width: 500px;
-            width: 100%;
-            position: relative;
-            animation: modalAppear 0.3s ease-out;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        .modal-close {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: var(--gray);
-        }
-
-        .modal-icon {
-            text-align: center;
-            margin-bottom: 1rem;
-        }
-
-        .modal-icon i {
-            font-size: 2.5rem;
-            color: var(--accent);
-        }
-
-        .modal-content h2 {
-            text-align: center;
-            margin-bottom: 1rem;
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: 1.5rem 0;
             color: var(--primary);
         }
 
-        .modal-content p {
-            text-align: center;
-            margin-bottom: 1.2rem;
-            color: var(--secondary);
+        .book-actions {
+            margin-top: 1.5rem;
         }
 
-        .donation-options {
+        /* ===== CONTACT PAGE ===== */
+        .contact-content {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 3rem;
+        }
+
+        @media (min-width: 992px) {
+            .contact-content {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .contact-info h2 {
+            color: var(--primary);
+            margin-bottom: 2rem;
+            font-size: 1.8rem;
+        }
+
+        .contact-item {
             display: flex;
-            gap: 0.8rem;
-            justify-content: center;
-            margin-bottom: 1.2rem;
-            flex-wrap: wrap;
-        }
-
-        .donation-option {
-            padding: 10px 16px;
-            border: 2px solid var(--accent);
-            background: none;
-            color: var(--accent);
-            border-radius: 8px;
-            cursor: pointer;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            padding: 2rem;
+            background: var(--light);
+            border-radius: var(--radius-lg);
             transition: var(--transition);
+            border: 1px solid rgba(74, 111, 165, 0.1);
+        }
+
+        .contact-item:hover {
+            transform: translateX(10px);
+            background: white;
+            box-shadow: var(--shadow-hover);
+            border-color: var(--accent);
+        }
+
+        .contact-icon {
+            font-size: 2rem;
+            color: var(--accent);
+            min-width: 40px;
+        }
+
+        .contact-item h3 {
+            margin-bottom: 1rem;
+            color: var(--dark);
+            font-size: 1.2rem;
+        }
+
+        .contact-form h2 {
+            color: var(--primary);
+            margin-bottom: 2rem;
+            font-size: 1.8rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.8rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.8rem;
+            color: var(--dark);
             font-weight: 600;
+            font-size: 1rem;
         }
 
-        .donation-option.selected {
-            background: var(--accent);
-            color: var(--white);
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 16px 20px;
+            border: 2px solid var(--light2);
+            border-radius: var(--radius);
+            font-size: 1rem;
+            transition: var(--transition);
+            background: white;
+            color: var(--dark);
+            font-family: inherit;
         }
 
-        .modal-actions {
+        .form-group input:focus, .form-group textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(74, 111, 165, 0.2);
+            outline: none;
+        }
+
+        .form-group textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        .alert {
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            margin-bottom: 2rem;
             display: flex;
-            flex-direction: column;
-            gap: 0.8rem;
+            align-items: center;
+            gap: 15px;
+            animation: fadeIn 0.6s ease-out;
         }
 
-        /* Footer */
+        .alert-success {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        /* ===== FOOTER ===== */
         footer {
-            background: var(--primary);
-            color: var(--white);
-            padding: 2rem 0 1rem;
-            margin-top: 2rem;
+            background: linear-gradient(135deg, var(--dark), #1A2530);
+            color: white;
+            padding: 4rem 0 2rem;
+            margin-top: 4rem;
         }
 
         .footer-links {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 1.5rem;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+            margin-bottom: 3rem;
         }
 
         .footer-section h3 {
-            margin-bottom: 1rem;
+            margin-bottom: 1.8rem;
             color: var(--accent);
+            font-size: 1.3rem;
+            position: relative;
+            padding-bottom: 12px;
+        }
+
+        .footer-section h3::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: var(--accent);
         }
 
         .footer-section a {
             display: block;
-            color: var(--light);
+            color: rgba(255, 255, 255, 0.85);
             text-decoration: none;
-            margin-bottom: 0.5rem;
+            margin-bottom: 1rem;
             transition: var(--transition);
-            font-size: 0.9rem;
+            padding: 8px 0;
         }
 
         .footer-section a:hover {
             color: var(--accent);
+            transform: translateX(10px);
         }
 
         .legal-links {
             display: flex;
             justify-content: center;
-            gap: 1.5rem;
-            margin-bottom: 1.5rem;
+            gap: 2.5rem;
+            margin-bottom: 2.5rem;
             flex-wrap: wrap;
         }
 
         .legal-links a {
-            color: var(--light);
+            color: rgba(255, 255, 255, 0.85);
             text-decoration: none;
             transition: var(--transition);
-            font-size: 0.9rem;
+            padding: 10px 20px;
+            border-radius: 50px;
+            background: rgba(255, 255, 255, 0.1);
         }
 
         .legal-links a:hover {
-            color: var(--accent);
+            color: white;
+            background: rgba(212, 160, 23, 0.3);
+            transform: translateY(-3px);
         }
 
         .copyright {
             text-align: center;
-            padding-top: 1.5rem;
-            border-top: 1px solid var(--gray);
-            color: var(--light);
-            font-size: 0.9rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.95rem;
         }
 
-        /* Styles pour les publicités flottantes - FORMAT AGRANDI */
-        #ad-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.8);
-            z-index: 9999;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            backdrop-filter: blur(8px);
-            padding: 15px;
-        }
-
-        #ad-modal {
-            position: relative;
-            background-color: white;
-            border-radius: 15px;
-            padding: 0;
-            width: 100%;
-            max-width: 800px;
-            height: 85vh;
-            max-height: 700px;
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
-            overflow: hidden;
-            animation: modalAppear 0.3s ease-out;
-        }
-
-        @keyframes modalAppear {
-            from { transform: scale(0.8); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
-
-        #ad-close {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: rgba(0, 0, 0, 0.8);
-            border: none;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            font-size: 20px;
-            cursor: pointer;
-            color: white;
-            z-index: 10000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-        }
-
-        #ad-close:hover {
-            background: rgba(231, 76, 60, 0.9);
-            transform: scale(1.1);
-        }
-
-        #ad-content {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-            height: 100%;
-        }
-
-        #ad-image {
-            max-width: 100%;
-            max-height: 100%;
-            width: auto;
-            height: auto;
-            display: block;
-            cursor: pointer;
-            object-fit: contain;
-            transition: transform 0.3s ease;
-        }
-
-        #ad-image:hover {
-            transform: scale(1.02);
-        }
-
-        /* Styles pour le compte à rebours des publicités */
-        #ad-countdown {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.95);
-            color: white;
-            padding: 20px 30px;
-            border-radius: 15px;
-            font-size: 20px;
-            font-weight: bold;
-            z-index: 10001;
-            text-align: center;
-            min-width: 200px;
-            backdrop-filter: blur(10px);
-            border: 3px solid var(--accent);
-            box-shadow: 0 0 25px rgba(52, 152, 219, 0.7);
-            animation: pulse 1s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: translate(-50%, -50%) scale(1); }
-            50% { transform: translate(-50%, -50%) scale(1.05); }
-            100% { transform: translate(-50%, -50%) scale(1); }
-        }
-
-        #ad-countdown::before {
-            content: "⏰";
-            display: block;
-            font-size: 30px;
-            margin-bottom: 10px;
-        }
-
-        /* Indicateur de chargement pour les pubs */
-        .ad-loading {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: white;
-            font-size: 16px;
-            text-align: center;
-        }
-
-        .ad-loading i {
-            display: block;
-            font-size: 30px;
-            margin-bottom: 10px;
-        }
-
-        /* Styles pour le message de clic sur les publicités */
-        .ad-click-message {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.8);
-            color: white;
-            padding: 12px 20px;
-            border-radius: 25px;
-            font-size: 16px;
-            font-weight: 600;
-            z-index: 10001;
-            text-align: center;
-            backdrop-filter: blur(10px);
-            border: 2px solid var(--accent);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-            animation: pulse 2s infinite;
-            display: none;
-        }
-
-        .ad-click-message i {
-            margin-right: 8px;
-            color: #ffd700;
-        }
-
-        /* Modal de partage */
-        #share-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            padding: 15px;
-        }
-
-        .share-modal-content {
-            background: var(--white);
-            border-radius: 15px;
-            padding: 1.5rem;
-            max-width: 500px;
-            width: 100%;
-            position: relative;
-            animation: modalAppear 0.3s ease-out;
-        }
-
-        .share-modal-close {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: var(--gray);
-        }
-
-        .share-modal-icon {
-            text-align: center;
-            margin-bottom: 1rem;
-        }
-
-        .share-modal-icon i {
-            font-size: 2.5rem;
-            color: var(--accent);
-        }
-
-        .share-modal-content h2 {
-            text-align: center;
-            margin-bottom: 1rem;
-            color: var(--primary);
-        }
-
-        .share-modal-content p {
-            text-align: center;
-            margin-bottom: 1.2rem;
-            color: var(--secondary);
-        }
-
-        .share-options {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-            gap: 0.8rem;
-            margin-bottom: 1.2rem;
-        }
-
-        .share-option {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 0.8rem;
-            border: 2px solid var(--light);
-            border-radius: 10px;
-            background: none;
-            cursor: pointer;
-            transition: var(--transition);
-            text-decoration: none;
-            color: var(--primary);
-        }
-
-        .share-option:hover {
-            border-color: var(--accent);
-            transform: translateY(-2px);
-        }
-
-        .share-option i {
-            font-size: 1.8rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .share-option.whatsapp i { color: #25D366; }
-        .share-option.facebook i { color: #3b5998; }
-        .share-option.twitter i { color: #1DA1F2; }
-        .share-option.telegram i { color: #0088cc; }
-        .share-option.link i { color: var(--accent); }
-
-        .share-modal-actions {
-            display: flex;
-            gap: 0.8rem;
-            justify-content: center;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            html {
-                font-size: 14px;
-            }
-            
+        /* ===== RESPONSIVE DESIGN ===== */
+        @media (max-width: 992px) {
             .header-content {
                 flex-direction: column;
-                padding: 0.8rem 0;
-                gap: 1rem;
+                gap: 1.5rem;
             }
             
             nav ul {
                 flex-wrap: wrap;
                 justify-content: center;
-                gap: 0.8rem;
-            }
-            
-            nav a {
-                padding: 0.4rem 0.6rem;
-                font-size: 0.85rem;
-            }
-            
-            .logo {
-                font-size: 1.1rem;
-            }
-            
-            .logo i {
-                font-size: 1.3rem;
             }
             
             .page-title h1 {
-                font-size: 1.8rem;
-            }
-            
-            .page-title i {
                 font-size: 2.2rem;
             }
             
             .card-view {
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 15px;
+            }
+            
+            .page-title h1 {
+                font-size: 2rem;
+            }
+            
+            .page-title i {
+                font-size: 3rem;
+            }
+            
+            .filter-group {
+                flex-direction: column;
+            }
+            
+            select {
+                width: 100%;
+            }
+            
+            .view-toggle {
+                align-self: center;
+            }
+            
+            .stats {
                 grid-template-columns: 1fr;
             }
             
-            .articles-grid {
+            .articles-grid, .books-grid {
                 grid-template-columns: 1fr;
+            }
+            
+            .article-detail {
+                padding: 2rem;
             }
             
             .article-header h1 {
-                font-size: 1.8rem;
-            }
-            
-            .article-meta-large {
-                gap: 1rem;
+                font-size: 2rem;
             }
             
             .contact-content {
@@ -1397,323 +1372,73 @@
             
             .footer-links {
                 grid-template-columns: 1fr;
+                gap: 2rem;
             }
             
             .legal-links {
                 flex-direction: column;
                 align-items: center;
-                gap: 0.8rem;
-            }
-            
-            #ad-modal {
-                height: 80vh;
-            }
-            
-            .share-options {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            
-            .table-view {
-                display: block;
-                overflow-x: auto;
-            }
-            
-            .table-view th, .table-view td {
-                padding: 0.6rem;
-            }
-            
-            .filter-group {
-                flex-direction: column;
-            }
-            
-            select {
-                width: 100%;
-            }
-            
-            .view-toggle {
-                align-self: center;
-            }
-            
-            .stats {
-                grid-template-columns: 1fr;
-            }
-            
-            .files-container, .about-content, .donation-content, .contact-content, .privacy-content, .legal-content {
-                padding: 1rem;
-            }
-            
-            .article-detail {
-                padding: 1rem;
-            }
-            
-            .article-header h1 {
-                font-size: 1.5rem;
-            }
-            
-            .article-meta-large {
-                flex-direction: column;
-                gap: 0.5rem;
-            }
-            
-            .books-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .donation-methods {
-                grid-template-columns: 1fr;
-            }
-            
-            .modal-content, .share-modal-content {
-                padding: 1rem;
-            }
-            
-            .donation-options {
-                flex-direction: column;
-            }
-            
-            .donation-option {
-                width: 100%;
-            }
-            
-            .share-options {
-                grid-template-columns: 1fr;
-            }
-            
-            footer {
-                padding: 1.5rem 0 0.8rem;
-            }
-            
-            .footer-section {
-                margin-bottom: 1rem;
-            }
-
-            .ad-click-message {
-                font-size: 14px;
-                padding: 10px 16px;
-                bottom: 15px;
+                gap: 1rem;
             }
         }
 
         @media (max-width: 480px) {
-            html {
-                font-size: 13px;
-            }
-            
-            .container {
-                padding: 0 10px;
-            }
-            
-            .header-content {
-                flex-wrap: wrap;
-            }
-            
-            .logo {
-                font-size: 1rem;
-            }
-            
-            .page-title h1 {
-                font-size: 1.6rem;
-            }
-            
-            .filter-group {
-                flex-direction: column;
-            }
-            
-            select {
-                min-width: 100%;
-            }
-            
-            .view-toggle {
-                align-self: center;
-            }
-            
-            .stats {
-                grid-template-columns: 1fr;
-            }
-            
-            .files-container, .about-content, .donation-content, .contact-content, .privacy-content, .legal-content {
-                padding: 1rem;
-            }
-            
-            .article-detail {
-                padding: 1rem;
-            }
-            
-            .article-header h1 {
-                font-size: 1.5rem;
-            }
-            
-            .article-meta-large {
-                flex-direction: column;
+            nav ul {
                 gap: 0.5rem;
             }
             
-            .books-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .donation-methods {
-                grid-template-columns: 1fr;
-            }
-            
-            .modal-content, .share-modal-content {
-                padding: 1rem;
-            }
-            
-            .donation-options {
-                flex-direction: column;
-            }
-            
-            .donation-option {
-                width: 100%;
-            }
-            
-            .share-options {
-                grid-template-columns: 1fr;
-            }
-            
-            footer {
-                padding: 1.5rem 0 0.8rem;
-            }
-            
-            .footer-section {
-                margin-bottom: 1rem;
-            }
-            
-            /* Améliorations pour les très petits écrans */
-            .header-content {
-                padding: 0.5rem 0;
-            }
-            
-            .logo {
+            nav a {
+                padding: 0.6rem 1rem;
                 font-size: 0.9rem;
             }
             
             .page-title h1 {
-                font-size: 1.4rem;
-            }
-            
-            .page-title i {
                 font-size: 1.8rem;
             }
             
-            .intro-collapsed, .intro-expanded {
-                padding: 1rem;
-            }
-            
-            .stat-card {
-                padding: 1rem;
-            }
-            
-            .stat-card i {
-                font-size: 2rem;
-            }
-            
-            .stat-card h3 {
-                font-size: 1.5rem;
-            }
-            
-            .file-card-header, .file-card-body, .file-card-footer {
-                padding: 0.8rem;
-            }
-            
-            .article-card {
-                margin-bottom: 1rem;
-            }
-            
-            .article-image {
-                padding: 1rem;
-            }
-            
-            .article-content {
-                padding: 1rem;
-            }
-            
-            .contact-item {
-                padding: 1rem;
-                flex-direction: column;
-                gap: 0.5rem;
-            }
-            
-            .form-group input, .form-group textarea {
-                padding: 8px 10px;
-            }
-            
-            .btn {
-                padding: 8px 16px;
-                font-size: 0.85rem;
-            }
-            
-            .modal-content, .share-modal-content {
-                padding: 1rem;
-            }
-            
-            .footer-links {
-                gap: 1rem;
-            }
-            
-            .footer-section {
-                margin-bottom: 1.5rem;
-            }
-
-            .ad-click-message {
-                font-size: 12px;
-                padding: 8px 14px;
-                bottom: 10px;
-            }
-        }
-
-        @media (max-width: 360px) {
-            html {
-                font-size: 12px;
-            }
-            
-            .container {
-                padding: 0 8px;
-            }
-            
-            .header-content {
-                padding: 0.4rem 0;
-            }
-            
-            .logo {
-                font-size: 0.85rem;
-            }
-            
-            .page-title h1 {
-                font-size: 1.3rem;
-            }
-            
-            .page-title i {
-                font-size: 1.6rem;
-            }
-            
-            .files-container, .about-content, .donation-content, .contact-content, .privacy-content, .legal-content {
-                padding: 0.8rem;
+            .intro-collapsed, .intro-expanded,
+            .controls, .files-container,
+            .about-content, .contact-content,
+            .privacy-content, .legal-content {
+                padding: 1.5rem;
             }
             
             .article-detail {
-                padding: 0.8rem;
+                padding: 1.5rem;
             }
             
             .article-header h1 {
-                font-size: 1.3rem;
+                font-size: 1.8rem;
             }
             
-            .modal-content, .share-modal-content {
-                padding: 0.8rem;
+            .article-meta-large {
+                flex-direction: column;
+                gap: 1rem;
             }
-            
-            .btn {
-                padding: 7px 14px;
-                font-size: 0.8rem;
-            }
+        }
+
+        /* ===== SCROLLBAR CUSTOM ===== */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--light);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, var(--accent2), var(--accent));
         }
     </style>
 </head>
 <body>
     <!-- Modal de partage -->
-    <div class="modal" id="share-modal">
+    <div class="modal" id="share-modal" style="display: none;">
         <div class="share-modal-content">
             <button class="share-modal-close" id="share-modal-close">&times;</button>
             <div class="share-modal-icon">
@@ -1753,8 +1478,8 @@
         </div>
     </div>
 
-    <!-- Container pour les publicités flottantes - FORMAT AGRANDI -->
-    <div id="ad-container">
+    <!-- Container pour les publicités flottantes -->
+    <div id="ad-container" style="display: none;">
         <div id="ad-modal">
             <button id="ad-close">&times;</button>
             <div id="ad-content">
@@ -1779,7 +1504,7 @@
         <div class="container">
             <div class="header-content">
                 <div class="logo">
-                    <i class="fas fa-book"></i>
+                    <i class="fas fa-book-open"></i>
                     <span>PrimeAcademia</span>
                 </div>
                 <nav>
@@ -1788,7 +1513,6 @@
                         <li><a href="#" class="nav-link" data-page="articles">Articles</a></li>
                         <li><a href="#" class="nav-link" data-page="librairie">Librairie</a></li>
                         <li><a href="#" class="nav-link" data-page="about">À propos</a></li>
-                        <li><a href="#" class="nav-link" data-page="donation">Soutien</a></li>
                         <li><a href="#" class="nav-link" data-page="contact">Contact</a></li>
                     </ul>
                 </nav>
@@ -2169,73 +1893,6 @@
                         <div class="feature-card">
                             <h3><i class="fas fa-shield-alt"></i> Sécurité et Confidentialité</h3>
                             <p>Vos données sont protégées et nous ne collectons aucune information personnelle sensible.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Page Soutien -->
-        <div class="page-section" id="donation-page">
-            <div class="page-title">
-                <i class="fas fa-hand-holding-heart"></i>
-                <h1>Soutenir PrimeAcademia</h1>
-            </div>
-
-            <div class="donation-content">
-                <div class="donation-section">
-                    <h2><i class="fas fa-heart"></i> Pourquoi Nous Soutenir ?</h2>
-                    <p>PrimeAcademia est une plateforme entièrement gratuite qui repose sur la contribution de sa communauté. Votre soutien nous permet de :</p>
-                    <ul>
-                        <li>Maintenir les serveurs et l'infrastructure technique</li>
-                        <li>Développer de nouvelles fonctionnalités</li>
-                        <li>Améliorer continuellement l'expérience utilisateur</li>
-                        <li>Étendre notre collection de ressources pédagogiques</li>
-                        <li>Assurer la pérennité du projet à long terme</li>
-                    </ul>
-                    <p>Chaque contribution, même modeste, fait une réelle différence et nous aide à poursuivre notre mission éducative.</p>
-                </div>
-
-                <div class="donation-section">
-                    <h2><i class="fas fa-donate"></i> Méthodes de Soutien</h2>
-                    <div class="donation-methods">
-                        <div class="donation-method">
-                            <i class="fab fa-whatsapp"></i>
-                            <h3>Don via WhatsApp</h3>
-                            <p>Contactez-nous directement sur WhatsApp pour effectuer un don.</p>
-                            <div class="whatsapp-contact">
-                                <a href="https://wa.me/22941733286" class="btn btn-whatsapp" target="_blank">
-                                    <i class="fab fa-whatsapp"></i> Contacter sur WhatsApp
-                                </a>
-                            </div>
-                        </div>
-
-                        <div class="donation-method">
-                            <i class="fas fa-mobile-alt"></i>
-                            <h3>Mobile Money</h3>
-                            <p>Effectuez un transfert via Mobile Money aux coordonnées suivantes :</p>
-                            <div class="payment-instructions">
-                                <h4>Instructions :</h4>
-                                <ol>
-                                    <li>Ouvrez votre application Mobile Money</li>
-                                    <li>Sélectionnez "Transfert d'argent"</li>
-                                    <li>Entrez le numéro : <strong>+229 41733286</strong></li>
-                                    <li>Indiquez le montant de votre don</li>
-                                    <li>Confirmez la transaction</li>
-                                </ol>
-                            </div>
-                        </div>
-
-                        <div class="donation-method">
-                            <i class="fas fa-hands-helping"></i>
-                            <h3>Autres Formes de Soutien</h3>
-                            <p>Vous pouvez également nous soutenir en :</p>
-                            <ul>
-                                <li>Partageant la plateforme avec d'autres étudiants</li>
-                                <li>Proposant des améliorations</li>
-                                <li>Contribuant avec vos propres ressources</li>
-                                <li>Donnant votre avis sur l'expérience utilisateur</li>
-                            </ul>
                         </div>
                     </div>
                 </div>
@@ -2947,14 +2604,12 @@
                     <a href="#" class="nav-link" data-page="articles">Articles</a>
                     <a href="#" class="nav-link" data-page="librairie">Librairie</a>
                     <a href="#" class="nav-link" data-page="about">À propos</a>
-                    <a href="#" class="nav-link" data-page="donation">Soutien</a>
                     <a href="#" class="nav-link" data-page="contact">Contact</a>
                 </div>
                 <div class="footer-section">
                     <h3>Légal</h3>
                     <a href="#" class="nav-link" data-page="privacy">Politique de confidentialité</a>
                     <a href="#" class="nav-link" data-page="legal">Mentions légales</a>
-                    <a href="#" class="nav-link" data-page="donation">Soutenir le projet</a>
                 </div>
                 <div class="footer-section">
                     <h3>Contact</h3>
@@ -2967,7 +2622,6 @@
             <div class="legal-links">
                 <a href="#" class="nav-link" data-page="privacy">Politique de confidentialité</a>
                 <a href="#" class="nav-link" data-page="legal">Mentions légales</a>
-                <a href="#" class="nav-link" data-page="donation">Soutenir le projet</a>
                 <a href="#" class="nav-link" data-page="contact">Contact</a>
             </div>
             
@@ -3060,26 +2714,6 @@
             apiKey: DRIVE_CONFIG.apiKey
         };
 
-        // Configuration pour les publicités
-        const AD_CONFIG = {
-            driveFolderId: '1jJjzp5QXHff62638bspkBKT2zwhNPzdd',
-            apiKey: DRIVE_CONFIG.apiKey,
-            interval: 60000,
-            displayTime: 10000,
-            currentAdIndex: 0,
-            isAdActive: false,
-            adInterval: null,
-            countdownInterval: null,
-            countdownTime: 5,
-            ads: [],
-            adLinks: {
-                'Ice_zone.jpg': 'https://icezone.netlify.app',
-                'nom_de_votre_image2.png': 'https://votre-lien2.com',
-                'publicite_special.pdf': 'https://votre-site.com/offre',
-                'banniere_promo.jpg': 'https://example.com/promotion'
-            }
-        };
-
         // Configuration des pages
         const PAGES_CONFIG = {
             'home': 'home-page',
@@ -3092,7 +2726,6 @@
             'article5': 'article5-page',
             'article6': 'article6-page',
             'about': 'about-page',
-            'donation': 'donation-page',
             'contact': 'contact-page',
             'privacy': 'privacy-page',
             'legal': 'legal-page'
@@ -3163,24 +2796,6 @@
         const introToggle = document.getElementById('intro-toggle');
         const introClose = document.getElementById('intro-close');
 
-        // Modal de partage
-        const shareModal = document.getElementById('share-modal');
-        const shareModalClose = document.getElementById('share-modal-close');
-        const shareContinue = document.getElementById('share-continue');
-        const shareWhatsapp = document.getElementById('share-whatsapp');
-        const shareFacebook = document.getElementById('share-facebook');
-        const shareTwitter = document.getElementById('share-twitter');
-        const shareTelegram = document.getElementById('share-telegram');
-        const shareLink = document.getElementById('share-link');
-
-        // Publicités
-        const adContainer = document.getElementById('ad-container');
-        const adClose = document.getElementById('ad-close');
-        const adImage = document.getElementById('ad-image');
-        const adCountdown = document.getElementById('ad-countdown');
-        const adLoading = document.getElementById('ad-loading');
-        const adClickMessage = document.getElementById('ad-click-message');
-
         // =============================================
         // INITIALISATION
         // =============================================
@@ -3200,7 +2815,6 @@
             // Chargement des données
             loadFiles();
             loadBooks();
-            initializeAds();
             
             console.log("✅ PrimeAcademia initialisé avec succès");
         });
@@ -3215,8 +2829,6 @@
             setupIntroduction();
             setupArticles();
             setupContactForm();
-            setupShareModal();
-            setupAds();
             setupTheme();
         }
 
@@ -3304,59 +2916,6 @@
             }
         }
 
-        function setupShareModal() {
-            if (shareModalClose) shareModalClose.addEventListener('click', closeShareModal);
-            if (shareContinue) shareContinue.addEventListener('click', closeShareModal);
-            
-            // Configuration des liens de partage
-            if (shareWhatsapp) {
-                shareWhatsapp.href = `https://wa.me/?text=${encodeURIComponent(SHARE_CONFIG.title + ' - ' + SHARE_CONFIG.description + ' ' + SHARE_CONFIG.url)}`;
-            }
-            
-            if (shareFacebook) {
-                shareFacebook.href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(SHARE_CONFIG.url)}`;
-            }
-            
-            if (shareTwitter) {
-                shareTwitter.href = `https://twitter.com/intent/tweet?text=${encodeURIComponent(SHARE_CONFIG.title)}&url=${encodeURIComponent(SHARE_CONFIG.url)}&hashtags=${SHARE_CONFIG.hashtags}`;
-            }
-            
-            if (shareTelegram) {
-                shareTelegram.href = `https://t.me/share/url?url=${encodeURIComponent(SHARE_CONFIG.url)}&text=${encodeURIComponent(SHARE_CONFIG.title + ' - ' + SHARE_CONFIG.description)}`;
-            }
-            
-            if (shareLink) {
-                shareLink.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    navigator.clipboard.writeText(SHARE_CONFIG.url).then(() => {
-                        alert('Lien copié dans le presse-papiers !');
-                    });
-                });
-            }
-
-            if (shareModal) {
-                shareModal.addEventListener('click', function(e) {
-                    if (e.target === shareModal) closeShareModal();
-                });
-            }
-        }
-
-        function setupAds() {
-            if (adClose) {
-                adClose.addEventListener('click', closeAd);
-            }
-            if (adContainer) {
-                adContainer.addEventListener('click', function(e) {
-                    if (e.target === adContainer) closeAd();
-                });
-            }
-            if (adImage) {
-                adImage.addEventListener('click', function() {
-                    handleAdClick();
-                });
-            }
-        }
-
         function setupTheme() {
             if (themeToggle) {
                 themeToggle.addEventListener('click', toggleTheme);
@@ -3391,9 +2950,11 @@
             if (savedTheme === 'dark') {
                 document.body.classList.add('dark-theme');
                 themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+                themeToggle.style.background = 'linear-gradient(135deg, #D4A017, #8A2BE2)';
             } else {
                 document.body.classList.remove('dark-theme');
                 themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+                themeToggle.style.background = 'var(--primary)';
             }
         }
 
@@ -3401,16 +2962,18 @@
             if (document.body.classList.contains('dark-theme')) {
                 document.body.classList.remove('dark-theme');
                 themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+                themeToggle.style.background = 'var(--primary)';
                 localStorage.setItem('theme', 'light');
             } else {
                 document.body.classList.add('dark-theme');
                 themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+                themeToggle.style.background = 'linear-gradient(135deg, #D4A017, #8A2BE2)';
                 localStorage.setItem('theme', 'dark');
             }
         }
 
         // =============================================
-        // GESTION DES FICHIERS ACADÉMIQUES - CORRIGÉE
+        // GESTION DES FICHIERS ACADÉMIQUES
         // =============================================
 
         async function loadFiles() {
@@ -3474,7 +3037,6 @@
                 type: getFileType(file.mimeType),
                 createdTime: file.createdTime,
                 webViewLink: file.webViewLink,
-                // NOUVELLE APPROCHE : Utiliser webContentLink quand disponible
                 downloadLink: file.webContentLink || `https://drive.google.com/uc?export=download&id=${file.id}`,
                 iconLink: getFileIcon(getFileType(file.mimeType)),
                 isNew: isFileNew(file.createdTime)
@@ -3514,9 +3076,9 @@
             if (files.length === 0) {
                 filesTableBody.innerHTML = `
                     <tr>
-                        <td colspan="6" style="text-align: center; padding: 2rem;">
-                            <i class="fas fa-search" style="font-size: 2rem; margin-bottom: 1rem; color: var(--gray);"></i>
-                            <p>Aucun fichier trouvé avec ces critères.</p>
+                        <td colspan="6" style="text-align: center; padding: 3rem;">
+                            <i class="fas fa-search" style="font-size: 3rem; margin-bottom: 1rem; color: var(--accent3);"></i>
+                            <p style="color: var(--dark2); font-size: 1.1rem;">Aucun fichier trouvé avec ces critères.</p>
                         </td>
                     </tr>
                 `;
@@ -3528,7 +3090,11 @@
                 if (file.isNew) row.classList.add('new-file');
 
                 const createdDate = new Date(file.createdTime);
-                const formattedDate = createdDate.toLocaleDateString('fr-FR');
+                const formattedDate = createdDate.toLocaleDateString('fr-FR', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
+                });
 
                 row.innerHTML = `
                     <td>
@@ -3541,7 +3107,7 @@
                     <td>${formatFiliere(file.filiere)}</td>
                     <td>${formatYear(file.year)}</td>
                     <td>${formatSemestre(file.semestre)}</td>
-                    <td>${file.type}</td>
+                    <td><span style="padding: 4px 12px; background: rgba(74, 111, 165, 0.1); border-radius: 20px; font-weight: 500;">${file.type}</span></td>
                     <td>${formattedDate}</td>
                 `;
                 filesTableBody.appendChild(row);
@@ -3553,9 +3119,9 @@
 
             if (files.length === 0) {
                 cardViewElement.innerHTML = `
-                    <div style="grid-column: 1 / -1; text-align: center; padding: 2rem;">
-                        <i class="fas fa-search" style="font-size: 2rem; margin-bottom: 1rem; color: var(--gray);"></i>
-                        <p>Aucun fichier trouvé avec ces critères.</p>
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 3rem;">
+                        <i class="fas fa-search" style="font-size: 3rem; margin-bottom: 1rem; color: var(--accent3);"></i>
+                        <p style="color: var(--dark2); font-size: 1.1rem;">Aucun fichier trouvé avec ces critères.</p>
                     </div>
                 `;
                 return;
@@ -3563,7 +3129,11 @@
 
             files.forEach(file => {
                 const createdDate = new Date(file.createdTime);
-                const formattedDate = createdDate.toLocaleDateString('fr-FR');
+                const formattedDate = createdDate.toLocaleDateString('fr-FR', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
+                });
 
                 const card = document.createElement('div');
                 card.className = 'file-card';
@@ -3621,10 +3191,21 @@
             totalFilesElement.textContent = filesData.length;
             const uniqueFilieres = new Set(filesData.map(file => file.filiere));
             totalFilieresElement.textContent = uniqueFilieres.size;
+            
+            // Mise à jour du temps de mise à jour
+            updateCounter--;
+            if (updateCounter <= 0) {
+                updateCounter = 24 * 60 * 60;
+                loadFiles(); // Recharger les fichiers après 24h
+            }
+            
+            const hours = Math.floor(updateCounter / 3600);
+            const minutes = Math.floor((updateCounter % 3600) / 60);
+            updateTimeElement.textContent = `${hours}h ${minutes}m`;
         }
 
         // =============================================
-        // FONCTIONNALITÉS DE TÉLÉCHARGEMENT - CORRIGÉES
+        // FONCTIONNALITÉS DE TÉLÉCHARGEMENT
         // =============================================
 
         async function handleFileDownload(fileId, fileName) {
@@ -3634,7 +3215,7 @@
                 // Afficher un indicateur de chargement
                 showDownloadLoading(fileName);
                 
-                // Méthode 1: Essayer d'abord avec une requête directe
+                // Méthode directe
                 const directDownloadUrl = `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&key=${DRIVE_CONFIG.apiKey}`;
                 
                 const response = await fetch(directDownloadUrl, {
@@ -3645,11 +3226,9 @@
                 });
                 
                 if (response.ok) {
-                    // Méthode directe fonctionne
                     const blob = await response.blob();
                     const url = window.URL.createObjectURL(blob);
                     
-                    // Créer un lien de téléchargement
                     const link = document.createElement('a');
                     link.href = url;
                     link.download = fileName;
@@ -3657,26 +3236,18 @@
                     link.click();
                     document.body.removeChild(link);
                     
-                    // Nettoyer l'URL
                     window.URL.revokeObjectURL(url);
                     
                     console.log(`✅ Téléchargement direct réussi: ${fileName}`);
                     hideDownloadLoading();
                     
-                    // Afficher le modal de partage
-                    setTimeout(() => {
-                        showShareModal();
-                    }, 1000);
-                    
                 } else {
-                    // Si la méthode directe échoue, utiliser l'approche Google Drive
                     console.log('🔄 Méthode directe échouée, utilisation de Google Drive');
                     fallbackDownload(fileId, fileName);
                 }
                 
             } catch (error) {
                 console.error('❌ Erreur de téléchargement:', error);
-                // Utiliser la méthode de secours
                 fallbackDownload(fileId, fileName);
             }
             
@@ -3684,14 +3255,11 @@
         }
 
         function fallbackDownload(fileId, fileName) {
-            // Méthode de secours avec Google Drive
             const driveUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
             
-            // Ouvrir dans un nouvel onglet pour éviter les problèmes de popup
             const newWindow = window.open(driveUrl, '_blank');
             
             if (!newWindow) {
-                // Si les popups sont bloquées, utiliser une approche différente
                 const link = document.createElement('a');
                 link.href = driveUrl;
                 link.target = '_blank';
@@ -3702,15 +3270,9 @@
             }
             
             hideDownloadLoading();
-            
-            // Afficher le modal de partage après un délai
-            setTimeout(() => {
-                showShareModal();
-            }, 2000);
         }
 
         function showDownloadLoading(fileName) {
-            // Créer un overlay de chargement
             const loadingOverlay = document.createElement('div');
             loadingOverlay.id = 'download-loading';
             loadingOverlay.style.cssText = `
@@ -3731,7 +3293,7 @@
             
             loadingOverlay.innerHTML = `
                 <div style="text-align: center;">
-                    <i class="fas fa-spinner fa-spin" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                    <i class="fas fa-spinner fa-spin" style="font-size: 3rem; margin-bottom: 1rem; color: var(--accent);"></i>
                     <p>Préparation du téléchargement...</p>
                     <p><strong>${fileName}</strong></p>
                     <p style="font-size: 0.9rem; margin-top: 1rem;">Veuillez patienter</p>
@@ -3745,18 +3307,6 @@
             const loadingOverlay = document.getElementById('download-loading');
             if (loadingOverlay) {
                 loadingOverlay.remove();
-            }
-        }
-
-        function showShareModal() {
-            if (shareModal) {
-                shareModal.style.display = 'flex';
-            }
-        }
-
-        function closeShareModal() {
-            if (shareModal) {
-                shareModal.style.display = 'none';
             }
         }
 
@@ -3851,244 +3401,6 @@
         }
 
         // =============================================
-        // SYSTÈME DE PUBLICITÉS
-        // =============================================
-
-        function initializeAds() {
-            console.log("🔄 Initialisation du système de publicités...");
-            loadAdsFromDrive();
-        }
-
-        async function loadAdsFromDrive() {
-            try {
-                console.log("📁 Chargement des publicités depuis Google Drive...");
-                
-                const response = await fetch(
-                    `https://www.googleapis.com/drive/v3/files?q='${AD_CONFIG.driveFolderId}' in parents and trashed=false&key=${AD_CONFIG.apiKey}&fields=files(id,name,mimeType,webViewLink,webContentLink)`
-                );
-
-                if (!response.ok) {
-                    throw new Error(`Erreur API Drive: ${response.status}`);
-                }
-
-                const data = await response.json();
-                
-                if (data.files && data.files.length > 0) {
-                    console.log(`📸 ${data.files.length} fichier(s) trouvé(s) dans le dossier publicité`);
-                    
-                    // Filtrer uniquement les images
-                    AD_CONFIG.ads = data.files
-                        .filter(file => file.mimeType && file.mimeType.startsWith('image/'))
-                        .map(file => {
-                            const link = AD_CONFIG.adLinks[file.name] || '#';
-                            console.log(`🔗 Publicité "${file.name}" -> Lien: ${link}`);
-                            
-                            return {
-                                id: file.id,
-                                name: file.name,
-                                imageUrl: `https://lh3.googleusercontent.com/d/${file.id}=w800`,
-                                imageUrlAlt: `https://drive.google.com/uc?export=view&id=${file.id}`,
-                                link: link
-                            };
-                        });
-                    
-                    console.log("✅ Publicités chargées avec succès:", AD_CONFIG.ads);
-                    
-                    if (AD_CONFIG.ads.length === 0) {
-                        console.log("❌ Aucune image trouvée dans le dossier publicité");
-                        return;
-                    }
-                    
-                    // Précharger toutes les images
-                    preloadAdImages();
-                    
-                    // Démarrer la rotation après 5 secondes
-                    setTimeout(() => {
-                        startAdRotation();
-                    }, 5000);
-                } else {
-                    console.log("❌ Aucune publicité trouvée dans le dossier");
-                }
-            } catch (error) {
-                console.error('❌ Erreur lors du chargement des publicités:', error);
-            }
-        }
-
-        function preloadAdImages() {
-            AD_CONFIG.ads.forEach(ad => {
-                const img = new Image();
-                img.src = ad.imageUrl;
-            });
-        }
-
-        function startAdRotation() {
-            if (AD_CONFIG.ads.length === 0) {
-                console.log("❌ Aucune publicité à afficher");
-                return;
-            }
-
-            console.log("🔄 Démarrage de la rotation des publicités");
-
-            // Nettoyer l'intervalle existant
-            if (AD_CONFIG.adInterval) {
-                clearInterval(AD_CONFIG.adInterval);
-            }
-
-            // Afficher la première publicité
-            showNextAd();
-
-            // Configurer l'intervalle pour les publicités suivantes
-            AD_CONFIG.adInterval = setInterval(() => {
-                if (!AD_CONFIG.isAdActive) {
-                    showNextAd();
-                }
-            }, AD_CONFIG.interval);
-        }
-
-        function showNextAd() {
-            if (AD_CONFIG.ads.length === 0) return;
-            if (AD_CONFIG.isAdActive) return;
-
-            const ad = AD_CONFIG.ads[AD_CONFIG.currentAdIndex];
-            console.log(`🖼️ Tentative d'affichage de la publicité: ${ad.name}`);
-
-            // Afficher le conteneur et l'indicateur de chargement
-            adContainer.style.display = 'flex';
-            adLoading.style.display = 'block';
-            adImage.style.display = 'none';
-            adCountdown.style.display = 'none';
-            adClose.style.display = 'none';
-            adClickMessage.style.display = 'none';
-
-            // Créer une image pour précharger et tester
-            const img = new Image();
-            
-            img.onload = function() {
-                console.log(`✅ Publicité chargée avec succès: ${ad.name}`);
-                adLoading.style.display = 'none';
-                // Démarrer le compte à rebours de 5 secondes AVANT d'afficher l'image
-                startCountdown(ad);
-            };
-            
-            img.onerror = function() {
-                console.error(`❌ Erreur de chargement de la publicité: ${ad.name}`);
-                adLoading.innerHTML = '<i class="fas fa-exclamation-triangle"></i><p>Erreur de chargement</p>';
-                
-                // Passer à la publicité suivante en cas d'erreur
-                setTimeout(() => {
-                    AD_CONFIG.currentAdIndex = (AD_CONFIG.currentAdIndex + 1) % AD_CONFIG.ads.length;
-                    closeAd();
-                    // Réessayer avec la suivante après 2 secondes
-                    setTimeout(() => showNextAd(), 2000);
-                }, 2000);
-            };
-            
-            // Essayer d'abord l'URL principale, puis l'alternative en cas d'échec
-            img.src = ad.imageUrl;
-        }
-
-        function startCountdown(ad) {
-            let countdown = AD_CONFIG.countdownTime;
-            AD_CONFIG.isAdActive = true;
-            
-            // Afficher le compte à rebours avec le message demandé - AVANT l'image
-            adCountdown.style.display = 'block';
-            adCountdown.innerHTML = `
-                <div style="font-size: 20px; margin-bottom: 10px;">Pause publicitaire dans...</div>
-                <div style="font-size: 36px; margin: 15px 0; font-weight: bold;">${countdown}s</div>
-            `;
-
-            console.log(`⏱️ Début du compte à rebours: ${countdown} secondes`);
-
-            // Démarrer le compte à rebours
-            AD_CONFIG.countdownInterval = setInterval(() => {
-                countdown--;
-                adCountdown.innerHTML = `
-                    <div style="font-size: 20px; margin-bottom: 10px;">Pause publicitaire dans...</div>
-                    <div style="font-size: 36px; margin: 15px 0; font-weight: bold;">${countdown}s</div>
-                `;
-                
-                if (countdown <= 0) {
-                    clearInterval(AD_CONFIG.countdownInterval);
-                    console.log("🎯 Compte à rebours terminé, affichage de la publicité");
-                    showAdAfterCountdown(ad);
-                }
-            }, 1000);
-        }
-
-        function showAdAfterCountdown(ad) {
-            console.log(`🎯 Affichage de la publicité: ${ad.name}`);
-            console.log(`🔗 Lien associé: ${ad.link}`);
-            
-            // Cacher le compte à rebours
-            adCountdown.style.display = 'none';
-            
-            // Afficher l'image de la publicité
-            adImage.src = ad.imageUrl;
-            adImage.alt = ad.name;
-            adImage.style.display = 'block';
-            
-            // Rendre l'image cliquable seulement si le lien n'est pas '#'
-            if (ad.link && ad.link !== '#') {
-                adImage.style.cursor = 'pointer';
-                adImage.title = `Cliquer pour visiter ${ad.link}`;
-                
-                // Afficher le message invitant à cliquer
-                adClickMessage.style.display = 'block';
-                
-                // Stocker l'index actuel pour le clic
-                adImage.setAttribute('data-ad-index', AD_CONFIG.currentAdIndex);
-            } else {
-                adImage.style.cursor = 'default';
-                adClickMessage.style.display = 'none';
-            }
-            
-            // Afficher le bouton fermer
-            adClose.style.display = 'block';
-            
-            // Fermer automatiquement après le temps défini
-            setTimeout(() => {
-                if (AD_CONFIG.isAdActive) {
-                    console.log("⏰ Fermeture automatique de la publicité");
-                    closeAd();
-                }
-            }, AD_CONFIG.displayTime);
-            
-            // Passer à la publicité suivante pour le prochain tour
-            AD_CONFIG.currentAdIndex = (AD_CONFIG.currentAdIndex + 1) % AD_CONFIG.ads.length;
-        }
-
-        function handleAdClick() {
-            // Récupérer l'index de la pub actuellement affichée
-            const currentAdIndex = (AD_CONFIG.currentAdIndex - 1 + AD_CONFIG.ads.length) % AD_CONFIG.ads.length;
-            const currentAd = AD_CONFIG.ads[currentAdIndex];
-            
-            if (currentAd && currentAd.link && currentAd.link !== '#') {
-                console.log(`🔗 Clic sur la publicité - Ouverture: ${currentAd.link}`);
-                window.open(currentAd.link, '_blank');
-                closeAd();
-            } else {
-                console.log("ℹ️ Publicité sans lien ou lien non défini");
-            }
-        }
-
-        function closeAd() {
-            console.log("🔒 Fermeture de la publicité");
-            adContainer.style.display = 'none';
-            AD_CONFIG.isAdActive = false;
-            adImage.src = '';
-            adImage.style.display = 'none';
-            adLoading.style.display = 'block';
-            adCountdown.style.display = 'none';
-            adClickMessage.style.display = 'none';
-            
-            // Nettoyer l'intervalle de compte à rebours s'il existe
-            if (AD_CONFIG.countdownInterval) {
-                clearInterval(AD_CONFIG.countdownInterval);
-            }
-        }
-
-        // =============================================
         // FORMULAIRE DE CONTACT
         // =============================================
 
@@ -4106,7 +3418,6 @@
             const form = e.target;
             const formData = new FormData(form);
             
-            // Utilisation directe de Formspree sans EmailJS
             fetch(form.action, {
                 method: 'POST',
                 body: formData,
@@ -4136,7 +3447,6 @@
         // UTILITAIRES
         // =============================================
 
-        // Gestion des types de fichiers
         function getFileType(mimeType) {
             const typeMap = {
                 'application/pdf': 'PDF',
@@ -4166,7 +3476,6 @@
             return diffDays <= 1;
         }
 
-        // Formatage des données
         function formatFiliere(filiere) {
             const filiereNames = {
                 'informatique': 'Informatique',
@@ -4261,33 +3570,16 @@
         // EXPORT DES FONCTIONS GLOBALES
         // =============================================
 
-        // Fonctions qui doivent être accessibles globalement
         window.handleFileDownload = handleFileDownload;
 
         // =============================================
-        // CORRECTIONS SPÉCIFIQUES
+        // MISE À JOUR AUTOMATIQUE
         // =============================================
 
-        // Protection légère contre l'inspection
-        document.addEventListener('contextmenu', function(e) {
-            if (window.innerWidth > 768) {
-                e.preventDefault();
-            }
-        });
+        // Mettre à jour le compteur toutes les secondes
+        setInterval(updateStats, 1000);
 
-        // Protection légère contre les raccourcis clavier
-        document.addEventListener('keydown', function(e) {
-            if (window.innerWidth > 768 && e.key === 'F12') {
-                e.preventDefault();
-            }
-            
-            if (window.innerWidth > 768 && e.ctrlKey && e.shiftKey && e.key === 'I') {
-                e.preventDefault();
-            }
-        });
-
-        console.log("✅ JavaScript PrimeAcademia chargé avec succès - Version corrigée");
+        console.log("✅ JavaScript PrimeAcademia chargé avec succès");
     </script>
 </body>
 </html>
-
