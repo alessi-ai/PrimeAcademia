@@ -82,6 +82,11 @@
             50% { transform: translateY(-10px); }
         }
 
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         /* ===== HEADER & MENU BURGER ===== */
         header {
             background: var(--light);
@@ -1305,7 +1310,7 @@
             max-width: 500px;
             width: 90%;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            animation: fadeIn 0.5s ease-out;
+            animation: fadeInDown 0.5s ease-out;
             position: relative;
             border: 3px solid var(--primary);
         }
@@ -1313,6 +1318,7 @@
         .share-modal-header {
             text-align: center;
             margin-bottom: 2rem;
+            position: relative;
         }
 
         .share-modal-header i {
@@ -1333,6 +1339,8 @@
             color: var(--dark2);
             font-size: 1rem;
             line-height: 1.6;
+            max-width: 400px;
+            margin: 0 auto;
         }
 
         .share-options {
@@ -1409,6 +1417,7 @@
             font-size: 0.9rem;
             background: var(--light);
             color: var(--dark);
+            font-family: inherit;
         }
 
         .share-url-input button {
@@ -1421,6 +1430,7 @@
             cursor: pointer;
             transition: var(--transition);
             white-space: nowrap;
+            font-family: inherit;
         }
 
         .share-url-input button:hover {
@@ -1456,12 +1466,56 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            z-index: 10;
         }
 
         .close-share-modal:hover {
             background: var(--error);
             color: white;
             transform: rotate(90deg);
+        }
+
+        .close-modal-btn {
+            background: var(--light2);
+            color: var(--dark);
+            border: 2px solid var(--light2);
+            padding: 10px 20px;
+            border-radius: var(--radius);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: inherit;
+        }
+
+        .close-modal-btn:hover {
+            background: white;
+            border-color: var(--accent);
+            color: var(--dark);
+            transform: translateY(-2px);
+        }
+
+        /* ===== TOAST NOTIFICATION ===== */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--success);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-hover);
+            z-index: 10001;
+            animation: slideIn 0.3s ease-out;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            max-width: 350px;
+        }
+
+        .toast.hidden {
+            animation: fadeIn 0.3s ease-out reverse;
+            opacity: 0;
+            visibility: hidden;
         }
 
         /* ===== FOOTER ===== */
@@ -1960,7 +2014,7 @@
             <div class="share-modal-header">
                 <i class="fas fa-share-alt"></i>
                 <h2>Partagez PrimeAcademia !</h2>
-                <p>Aidez d'autres étudiants à bénéficier de ressources gratuites. Partagez cette plateforme avec vos amis et collègues.</p>
+                <p>Merci d'avoir téléchargé ! Aidez d'autres étudiants à bénéficier de ressources gratuites en partageant cette plateforme.</p>
             </div>
             
             <div class="share-options">
@@ -2002,8 +2056,8 @@
             
             <div class="share-modal-footer">
                 <p>Merci de contribuer à rendre l'éducation plus accessible !</p>
-                <button class="btn btn-primary" id="closeAndDownload">
-                    <i class="fas fa-download"></i> Continuer vers le téléchargement
+                <button class="close-modal-btn" id="closeModalBtn">
+                    <i class="fas fa-times"></i> Fermer
                 </button>
             </div>
         </div>
@@ -3262,13 +3316,6 @@
         const itemsPerPage = 12;
         let filteredFiles = [];
 
-        // Variables pour le téléchargement avec partage
-        let pendingDownload = {
-            fileId: null,
-            fileName: null,
-            action: null
-        };
-
         // =============================================
         // ÉLÉMENTS DOM
         // =============================================
@@ -3331,7 +3378,7 @@
         const closeShareModal = document.getElementById('closeShareModal');
         const shareUrl = document.getElementById('shareUrl');
         const copyUrlBtn = document.getElementById('copyUrlBtn');
-        const closeAndDownloadBtn = document.getElementById('closeAndDownload');
+        const closeModalBtn = document.getElementById('closeModalBtn');
         const shareOptions = document.querySelectorAll('.share-option');
 
         // =============================================
@@ -3524,7 +3571,7 @@
         }
 
         function setupShareModal() {
-            // Bouton de fermeture
+            // Bouton de fermeture (croix)
             if (closeShareModal) {
                 closeShareModal.addEventListener('click', closeShareModalHandler);
             }
@@ -3534,9 +3581,9 @@
                 copyUrlBtn.addEventListener('click', copyShareUrl);
             }
             
-            // Bouton continuer vers téléchargement
-            if (closeAndDownloadBtn) {
-                closeAndDownloadBtn.addEventListener('click', closeAndDownload);
+            // Bouton fermer en bas
+            if (closeModalBtn) {
+                closeModalBtn.addEventListener('click', closeShareModalHandler);
             }
             
             // Options de partage
@@ -3550,6 +3597,13 @@
             // Fermer avec la touche Echap
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape' && shareModal.classList.contains('active')) {
+                    closeShareModalHandler();
+                }
+            });
+            
+            // Fermer en cliquant en dehors du modal
+            shareModal.addEventListener('click', function(e) {
+                if (e.target === shareModal) {
                     closeShareModalHandler();
                 }
             });
@@ -3747,11 +3801,11 @@
                             <i class="far fa-calendar"></i> Ajouté le ${formattedDate}
                         </div>
                         <div class="file-actions">
-                            <button class="btn btn-primary" onclick="promptShare('${file.id}', '${file.name}', 'download')">
+                            <button class="btn btn-primary" onclick="downloadAndShare('${file.id}', '${file.name}')">
                                 <i class="fas fa-download"></i> Télécharger
                             </button>
-                            <button class="btn btn-share" onclick="promptShare('${file.id}', '${file.name}', 'preview')">
-                                <i class="fas fa-share-alt"></i> Partager le site
+                            <button class="btn btn-secondary" onclick="handleFilePreview('${file.id}')">
+                                <i class="fas fa-eye"></i> Prévisualiser
                             </button>
                         </div>
                     </div>
@@ -3816,33 +3870,36 @@
         // FONCTIONNALITÉS DE TÉLÉCHARGEMENT AVEC PARTAGE
         // =============================================
 
-        function promptShare(fileId, fileName, action) {
-            // Stocker les informations de téléchargement
-            pendingDownload = {
-                fileId: fileId,
-                fileName: fileName,
-                action: action
-            };
-            
-            // Afficher le modal de partage
-            openShareModal();
-            
-            // Mettre à jour le texte du bouton selon l'action
-            if (closeAndDownloadBtn) {
-                if (action === 'download') {
-                    closeAndDownloadBtn.innerHTML = '<i class="fas fa-download"></i> Continuer vers le téléchargement';
-                } else if (action === 'preview') {
-                    closeAndDownloadBtn.innerHTML = '<i class="fas fa-eye"></i> Continuer vers la prévisualisation';
-                }
+        async function downloadAndShare(fileId, fileName) {
+            try {
+                console.log(`📥 Téléchargement en cours: ${fileName}`);
+                
+                // Afficher l'indicateur de chargement
+                showDownloadLoading(fileName);
+                
+                // Télécharger le fichier
+                await handleFileDownload(fileId, fileName);
+                
+                // Masquer l'indicateur de chargement
+                hideDownloadLoading();
+                
+                // Afficher le modal de partage après un court délai
+                setTimeout(() => {
+                    openShareModal();
+                }, 500);
+                
+            } catch (error) {
+                console.error('❌ Erreur lors du téléchargement:', error);
+                hideDownloadLoading();
+                // On peut quand même afficher le modal de partage
+                setTimeout(() => {
+                    openShareModal();
+                }, 500);
             }
         }
 
         async function handleFileDownload(fileId, fileName) {
             try {
-                console.log(`📥 Tentative de téléchargement: ${fileName} (ID: ${fileId})`);
-                
-                showDownloadLoading(fileName);
-                
                 const directDownloadUrl = `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&key=${DRIVE_CONFIG.apiKey}`;
                 
                 const response = await fetch(directDownloadUrl, {
@@ -3866,19 +3923,19 @@
                     window.URL.revokeObjectURL(url);
                     
                     console.log(`✅ Téléchargement direct réussi: ${fileName}`);
-                    hideDownloadLoading();
+                    return true;
                     
                 } else {
                     console.log('🔄 Méthode directe échouée, utilisation de Google Drive');
                     fallbackDownload(fileId, fileName);
+                    return true;
                 }
                 
             } catch (error) {
                 console.error('❌ Erreur de téléchargement:', error);
                 fallbackDownload(fileId, fileName);
+                return true;
             }
-            
-            return false;
         }
 
         function fallbackDownload(fileId, fileName) {
@@ -3895,11 +3952,9 @@
                 link.click();
                 document.body.removeChild(link);
             }
-            
-            hideDownloadLoading();
         }
 
-        function handleFilePreview(fileId, fileName) {
+        function handleFilePreview(fileId) {
             const previewUrl = `https://drive.google.com/file/d/${fileId}/view`;
             window.open(previewUrl, '_blank');
         }
@@ -3919,29 +3974,7 @@
             if (shareModal) {
                 shareModal.classList.remove('active');
                 document.body.style.overflow = '';
-                
-                // Réinitialiser le téléchargement en attente
-                pendingDownload = {
-                    fileId: null,
-                    fileName: null,
-                    action: null
-                };
             }
-        }
-
-        function closeAndDownload() {
-            closeShareModalHandler();
-            
-            // Exécuter l'action après un court délai
-            setTimeout(() => {
-                if (pendingDownload.fileId && pendingDownload.fileName) {
-                    if (pendingDownload.action === 'download') {
-                        handleFileDownload(pendingDownload.fileId, pendingDownload.fileName);
-                    } else if (pendingDownload.action === 'preview') {
-                        handleFilePreview(pendingDownload.fileId, pendingDownload.fileName);
-                    }
-                }
-            }, 300);
         }
 
         function shareOnPlatform(platform) {
@@ -4007,10 +4040,41 @@
             copyUrlBtn.innerHTML = '<i class="fas fa-check"></i> Copié !';
             copyUrlBtn.style.background = 'var(--success)';
             
+            // Afficher une notification
+            showToast('Lien copié dans le presse-papiers !', 'success');
+            
             setTimeout(() => {
                 copyUrlBtn.innerHTML = originalText;
                 copyUrlBtn.style.background = '';
             }, 2000);
+        }
+
+        function showToast(message, type = 'success') {
+            // Supprimer les anciens toasts
+            const existingToast = document.querySelector('.toast');
+            if (existingToast) {
+                existingToast.remove();
+            }
+            
+            // Créer le toast
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+                <span>${message}</span>
+            `;
+            
+            document.body.appendChild(toast);
+            
+            // Supprimer le toast après 3 secondes
+            setTimeout(() => {
+                toast.classList.add('hidden');
+                setTimeout(() => {
+                    if (toast.parentNode) {
+                        toast.remove();
+                    }
+                }, 300);
+            }, 3000);
         }
 
         // =============================================
@@ -4235,7 +4299,7 @@
             loadingOverlay.innerHTML = `
                 <div style="text-align: center; max-width: 300px;">
                     <i class="fas fa-spinner fa-spin" style="font-size: 2.5rem; margin-bottom: 1rem; color: var(--accent);"></i>
-                    <p>Préparation du téléchargement...</p>
+                    <p>Téléchargement en cours...</p>
                     <p style="word-break: break-word;"><strong>${fileName}</strong></p>
                     <p style="font-size: 0.85rem; margin-top: 1rem; opacity: 0.8;">Veuillez patienter</p>
                 </div>
@@ -4312,8 +4376,8 @@
         // EXPORT DES FONCTIONS GLOBALES
         // =============================================
 
-        window.handleFileDownload = handleFileDownload;
-        window.promptShare = promptShare;
+        window.downloadAndShare = downloadAndShare;
+        window.handleFilePreview = handleFilePreview;
 
         // =============================================
         // MISE À JOUR AUTOMATIQUE
