@@ -1290,12 +1290,14 @@
             background: rgba(0, 0, 0, 0.85);
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start; /* Changé de center à flex-start */
             z-index: 10000;
             opacity: 0;
             visibility: hidden;
             transition: var(--transition);
             backdrop-filter: blur(5px);
+            overflow-y: auto; /* Permettre le défilement */
+            padding: 20px; /* Ajout de padding */
         }
 
         .share-modal.active {
@@ -1308,17 +1310,21 @@
             border-radius: var(--radius-lg);
             padding: 2.5rem;
             max-width: 500px;
-            width: 90%;
+            width: 100%;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             animation: fadeInDown 0.5s ease-out;
             position: relative;
             border: 3px solid var(--primary);
+            margin: auto; /* Centrer verticalement */
+            max-height: 90vh; /* Limiter la hauteur */
+            overflow-y: auto; /* Permettre le défilement si nécessaire */
         }
 
         .share-modal-header {
             text-align: center;
             margin-bottom: 2rem;
             position: relative;
+            padding-right: 2rem; /* Espace pour la croix */
         }
 
         .share-modal-header i {
@@ -1418,6 +1424,7 @@
             background: var(--light);
             color: var(--dark);
             font-family: inherit;
+            min-width: 0; /* Important pour les petits écrans */
         }
 
         .share-url-input button {
@@ -1431,6 +1438,7 @@
             transition: var(--transition);
             white-space: nowrap;
             font-family: inherit;
+            flex-shrink: 0; /* Empêcher le bouton de rétrécir */
         }
 
         .share-url-input button:hover {
@@ -1485,6 +1493,10 @@
             cursor: pointer;
             transition: var(--transition);
             font-family: inherit;
+            width: 100%;
+            max-width: 200px;
+            margin: 0 auto;
+            display: block;
         }
 
         .close-modal-btn:hover {
@@ -1753,18 +1765,77 @@
                 padding: 1rem;
             }
             
-            /* Share modal responsive */
+            /* MODAL DE PARTAGE RESPONSIVE - CORRECTIONS */
+            .share-modal {
+                padding: 10px;
+                align-items: flex-start;
+                padding-top: 20px;
+            }
+            
             .share-modal-content {
                 padding: 1.5rem;
-                margin: 1rem;
+                margin: 0;
+                max-height: 85vh;
+                overflow-y: auto;
+                width: 100%;
+            }
+            
+            .share-modal-header {
+                margin-bottom: 1.5rem;
+                padding-right: 2.5rem; /* Espace pour la croix */
+            }
+            
+            .share-modal-header h2 {
+                font-size: 1.4rem;
+                line-height: 1.3;
+            }
+            
+            .share-modal-header i {
+                font-size: 2.5rem;
             }
             
             .share-options {
                 grid-template-columns: repeat(2, 1fr);
+                gap: 0.8rem;
+                margin-bottom: 1.5rem;
+            }
+            
+            .share-option {
+                padding: 1rem 0.5rem;
+            }
+            
+            .share-option i {
+                font-size: 2rem;
             }
             
             .share-url-input {
                 flex-direction: column;
+                gap: 0.8rem;
+            }
+            
+            .share-url-input input {
+                font-size: 0.85rem;
+                padding: 10px 12px;
+            }
+            
+            .share-url-input button {
+                width: 100%;
+                padding: 10px;
+            }
+            
+            .close-share-modal {
+                top: 0.5rem;
+                right: 0.5rem;
+                width: 36px;
+                height: 36px;
+                background: rgba(255, 255, 255, 0.9);
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            }
+            
+            .close-modal-btn {
+                width: 100%;
+                max-width: none;
+                margin-top: 0.5rem;
             }
             
             /* Footer centré pour mobile */
@@ -1913,17 +1984,51 @@
                 font-size: 0.9rem;
             }
             
-            /* Share modal mobile */
-            .share-options {
-                grid-template-columns: 1fr;
+            /* Share modal mobile - encore plus petit */
+            .share-modal {
+                padding: 5px;
+                padding-top: 10px;
             }
             
-            .share-option {
-                padding: 1rem;
+            .share-modal-content {
+                padding: 1.2rem;
+                max-height: 80vh;
             }
             
             .share-modal-header h2 {
-                font-size: 1.5rem;
+                font-size: 1.3rem;
+                margin-bottom: 0.8rem;
+            }
+            
+            .share-modal-header p {
+                font-size: 0.9rem;
+                line-height: 1.5;
+            }
+            
+            .share-options {
+                grid-template-columns: 1fr;
+                gap: 0.6rem;
+            }
+            
+            .share-option {
+                padding: 0.8rem;
+            }
+            
+            .share-url-container p {
+                font-size: 0.9rem;
+            }
+            
+            .close-share-modal {
+                top: 0.3rem;
+                right: 0.3rem;
+                width: 32px;
+                height: 32px;
+                font-size: 1rem;
+            }
+            
+            .close-modal-btn {
+                padding: 8px 16px;
+                font-size: 0.9rem;
             }
         }
 
@@ -1959,6 +2064,15 @@
             
             .footer-links {
                 gap: 1rem;
+            }
+            
+            /* Modal encore plus petit pour très petits écrans */
+            .share-modal-content {
+                padding: 1rem;
+            }
+            
+            .share-modal-header h2 {
+                font-size: 1.2rem;
             }
         }
 
@@ -2637,7 +2751,7 @@
             </div>
         </div>
 
-        <!-- Pages Articles détaillés -->
+        <!-- Articles détaillés -->
         <div class="page-section" id="article1-page">
             <a href="#" class="back-to-articles">
                 <i class="fas fa-arrow-left"></i> Retour aux articles
@@ -2740,7 +2854,6 @@
             </div>
         </div>
 
-        <!-- Article 2 détaillé -->
         <div class="page-section" id="article2-page">
             <a href="#" class="back-to-articles">
                 <i class="fas fa-arrow-left"></i> Retour aux articles
@@ -2803,52 +2916,8 @@
                         <li>Consacrez des plages horaires spécifiques à la consultation des emails et réseaux sociaux</li>
                     </ul>
                     
-                    <h2>Éclairage et ambiance</h2>
-                    <p>L'éclairage joue un rôle crucial dans votre confort visuel et votre concentration :</p>
-                    
-                    <h3>Éclairage principal et d'appoint</h3>
-                    <p>Combinez un éclairage général avec une lampe de bureau pour éclairer spécifiquement votre zone de work. Privilégiez les ampoules à lumière naturelle (5000-6500K) qui réduisent la fatigue oculaire.</p>
-                    
-                    <h3>Température et ventilation</h3>
-                    <p>Maintenez une température entre 19°C et 22°C pour un confort optimal. Une bonne ventilation est essentielle pour renouveler l'air et maintenir un niveau d'oxygène suffisant, crucial pour les fonctions cognitives.</p>
-                    
-                    <h2>Personnalisation de l'espace</h2>
-                    <p>Un espace personnalisé peut améliorer votre motivation et votre bien-être :</p>
-                    
-                    <h3>Éléments motivationnels</h3>
-                    <p>Ajoutez des éléments qui vous inspirent : citations motivantes, photos de personnes qui vous inspirent, objectifs à court et long terme. Ces rappels visuels peuvent booster votre motivation lors des moments difficiles.</p>
-                    
-                    <h3>Plantes d'intérieur</h3>
-                    <p>Les plantes améliorent la qualité de l'air et créent une ambiance apaisante. Optez pour des plantes nécessitant peu d'entretien comme les succulentes, les plantes serpent ou les pothos.</p>
-                    
-                    <h2>Routines d'entretien</h2>
-                    <p>Un espace en désordre peut nuire à votre concentration. Adoptez ces habitudes :</p>
-                    <ul>
-                        <li><strong>Rangez votre bureau à la fin de chaque session</strong> : Cela crée un environnement accueillin pour la prochaine séance</li>
-                        <li><strong>Nettoyez régulièrement votre espace</strong> : Un espace propre améliore la clarté mentale</li>
-                        <li><strong>Évitez l'accumulation de papiers inutiles</strong> : Numérisez les documents importants et recyclez les autres</li>
-                        <li><strong>Utilisez le numérique pour réduire l'encombrement</strong> : Privilégiez les versions numériques des livres et documents quand c'est possible</li>
-                    </ul>
-                    
-                    <h2>Adaptation aux différents types de travail</h2>
-                    <p>Votre espace de travail peut être modulé en fonction du type d'activité :</p>
-                    
-                    <h3>Pour la lecture intensive</h3>
-                    <p>Créez un coin lecture confortable avec un bon éclairage et un siège adapté. Une chaise inclinable ou un fauteuil peut être plus approprié pour les longues sessions de lecture.</p>
-                    
-                    <h3>Pour le travail sur ordinateur</h3>
-                    <p>Assurez-vous que votre écran est à la bonne hauteur (ligne supérieure au niveau des yeux ou légèrement en dessous) et à une distance confortable (50-70 cm).</p>
-                    
-                    <h3>Pour la résolution de problèmes complexes</h3>
-                    <p>Prévoyez un espace pour écrire ou dessiner librement. Un tableau blanc ou de grandes feuilles de papier peuvent être utiles pour visualiser les problèmes complexes.</p>
-                    
-                    <div class="highlight-box">
-                        <h3>🎯 Stratégie Gagnante</h3>
-                        <p>Dédiez 5 minutes en fin de chaque session pour ranger votre espace. Cette habitude simple vous fera gagner du temps et maintiendra un environnement propice à la concentration.</p>
-                    </div>
-                    
                     <h2>Conclusion</h2>
-                    <p>Un espace de travail bien organisé n'est pas un luxe mais une nécessité pour réussir vos études. Prenez le temps d'aménager un environnement qui vous convient et qui favorise votre productivité. Rappelez-vous que l'objectif est de créer un espace où vous vous sentez à l'aise, concentré et motivé pour apprendre. Un bon environnement de travail peut faire la différence entre une séance d'étude productive et une perte de temps.</p>
+                    <p>Un espace de travail bien organisé n'est pas un luxe mais une nécessité pour réussir vos études. Prenez le temps d'aménager un environnement qui vous convient et qui favorise votre productivité. Rappelez-vous que l'objectif est de créer un espace où vous vous sentez à l'aise, concentré et motivé pour apprendre.</p>
                     
                     <blockquote>
                         "L'ordre est la beauté de l'esprit." - Proverbe français
@@ -2857,7 +2926,6 @@
             </div>
         </div>
 
-        <!-- Article 3 détaillé -->
         <div class="page-section" id="article3-page">
             <a href="#" class="back-to-articles">
                 <i class="fas fa-arrow-left"></i> Retour aux articles
@@ -2882,110 +2950,19 @@
                         <p>La mémorisation n'est pas une question de capacité innée mais de méthode. Avec les bonnes techniques, tout le monde peut considérablement améliorer sa mémoire.</p>
                     </div>
                     
-                    <h2>Comprendre le fonctionnement de la mémoire</h2>
-                    <p>Notre mémoire fonctionne selon plusieurs systèmes interdépendants :</p>
-                    
-                    <h3>Mémoire sensorielle</h3>
-                    <p>Elle retient l'information pendant quelques millisecondes à quelques secondes. C'est la première étape du traitement de l'information. Pour l'optimiser, soyez pleinement attentif à ce que vous voulez mémoriser.</p>
-                    
-                    <h3>Mémoire à court terme (ou mémoire de travail)</h3>
-                    <p>Elle retient l'information pendant quelques secondes à quelques minutes. Sa capacité est limitée (7 ± 2 éléments). Pour l'améliorer, utilisez la technique de regroupement (chunking) qui consiste à organiser l'information en unités significatives.</p>
-                    
-                    <h3>Mémoire à long terme</h3>
-                    <p>Elle stocke l'information de manière durable. C'est vers elle que nous devons transférer nos connaissances. Ce transfert nécessite un encodage profond et des révisions espacées.</p>
-                    
                     <h2>Techniques de mémorisation avancées</h2>
-                    <p>Voici les méthodes les plus efficaces pour améliorer votre mémoire :</p>
                     
-                    <h3>La répétition espacée (systematic review)</h3>
-                    <p>Révisez à intervalles croissants : après 1 jour, 3 jours, 1 semaine, 2 semaines, 1 mois, etc. Cette technique renforce la mémorisation à long terme en exploitant la courbe de l'oubli d'Ebbinghaus. Utilisez des applications comme Anki ou des planners de révision pour automatiser ce processus.</p>
+                    <h3>La répétition espacée</h3>
+                    <p>Révisez à intervalles croissants : après 1 jour, 3 jours, 1 semaine, 2 semaines, 1 mois, etc. Cette technique renforce la mémorisation à long terme en exploitant la courbe de l'oubli d'Ebbinghaus.</p>
                     
                     <h3>Le palais mental (méthode des loci)</h3>
-                    <p>Associez les informations à mémoriser à des lieux que vous connaissez bien (votre maison, votre trajet habituel). Parcourez mentalement ces lieux pour vous souvenir. Cette technique, utilisée depuis l'Antiquité, est extrêmement puissante pour mémoriser des listes ou des séquences.</p>
-                    
-                    <h3>Les acronymes et acrostiches</h3>
-                    <p>Créez des mots ou phrases mnémotechniques à partir des premières lettres des éléments à retenir. Par exemple, "Mais Où Est Donc Ornicar ?" pour se souvenir des conjonctions de coordination.</p>
+                    <p>Associez les informations à mémoriser à des lieux que vous connaissez bien (votre maison, votre trajet habituel). Parcourez mentalement ces lieux pour vous souvenir.</p>
                     
                     <h3>La technique de Feynman</h3>
-                    <p>Expliquez le concept que vous voulez mémoriser comme si vous l'enseigniez à un enfant. Cette méthode vous force à simplifier et à clarifier votre compréhension, ce qui renforce la mémorisation.</p>
-                    
-                    <h3>Les cartes mentales (mind mapping)</h3>
-                    <p>Représentez visuellement l'information sous forme de diagramme arborescent. Cette technique exploite la capacité naturelle du cerveau à associer les idées et à les organiser spatialement.</p>
-                    
-                    <h2>Stratégies d'encodage profond</h2>
-                    <p>L'encodage profond est essentiel pour transférer l'information vers la mémoire à long terme :</p>
-                    
-                    <h3>Association et visualisation</h3>
-                    <p>Créez des associations vivaces et personnelles avec ce que vous voulez mémoriser. Plus l'image mentale est bizarre, colorée ou exagérée, plus elle sera mémorable.</p>
-                    
-                    <h3>Contextualisation</h3>
-                    <p>Placez l'information dans un contexte significatif. Reliez les nouveaux concepts à des connaissances que vous possédez déjà. Plus le réseau de connexions est dense, plus la mémorisation est solide.</p>
-                    
-                    <h3>Élaboration</h3>
-                    <p>Posez-vous des questions sur le matériel à apprendre : Pourquoi est-ce important ? Comment cela fonctionne-t-il ? En quoi cela se relie-t-il à d'autres concepts ?</p>
-                    
-                    <h2>Optimisation des conditions d'apprentissage</h2>
-                    <p>Pour optimiser votre mémorisation :</p>
-                    <ul>
-                        <li><strong>Étudiez dans un environnement calme</strong> mais variez les lieux d'étude pour créer plus d'indices de récupération</li>
-                        <li><strong>Faites des pauses régulières</strong> : le cerveau consolide l'information pendant les périodes de repos</li>
-                        <li><strong>Utilisez plusieurs sens</strong> (vision, audition, écriture) pour créer des traces mnésiques multiples</li>
-                        <li><strong>Expliquez ce que vous apprenez à quelqu'un d'autre</strong> : l'enseignement est l'une des méthodes les plus efficaces pour consolider l'apprentissage</li>
-                        <li><strong>Dormez suffisamment</strong> pour consolider la mémoire : le sommeil profond est crucial pour le transfert des souvenirs vers la mémoire à long terme</li>
-                    </ul>
-                    
-                    <h2>Applications pratiques par type de contenu</h2>
-                    
-                    <h3>Pour les formules mathématiques et scientifiques</h3>
-                    <p>Comprenez la logique derrière la formule plutôt que de simplement la mémoriser. Créez des associations visuelles ou des histoires qui relient les différents éléments de la formule.</p>
-                    
-                    <h3>Pour les dates et événements historiques</h3>
-                    <p>Utilisez la méthode des nombres-formes ou des nombres-rimes. Associez chaque chiffre à une image (1 = bougie, 2 = cygne, etc.) et créez une scène mentale qui relie ces images à l'événement.</p>
-                    
-                    <h3>Pour le vocabulaire en langues étrangères</h3>
-                    <p>Créez des associations sonores entre le mot étranger et un mot similaire dans votre langue maternelle. Visualisez une scène absurde qui relie ces deux mots.</p>
-                    
-                    <h3>Pour les processus et séquences</h3>
-                    <p>Utilisez la méthode du palais mental pour placer chaque étape du processus dans un lieu différent d'un parcours familier.</p>
-                    
-                    <h2>Évaluation et auto-test</h2>
-                    <p>L'auto-test est l'une des méthodes les plus efficaces pour renforcer la mémoire :</p>
-                    
-                    <h3>Tests de rappel actif</h3>
-                    <p>Au lieu de simplement relire passivement vos notes, essayez de vous rappeler activement l'information. Cachez une partie de vos notes et essayez de la reconstituer de mémoire.</p>
-                    
-                    <h3>Flashcards intelligentes</h3>
-                    <p>Créez des flashcards avec une question d'un côté et la réponse de l'autre. Utilisez le système Leitner ou des applications de répétition espacée pour optimiser leur utilisation.</p>
-                    
-                    <h3>Exercices pratiques</h3>
-                    <p>Appliquez les concepts appris à de nouveaux problèmes ou situations. La résolution de problèmes active des réseaux neuronaux plus étendus que la simple mémorisation.</p>
-                    
-                    <h2>Facteurs influençant la mémorisation</h2>
-                    <p>Plusieurs facteurs peuvent améliorer ou diminuer votre capacité à mémoriser :</p>
-                    
-                    <h3>Facteurs physiologiques</h3>
-                    <ul>
-                        <li><strong>Sommeil</strong> : essentiel pour la consolidation de la mémoire</li>
-                        <li><strong>Exercice physique</strong> : améliore la circulation sanguine cérébrale et la neurogenèse</li>
-                        <li><strong>Nutrition</strong> : les oméga-3, antioxydants et certaines vitamines soutiennent la fonction cognitive</li>
-                        <li><strong>Hydratation</strong> : la déshydratation même légère peut impacter les performances cognitives</li>
-                    </ul>
-                    
-                    <h3>Facteurs psychologiques</h3>
-                    <ul>
-                        <li><strong>Motivation</strong> : nous mémorisons mieux ce qui nous intéresse</li>
-                        <li><strong>Émotions</strong> : les émotions fortes (positives ou négatives) renforcent la mémorisation</li>
-                        <li><strong>Attention</strong> : la distraction est l'ennemi numéro un de la mémorisation</li>
-                        <li><strong>Confiance</strong> : croire en sa capacité à mémoriser améliore effectivement les performances</li>
-                    </ul>
-                    
-                    <div class="highlight-box">
-                        <h3>🎯 Stratégie Gagnante</h3>
-                        <p>Combinez plusieurs techniques de mémorisation. Par exemple, utilisez une carte mentale pour organiser l'information, puis le palais mental pour mémoriser les points clés, et enfin la répétition espacée pour consolider durablement.</p>
-                    </div>
+                    <p>Expliquez le concept que vous voulez mémoriser comme si vous l'enseigniez à un enfant. Cette méthode vous force à simplifier et à clarifier votre compréhension.</p>
                     
                     <h2>Conclusion</h2>
-                    <p>La mémorisation n'est pas une question de capacité innée mais de méthode. En adoptant les bonnes techniques et en étant régulier dans votre travail, vous pouvez considérablement améliorer votre capacité à retenir l'information. Expérimentez avec différentes méthodes pour découvrir celles qui fonctionnent le mieux pour vous, et n'oubliez pas que la variété et la régularité sont souvent plus importantes que la durée des sessions d'étude.</p>
+                    <p>La mémorisation n'est pas une question de capacité innée mais de méthode. En adoptant les bonnes techniques et en étant régulier dans votre travail, vous pouvez considérablement améliorer votre capacité à retenir l'information.</p>
                     
                     <blockquote>
                         "La mémoire est le trésor et gardien de toutes choses." - Cicéron
@@ -2994,7 +2971,6 @@
             </div>
         </div>
 
-        <!-- Article 4 détaillé -->
         <div class="page-section" id="article4-page">
             <a href="#" class="back-to-articles">
                 <i class="fas fa-arrow-left"></i> Retour aux articles
@@ -3025,30 +3001,7 @@
                     <p>80% de vos résultats proviennent de 20% de vos efforts. Identifiez les tâches qui ont le plus d'impact sur votre réussite académique et concentrez-vous sur elles.</p>
                     
                     <h3>La Matrice d'Eisenhower</h3>
-                    <p>Classez vos tâches selon deux critères : l'urgence et l'importance. Cette méthode vous aide à prioriser efficacement :</p>
-                    <ul>
-                        <li><strong>Urgent et important</strong> : À faire immédiatement</li>
-                        <li><strong>Important mais pas urgent</strong> : À planifier</li>
-                        <li><strong>Urgent mais pas important</strong> : À déléguer si possible</li>
-                        <li><strong>Ni urgent ni important</strong> : À éliminer</li>
-                    </ul>
-                    
-                    <h2>Techniques de Planification Efficaces</h2>
-                    
-                    <h3>La Méthode Time Blocking</h3>
-                    <p>Divisez votre journée en blocs de temps dédiés à des activités spécifiques. Cette méthode réduit les transitions fréquentes qui nuisent à la concentration.</p>
-                    
-                    <h3>Le Planning Hebdomadaire</h3>
-                    <p>Créez un planning hebdomadaire qui inclut non seulement vos cours et séances d'étude, mais aussi les activités personnelles, le repos et les imprévus. Un planning réaliste est un planning tenable.</p>
-                    
-                    <h2>Outils et Applications</h2>
-                    <p>Utilisez la technologie à votre avantage :</p>
-                    
-                    <h3>Applications de Gestion des Tâches</h3>
-                    <p>Todoist, Trello ou Notion peuvent vous aider à organiser vos projets et deadlines. Choisissez un outil simple que vous utiliserez régulièrement.</p>
-                    
-                    <h3>Minuteries et Techniques Pomodoro</h3>
-                    <p>Les applications de minuterie comme Forest ou Focus Keeper peuvent vous aider à maintenir votre concentration pendant des périodes définies.</p>
+                    <p>Classez vos tâches selon deux critères : l'urgence et l'importance. Cette méthode vous aide à prioriser efficacement.</p>
                     
                     <h2>Conclusion</h2>
                     <p>Une bonne gestion du temps est une compétence qui s'apprend et se perfectionne avec la pratique. En expérimentant différentes techniques et en restant flexible, vous trouverez le système qui fonctionne le mieux pour votre style d'apprentissage et votre rythme de vie.</p>
@@ -3056,7 +3009,6 @@
             </div>
         </div>
 
-        <!-- Article 5 détaillé -->
         <div class="page-section" id="article5-page">
             <a href="#" class="back-to-articles">
                 <i class="fas fa-arrow-left"></i> Retour aux articles
@@ -3089,24 +3041,12 @@
                     <h3>Antioxydants</h3>
                     <p>Ils protègent le cerveau contre le stress oxydatif. Sources : fruits rouges, légumes colorés, thé vert, chocolat noir.</p>
                     
-                    <h3>Vitamines du Groupe B</h3>
-                    <p>Elles jouent un rôle crucial dans la production d'énergie et la synthèse des neurotransmetteurs. Sources : céréales complètes, légumineuses, œufs.</p>
-                    
-                    <h2>Aliments à Privilégier pendant les Périodes d'Étude</h2>
-                    
-                    <h3>Petit-déjeuner Équilibré</h3>
-                    <p>Un petit-déjeuner riche en protéines et en glucides complexes fournit une énergie durable pour la matinée. Évitez les sucres rapides qui provoquent des pics d'énergie suivis de baisses brutales.</p>
-                    
-                    <h3>Collations Intelligentes</h3>
-                    <p>Privilégiez les noix, les fruits frais, le yaourt nature ou les légumes crus pour maintenir un niveau d'énergie constant entre les repas.</p>
-                    
                     <h2>Conclusion</h2>
                     <p>Une alimentation équilibrée et adaptée aux besoins de votre cerveau peut significativement améliorer vos performances académiques. En combinant une nutrition optimale avec d'autres bonnes habitudes de vie, vous maximisez vos chances de réussite.</p>
                 </div>
             </div>
         </div>
 
-        <!-- Article 6 détaillé -->
         <div class="page-section" id="article6-page">
             <a href="#" class="back-to-articles">
                 <i class="fas fa-arrow-left"></i> Retour aux articles
@@ -3138,14 +3078,6 @@
                     
                     <h3>Sommeil Paradoxal (REM)</h3>
                     <p>Cette phase est cruciale pour la consolidation des souvenirs procéduraux (compétences, habiletés) et la créativité. Elle permet de réorganiser et d'intégrer les nouvelles connaissances.</p>
-                    
-                    <h2>Stratégies pour Optimiser son Sommeil</h2>
-                    
-                    <h3>Routine du Coucher</h3>
-                    <p>Établissez une routine relaxante avant de dormir : lecture légère, méditation, étirements doux. Évitez les écrans au moins une heure avant le coucher.</p>
-                    
-                    <h3>Environnement de Sommeil</h3>
-                    <p>Créez un environnement propice au sommeil : obscurité totale, température fraîche (18-20°C), silence ou bruit blanc.</p>
                     
                     <h2>Conclusion</h2>
                     <p>Investir dans un sommeil de qualité n'est pas du temps perdu, mais une stratégie intelligente pour optimiser vos capacités d'apprentissage. En dormant suffisamment, vous améliorez non seulement votre mémoire et votre concentration, mais aussi votre humeur et votre résistance au stress.</p>
