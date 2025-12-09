@@ -6,7 +6,7 @@
     <title>PrimeAcademia - Plateforme d'Épreuves Académiques</title>
     <meta name="description" content="PrimeAcademia - Plateforme éducative offrant gratuitement des épreuves académiques organisées par filière et année. Outils de préparation et conseils pour la réussite étudiante.">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         /* ===== VARIABLES DE COULEURS PROFESSIONNELLES ===== */
         :root {
@@ -52,10 +52,6 @@
             transition: var(--transition);
             overflow-x: hidden;
             min-height: 100vh;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
         }
 
         .container {
@@ -89,6 +85,426 @@
         @keyframes fadeInDown {
             from { opacity: 0; transform: translateY(-20px); }
             to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== AUTHENTICATION MODAL ===== */
+        .auth-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            padding: 20px;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+            backdrop-filter: blur(5px);
+        }
+
+        .auth-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .auth-modal-content {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 2.5rem;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: fadeInDown 0.5s ease-out;
+            position: relative;
+            border: 3px solid var(--primary);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .auth-header i {
+            font-size: 3.5rem;
+            color: var(--accent);
+            margin-bottom: 1rem;
+            display: inline-block;
+        }
+
+        .auth-header h2 {
+            color: var(--dark);
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .auth-header p {
+            color: var(--dark2);
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .close-auth-modal {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--light);
+            border: none;
+            color: var(--dark);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+
+        .close-auth-modal:hover {
+            background: var(--error);
+            color: white;
+            transform: rotate(90deg);
+        }
+
+        .auth-switch {
+            text-align: center;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--light2);
+        }
+
+        .auth-switch a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .auth-switch a:hover {
+            color: var(--accent2);
+            text-decoration: underline;
+        }
+
+        /* ===== AUTH FORMS ===== */
+        .auth-form {
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .auth-form.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.6rem;
+            color: var(--dark);
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid var(--light2);
+            border-radius: var(--radius);
+            font-size: 1rem;
+            transition: var(--transition);
+            background: white;
+            color: var(--dark);
+            font-family: inherit;
+        }
+
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(74, 111, 165, 0.2);
+            outline: none;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        .form-checkbox {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-checkbox input {
+            margin-top: 5px;
+            flex-shrink: 0;
+        }
+
+        .form-checkbox label {
+            font-size: 0.9rem;
+            color: var(--dark2);
+            line-height: 1.5;
+        }
+
+        .form-checkbox a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .form-checkbox a:hover {
+            text-decoration: underline;
+        }
+
+        /* ===== REGISTRATION STEPS ===== */
+        .registration-steps {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .registration-steps::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--light2);
+            z-index: 1;
+        }
+
+        .step {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            flex: 1;
+        }
+
+        .step-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--light2);
+            color: var(--dark2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .step.active .step-circle {
+            background: var(--primary);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .step.completed .step-circle {
+            background: var(--success);
+            color: white;
+        }
+
+        .step-label {
+            font-size: 0.85rem;
+            color: var(--dark2);
+            font-weight: 500;
+        }
+
+        .step.active .step-label {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        /* ===== BUTTONS ===== */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: var(--transition);
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 15px rgba(74, 111, 165, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(74, 111, 165, 0.4);
+            background: linear-gradient(135deg, var(--primary), var(--accent3));
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-full {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+            box-shadow: 0 4px 15px rgba(107, 142, 35, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, var(--secondary), #8BC34A);
+            box-shadow: 0 8px 25px rgba(107, 142, 35, 0.4);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            box-shadow: none;
+        }
+
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* ===== USER PROFILE ===== */
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-left: 1rem;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--accent3));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .user-avatar:hover {
+            transform: scale(1.1);
+        }
+
+        .user-name {
+            color: var(--dark);
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .user-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-hover);
+            padding: 1rem 0;
+            min-width: 200px;
+            display: none;
+            z-index: 1000;
+            border: 1px solid var(--light2);
+        }
+
+        .user-menu.active {
+            display: block;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .user-menu-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0.8rem 1.5rem;
+            color: var(--dark);
+            text-decoration: none;
+            transition: var(--transition);
+            cursor: pointer;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            font-size: 0.95rem;
+            font-family: inherit;
+        }
+
+        .user-menu-item:hover {
+            background: var(--light);
+            color: var(--primary);
+        }
+
+        .user-menu-item i {
+            width: 20px;
+            color: var(--accent3);
+        }
+
+        .user-menu-divider {
+            height: 1px;
+            background: var(--light2);
+            margin: 0.5rem 0;
+        }
+
+        /* ===== ALERTS ===== */
+        .alert {
+            padding: 1.2rem;
+            border-radius: var(--radius);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .alert-success {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-info {
+            background: linear-gradient(135deg, #d1ecf1, #bee5eb);
+            color: #0c5460;
+            border: 1px solid #bee5eb;
         }
 
         /* ===== HEADER & MENU BURGER ===== */
@@ -169,6 +585,8 @@
 
         /* Navigation principale */
         nav {
+            display: flex;
+            align-items: center;
             transition: var(--transition);
         }
 
@@ -661,6 +1079,13 @@
             display: flex;
             flex-direction: column;
             gap: 0.8rem;
+        }
+
+        .file-actions .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
 
         /* ===== PAGINATION ===== */
@@ -1198,342 +1623,6 @@
             resize: vertical;
         }
 
-        .alert {
-            padding: 1.2rem;
-            border-radius: var(--radius);
-            margin-bottom: 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            animation: fadeIn 0.6s ease-out;
-        }
-
-        .alert-success {
-            background: linear-gradient(135deg, #d4edda, #c3e6cb);
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .alert-error {
-            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        /* ===== BUTTONS ===== */
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 12px 24px;
-            border: none;
-            border-radius: var(--radius);
-            font-size: 0.95rem;
-            font-weight: 600;
-            cursor: pointer;
-            text-decoration: none;
-            transition: var(--transition);
-            background: var(--primary);
-            color: white;
-            box-shadow: 0 4px 15px rgba(74, 111, 165, 0.3);
-        }
-
-        .btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(74, 111, 165, 0.4);
-            background: linear-gradient(135deg, var(--primary), var(--accent3));
-        }
-
-        .btn-whatsapp {
-            background: linear-gradient(135deg, #25D366, #128C7E);
-            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
-        }
-
-        .btn-whatsapp:hover {
-            background: linear-gradient(135deg, #128C7E, #25D366);
-            box-shadow: 0 8px 25px rgba(37, 211, 102, 0.4);
-        }
-
-        .btn-secondary {
-            background: var(--secondary);
-            box-shadow: 0 4px 15px rgba(107, 142, 35, 0.3);
-        }
-
-        .btn-secondary:hover {
-            background: linear-gradient(135deg, var(--secondary), #8BC34A);
-            box-shadow: 0 8px 25px rgba(107, 142, 35, 0.4);
-        }
-
-        .btn-share {
-            background: linear-gradient(135deg, var(--accent4), #9B59B6);
-            box-shadow: 0 4px 15px rgba(138, 43, 226, 0.3);
-        }
-
-        .btn-share:hover {
-            background: linear-gradient(135deg, #9B59B6, var(--accent4));
-            box-shadow: 0 8px 25px rgba(138, 43, 226, 0.4);
-        }
-
-        .btn-share-alt {
-            background: linear-gradient(135deg, #3498db, #2980b9);
-            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
-        }
-
-        .btn-share-alt:hover {
-            background: linear-gradient(135deg, #2980b9, #3498db);
-            box-shadow: 0 8px 25px rgba(52, 152, 219, 0.4);
-        }
-
-        /* ===== MODAL DE PARTAGE ===== */
-        .share-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.85);
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            z-index: 10000;
-            opacity: 0;
-            visibility: hidden;
-            transition: var(--transition);
-            backdrop-filter: blur(5px);
-            overflow-y: auto;
-            padding: 20px;
-        }
-
-        .share-modal.active {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .share-modal-content {
-            background: white;
-            border-radius: var(--radius-lg);
-            padding: 2.5rem;
-            max-width: 500px;
-            width: 100%;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            animation: fadeInDown 0.5s ease-out;
-            position: relative;
-            border: 3px solid var(--primary);
-            margin: auto;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        .share-modal-header {
-            text-align: center;
-            margin-bottom: 2rem;
-            position: relative;
-            padding-right: 2rem;
-        }
-
-        .share-modal-header i {
-            font-size: 3.5rem;
-            color: var(--accent);
-            margin-bottom: 1rem;
-            display: inline-block;
-            animation: float 3s ease-in-out infinite;
-        }
-
-        .share-modal-header h2 {
-            color: var(--dark);
-            font-size: 1.8rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .share-modal-header p {
-            color: var(--dark2);
-            font-size: 1rem;
-            line-height: 1.6;
-            max-width: 400px;
-            margin: 0 auto;
-        }
-
-        .share-options {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        .share-option {
-            background: var(--light);
-            border-radius: var(--radius);
-            padding: 1.5rem 1rem;
-            text-align: center;
-            transition: var(--transition);
-            cursor: pointer;
-            border: 2px solid transparent;
-        }
-
-        .share-option:hover {
-            transform: translateY(-5px);
-            background: white;
-            box-shadow: var(--shadow-hover);
-            border-color: var(--accent);
-        }
-
-        .share-option i {
-            font-size: 2.5rem;
-            margin-bottom: 0.8rem;
-            display: inline-block;
-        }
-
-        .share-option.whatsapp i {
-            color: #25D366;
-        }
-
-        .share-option.facebook i {
-            color: #1877F2;
-        }
-
-        .share-option.telegram i {
-            color: #0088cc;
-        }
-
-        .share-option.twitter i {
-            color: #1DA1F2;
-        }
-
-        .share-option.copy i {
-            color: var(--primary);
-        }
-
-        .share-option span {
-            display: block;
-            font-weight: 600;
-            color: var(--dark);
-            font-size: 0.9rem;
-        }
-
-        .share-url-container {
-            margin-bottom: 2rem;
-        }
-
-        .share-url-input {
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        .share-url-input input {
-            flex: 1;
-            padding: 12px 16px;
-            border: 2px solid var(--light2);
-            border-radius: var(--radius);
-            font-size: 0.9rem;
-            background: var(--light);
-            color: var(--dark);
-            font-family: inherit;
-            min-width: 0;
-        }
-
-        .share-url-input button {
-            padding: 12px 20px;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: var(--radius);
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-            white-space: nowrap;
-            font-family: inherit;
-            flex-shrink: 0;
-        }
-
-        .share-url-input button:hover {
-            background: var(--accent2);
-            transform: translateY(-2px);
-        }
-
-        .share-modal-footer {
-            text-align: center;
-            padding-top: 1.5rem;
-            border-top: 1px solid var(--light2);
-        }
-
-        .share-modal-footer p {
-            color: var(--dark2);
-            font-size: 0.9rem;
-            margin-bottom: 1rem;
-        }
-
-        .close-share-modal {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: var(--light);
-            border: none;
-            color: var(--dark);
-            font-size: 1.2rem;
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 10;
-        }
-
-        .close-share-modal:hover {
-            background: var(--error);
-            color: white;
-            transform: rotate(90deg);
-        }
-
-        .close-modal-btn {
-            background: var(--light2);
-            color: var(--dark);
-            border: 2px solid var(--light2);
-            padding: 10px 20px;
-            border-radius: var(--radius);
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-            font-family: inherit;
-            width: 100%;
-            max-width: 200px;
-            margin: 0 auto;
-            display: block;
-        }
-
-        .close-modal-btn:hover {
-            background: white;
-            border-color: var(--accent);
-            color: var(--dark);
-            transform: translateY(-2px);
-        }
-
-        /* ===== TOAST NOTIFICATION ===== */
-        .toast {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: var(--success);
-            color: white;
-            padding: 1rem 1.5rem;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow-hover);
-            z-index: 10001;
-            animation: slideIn 0.3s ease-out;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            max-width: 350px;
-        }
-
-        .toast.hidden {
-            animation: fadeIn 0.3s ease-out reverse;
-            opacity: 0;
-            visibility: hidden;
-        }
-
         /* ===== FOOTER ===== */
         footer {
             background: linear-gradient(135deg, var(--dark), #1A2530);
@@ -1636,11 +1725,6 @@
             
             .files-grid {
                 grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            }
-            
-            .share-modal-content {
-                width: 95%;
-                padding: 2rem;
             }
         }
 
@@ -1769,91 +1853,17 @@
                 padding: 1rem;
             }
             
-            /* MODAL DE PARTAGE RESPONSIVE - CORRECTIONS */
-            .share-modal {
-                padding: 10px;
-                align-items: flex-start;
-                padding-top: 20px;
-            }
-            
-            .share-modal-content {
+            .auth-modal-content {
                 padding: 1.5rem;
-                margin: 0;
-                max-height: 85vh;
-                overflow-y: auto;
-                width: 100%;
             }
             
-            .share-modal-header {
-                margin-bottom: 1.5rem;
-                padding-right: 2.5rem;
-            }
-            
-            .share-modal-header h2 {
-                font-size: 1.4rem;
-                line-height: 1.3;
-            }
-            
-            .share-modal-header i {
-                font-size: 2.5rem;
-            }
-            
-            .share-options {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 0.8rem;
-                margin-bottom: 1.5rem;
-            }
-            
-            .share-option {
-                padding: 1rem 0.5rem;
-            }
-            
-            .share-option i {
-                font-size: 2rem;
-            }
-            
-            .share-url-input {
+            .form-row {
                 flex-direction: column;
-                gap: 0.8rem;
+                gap: 1rem;
             }
             
-            .share-url-input input {
-                font-size: 0.85rem;
-                padding: 10px 12px;
-            }
-            
-            .share-url-input button {
-                width: 100%;
-                padding: 10px;
-            }
-            
-            .close-share-modal {
-                top: 0.5rem;
-                right: 0.5rem;
-                width: 36px;
-                height: 36px;
-                background: rgba(255, 255, 255, 0.9);
-                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            }
-            
-            .close-modal-btn {
-                width: 100%;
-                max-width: none;
-                margin-top: 0.5rem;
-            }
-            
-            /* Footer centré pour mobile */
-            .footer-section {
-                text-align: center;
-            }
-            
-            .footer-section h3::after {
-                left: 50%;
-                transform: translateX(-50%);
-            }
-            
-            .footer-section a:hover {
-                transform: translateX(0);
+            .user-profile {
+                display: none;
             }
         }
 
@@ -1988,95 +1998,26 @@
                 font-size: 0.9rem;
             }
             
-            /* Share modal mobile - encore plus petit */
-            .share-modal {
-                padding: 5px;
-                padding-top: 10px;
-            }
-            
-            .share-modal-content {
+            .auth-modal-content {
                 padding: 1.2rem;
-                max-height: 80vh;
             }
             
-            .share-modal-header h2 {
-                font-size: 1.3rem;
-                margin-bottom: 0.8rem;
+            .auth-header h2 {
+                font-size: 1.4rem;
             }
             
-            .share-modal-header p {
-                font-size: 0.9rem;
-                line-height: 1.5;
+            .registration-steps {
+                margin-bottom: 1.5rem;
             }
             
-            .share-options {
-                grid-template-columns: 1fr;
-                gap: 0.6rem;
-            }
-            
-            .share-option {
-                padding: 0.8rem;
-            }
-            
-            .share-url-container p {
+            .step-circle {
+                width: 35px;
+                height: 35px;
                 font-size: 0.9rem;
             }
             
-            .close-share-modal {
-                top: 0.3rem;
-                right: 0.3rem;
-                width: 32px;
-                height: 32px;
-                font-size: 1rem;
-            }
-            
-            .close-modal-btn {
-                padding: 8px 16px;
-                font-size: 0.9rem;
-            }
-        }
-
-        @media (max-width: 360px) {
-            .page-title h1 {
-                font-size: 1.3rem;
-            }
-            
-            .page-title i {
-                font-size: 1.8rem;
-            }
-            
-            .intro-collapsed-header h2 {
-                font-size: 1rem;
-            }
-            
-            .files-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .file-content h3 {
-                font-size: 0.95rem;
-            }
-            
-            .article-content h3 {
-                font-size: 1rem;
-            }
-            
-            .btn {
-                padding: 8px 16px;
-                font-size: 0.85rem;
-            }
-            
-            .footer-links {
-                gap: 1rem;
-            }
-            
-            /* Modal encore plus petit pour très petits écrans */
-            .share-modal-content {
-                padding: 1rem;
-            }
-            
-            .share-modal-header h2 {
-                font-size: 1.2rem;
+            .step-label {
+                font-size: 0.75rem;
             }
         }
 
@@ -2099,6 +2040,38 @@
             visibility: visible;
         }
 
+        /* ===== TOAST NOTIFICATION ===== */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--success);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-hover);
+            z-index: 10001;
+            animation: slideIn 0.3s ease-out;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            max-width: 350px;
+        }
+
+        .toast.hidden {
+            animation: fadeIn 0.3s ease-out reverse;
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .toast-error {
+            background: var(--error);
+        }
+
+        .toast-info {
+            background: var(--primary);
+        }
+
         /* ===== SCROLLBAR CUSTOM ===== */
         ::-webkit-scrollbar {
             width: 8px;
@@ -2119,67 +2092,384 @@
     </style>
 </head>
 <body>
-    <!-- Overlay pour menu burger -->
-    <div class="menu-overlay" id="menuOverlay"></div>
-
-    <!-- Modal de partage -->
-    <div class="share-modal" id="shareModal">
-        <div class="share-modal-content">
-            <button class="close-share-modal" id="closeShareModal">
+    <!-- Modal d'authentification -->
+    <div class="auth-modal" id="authModal">
+        <div class="auth-modal-content">
+            <button class="close-auth-modal" id="closeAuthModal">
                 <i class="fas fa-times"></i>
             </button>
             
-            <div class="share-modal-header">
-                <i class="fas fa-share-alt"></i>
-                <h2>Partagez PrimeAcademia !</h2>
-                <p>Merci d'avoir téléchargé ! Aidez d'autres étudiants à bénéficier de ressources gratuites en partageant cette plateforme.</p>
+            <!-- ÉTAPE 1: Informations de base -->
+            <div class="auth-form active" id="register-step-1">
+                <div class="auth-header">
+                    <i class="fas fa-user-plus"></i>
+                    <h2>Créer un compte</h2>
+                    <p>Étape 1/4 - Informations personnelles</p>
+                </div>
+                
+                <div class="registration-steps">
+                    <div class="step active" data-step="1">
+                        <div class="step-circle">1</div>
+                        <div class="step-label">Infos perso</div>
+                    </div>
+                    <div class="step" data-step="2">
+                        <div class="step-circle">2</div>
+                        <div class="step-label">Études</div>
+                    </div>
+                    <div class="step" data-step="3">
+                        <div class="step-circle">3</div>
+                        <div class="step-label">Sécurité</div>
+                    </div>
+                    <div class="step" data-step="4">
+                        <div class="step-circle">4</div>
+                        <div class="step-label">Finalisation</div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="register-nom">Nom *</label>
+                    <input type="text" id="register-nom" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="register-prenom">Prénom *</label>
+                    <input type="text" id="register-prenom" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="register-email">Adresse email *</label>
+                    <input type="email" id="register-email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="register-phone">Numéro de téléphone *</label>
+                    <input type="tel" id="register-phone" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="register-birthdate">Date de naissance</label>
+                    <input type="date" id="register-birthdate">
+                </div>
+                
+                <div class="form-group">
+                    <label for="register-gender">Genre</label>
+                    <select id="register-gender">
+                        <option value="">Sélectionner</option>
+                        <option value="male">Masculin</option>
+                        <option value="female">Féminin</option>
+                        <option value="other">Autre</option>
+                    </select>
+                </div>
+                
+                <button class="btn btn-full" id="next-step-1">
+                    Suivant <i class="fas fa-arrow-right"></i>
+                </button>
+                
+                <div class="auth-switch">
+                    <p>Déjà inscrit ? <a href="#" id="switch-to-login">Se connecter</a></p>
+                </div>
             </div>
             
-            <div class="share-options">
-                <div class="share-option whatsapp" data-platform="whatsapp">
-                    <i class="fab fa-whatsapp"></i>
-                    <span>WhatsApp</span>
+            <!-- ÉTAPE 2: Informations académiques -->
+            <div class="auth-form" id="register-step-2">
+                <div class="auth-header">
+                    <i class="fas fa-graduation-cap"></i>
+                    <h2>Informations académiques</h2>
+                    <p>Étape 2/4 - Votre parcours étudiant</p>
                 </div>
                 
-                <div class="share-option facebook" data-platform="facebook">
-                    <i class="fab fa-facebook"></i>
-                    <span>Facebook</span>
+                <div class="registration-steps">
+                    <div class="step completed" data-step="1">
+                        <div class="step-circle"><i class="fas fa-check"></i></div>
+                        <div class="step-label">Infos perso</div>
+                    </div>
+                    <div class="step active" data-step="2">
+                        <div class="step-circle">2</div>
+                        <div class="step-label">Études</div>
+                    </div>
+                    <div class="step" data-step="3">
+                        <div class="step-circle">3</div>
+                        <div class="step-label">Sécurité</div>
+                    </div>
+                    <div class="step" data-step="4">
+                        <div class="step-circle">4</div>
+                        <div class="step-label">Finalisation</div>
+                    </div>
                 </div>
                 
-                <div class="share-option telegram" data-platform="telegram">
-                    <i class="fab fa-telegram"></i>
-                    <span>Telegram</span>
+                <div class="form-group">
+                    <label for="register-filiere">Filière d'études *</label>
+                    <select id="register-filiere" required>
+                        <option value="">Sélectionner une filière</option>
+                        <option value="informatique">Informatique</option>
+                        <option value="gestion">Gestion</option>
+                        <option value="college">Collège (Secondaire)</option>
+                        <option value="autre">Autre</option>
+                    </select>
                 </div>
                 
-                <div class="share-option twitter" data-platform="twitter">
-                    <i class="fab fa-twitter"></i>
-                    <span>Twitter</span>
+                <div class="form-group">
+                    <label for="register-niveau">Niveau d'études *</label>
+                    <select id="register-niveau" required>
+                        <option value="">Sélectionner un niveau</option>
+                        <optgroup label="Université">
+                            <option value="annee1">Année 1 (Licence 1)</option>
+                            <option value="annee2">Année 2 (Licence 2)</option>
+                            <option value="annee3">Année 3 (Licence 3)</option>
+                            <option value="master1">Master 1</option>
+                            <option value="master2">Master 2</option>
+                        </optgroup>
+                        <optgroup label="Collège/Lycée">
+                            <option value="sixieme">6ème</option>
+                            <option value="cinquieme">5ème</option>
+                            <option value="quatrieme">4ème</option>
+                            <option value="troisieme">3ème</option>
+                            <option value="seconde">Seconde</option>
+                            <option value="premiere">Première</option>
+                            <option value="terminale">Terminale</option>
+                        </optgroup>
+                    </select>
                 </div>
                 
-                <div class="share-option copy" data-platform="copy">
-                    <i class="fas fa-copy"></i>
-                    <span>Copier le lien</span>
+                <div class="form-group">
+                    <label for="register-etablissement">Établissement/Université</label>
+                    <input type="text" id="register-etablissement" placeholder="Ex: Université de ...">
                 </div>
-            </div>
-            
-            <div class="share-url-container">
-                <p style="margin-bottom: 0.8rem; color: var(--dark); font-weight: 600;">Lien à partager :</p>
-                <div class="share-url-input">
-                    <input type="text" id="shareUrl" readonly value="https://primeacademia.com">
-                    <button id="copyUrlBtn">
-                        <i class="fas fa-copy"></i> Copier
+                
+                <div class="form-group">
+                    <label for="register-ville">Ville d'études</label>
+                    <input type="text" id="register-ville" placeholder="Ex: Cotonou, Lomé, etc.">
+                </div>
+                
+                <div class="form-group">
+                    <label for="register-objectif">Objectif académique</label>
+                    <select id="register-objectif">
+                        <option value="">Sélectionner un objectif</option>
+                        <option value="examen">Préparer un examen</option>
+                        <option value="concours">Préparer un concours</option>
+                        <option value="renforcement">Renforcement des connaissances</option>
+                        <option value="autre">Autre</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="register-matieres">Matières principales (séparées par des virgules)</label>
+                    <input type="text" id="register-matieres" placeholder="Ex: Mathématiques, Physique, Chimie">
+                </div>
+                
+                <div class="form-row">
+                    <button class="btn btn-outline btn-full" id="prev-step-2">
+                        <i class="fas fa-arrow-left"></i> Précédent
+                    </button>
+                    <button class="btn btn-full" id="next-step-2">
+                        Suivant <i class="fas fa-arrow-right"></i>
                     </button>
                 </div>
             </div>
             
-            <div class="share-modal-footer">
-                <p>Merci de contribuer à rendre l'éducation plus accessible !</p>
-                <button class="close-modal-btn" id="closeModalBtn">
-                    <i class="fas fa-times"></i> Fermer
+            <!-- ÉTAPE 3: Sécurité -->
+            <div class="auth-form" id="register-step-3">
+                <div class="auth-header">
+                    <i class="fas fa-shield-alt"></i>
+                    <h2>Sécurité du compte</h2>
+                    <p>Étape 3/4 - Créer votre mot de passe</p>
+                </div>
+                
+                <div class="registration-steps">
+                    <div class="step completed" data-step="1">
+                        <div class="step-circle"><i class="fas fa-check"></i></div>
+                        <div class="step-label">Infos perso</div>
+                    </div>
+                    <div class="step completed" data-step="2">
+                        <div class="step-circle"><i class="fas fa-check"></i></div>
+                        <div class="step-label">Études</div>
+                    </div>
+                    <div class="step active" data-step="3">
+                        <div class="step-circle">3</div>
+                        <div class="step-label">Sécurité</div>
+                    </div>
+                    <div class="step" data-step="4">
+                        <div class="step-circle">4</div>
+                        <div class="step-label">Finalisation</div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="register-password">Mot de passe *</label>
+                    <input type="password" id="register-password" required minlength="8">
+                    <small style="color: var(--dark2); font-size: 0.85rem; display: block; margin-top: 5px;">
+                        Minimum 8 caractères avec majuscule, minuscule et chiffre
+                    </small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="register-confirm-password">Confirmer le mot de passe *</label>
+                    <input type="password" id="register-confirm-password" required>
+                </div>
+                
+                <div class="form-checkbox">
+                    <input type="checkbox" id="register-newsletter" checked>
+                    <label for="register-newsletter">
+                        Je souhaite recevoir les nouveautés, conseils et offres spéciales par email
+                    </label>
+                </div>
+                
+                <div class="form-checkbox">
+                    <input type="checkbox" id="register-terms" required>
+                    <label for="register-terms">
+                        J'accepte les <a href="#" id="terms-link">conditions d'utilisation</a> et la 
+                        <a href="#" id="privacy-link">politique de confidentialité</a> *
+                    </label>
+                </div>
+                
+                <div class="form-row">
+                    <button class="btn btn-outline btn-full" id="prev-step-3">
+                        <i class="fas fa-arrow-left"></i> Précédent
+                    </button>
+                    <button class="btn btn-full" id="next-step-3">
+                        Suivant <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- ÉTAPE 4: Finalisation -->
+            <div class="auth-form" id="register-step-4">
+                <div class="auth-header">
+                    <i class="fas fa-check-circle"></i>
+                    <h2>Finalisation</h2>
+                    <p>Étape 4/4 - Vérification des informations</p>
+                </div>
+                
+                <div class="registration-steps">
+                    <div class="step completed" data-step="1">
+                        <div class="step-circle"><i class="fas fa-check"></i></div>
+                        <div class="step-label">Infos perso</div>
+                    </div>
+                    <div class="step completed" data-step="2">
+                        <div class="step-circle"><i class="fas fa-check"></i></div>
+                        <div class="step-label">Études</div>
+                    </div>
+                    <div class="step completed" data-step="3">
+                        <div class="step-circle"><i class="fas fa-check"></i></div>
+                        <div class="step-label">Sécurité</div>
+                    </div>
+                    <div class="step active" data-step="4">
+                        <div class="step-circle">4</div>
+                        <div class="step-label">Finalisation</div>
+                    </div>
+                </div>
+                
+                <div id="registration-summary" style="background: var(--light); padding: 1.5rem; border-radius: var(--radius); margin-bottom: 1.5rem;">
+                    <h3 style="color: var(--primary); margin-bottom: 1rem; font-size: 1.1rem;">Récapitulatif</h3>
+                    <div id="summary-content" style="font-size: 0.9rem; color: var(--dark2);">
+                        <!-- Les informations seront affichées ici -->
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="register-invite-code">Code d'invitation (optionnel)</label>
+                    <input type="text" id="register-invite-code" placeholder="Entrez un code d'un ami">
+                    <small style="color: var(--dark2); font-size: 0.85rem; display: block; margin-top: 5px;">
+                        Obtenez des avantages avec un code d'invitation
+                    </small>
+                </div>
+                
+                <div class="form-checkbox">
+                    <input type="checkbox" id="register-confirm" required>
+                    <label for="register-confirm">
+                        Je certifie que toutes les informations fournies sont exactes et complètes
+                    </label>
+                </div>
+                
+                <div class="form-row">
+                    <button class="btn btn-outline btn-full" id="prev-step-4">
+                        <i class="fas fa-arrow-left"></i> Précédent
+                    </button>
+                    <button class="btn btn-full" id="complete-registration" disabled>
+                        <i class="fas fa-user-plus"></i> Créer mon compte
+                    </button>
+                </div>
+            </div>
+            
+            <!-- FORMULAIRE DE CONNEXION -->
+            <div class="auth-form" id="login-form">
+                <div class="auth-header">
+                    <i class="fas fa-sign-in-alt"></i>
+                    <h2>Connexion</h2>
+                    <p>Accédez à votre compte PrimeAcademia</p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="login-email">Adresse email</label>
+                    <input type="email" id="login-email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="login-password">Mot de passe</label>
+                    <input type="password" id="login-password" required>
+                </div>
+                
+                <div class="form-checkbox">
+                    <input type="checkbox" id="remember-me">
+                    <label for="remember-me">Se souvenir de moi</label>
+                </div>
+                
+                <button class="btn btn-full" id="login-button">
+                    <i class="fas fa-sign-in-alt"></i> Se connecter
                 </button>
+                
+                <div style="text-align: center; margin: 1rem 0;">
+                    <a href="#" id="forgot-password">Mot de passe oublié ?</a>
+                </div>
+                
+                <div class="auth-switch">
+                    <p>Pas encore de compte ? <a href="#" id="switch-to-register">S'inscrire</a></p>
+                </div>
+            </div>
+            
+            <!-- MOT DE PASSE OUBLIÉ -->
+            <div class="auth-form" id="forgot-password-form">
+                <div class="auth-header">
+                    <i class="fas fa-key"></i>
+                    <h2>Réinitialisation du mot de passe</h2>
+                    <p>Entrez votre email pour recevoir un lien de réinitialisation</p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="reset-email">Adresse email</label>
+                    <input type="email" id="reset-email" required>
+                </div>
+                
+                <button class="btn btn-full" id="reset-password-button">
+                    <i class="fas fa-paper-plane"></i> Envoyer le lien
+                </button>
+                
+                <div class="auth-switch">
+                    <p><a href="#" id="back-to-login">Retour à la connexion</a></p>
+                </div>
             </div>
         </div>
     </div>
+
+    <!-- Menu utilisateur -->
+    <div class="user-menu" id="userMenu">
+        <div class="user-menu-item" id="view-profile">
+            <i class="fas fa-user"></i>
+            <span>Mon profil</span>
+        </div>
+        <div class="user-menu-item" id="my-downloads">
+            <i class="fas fa-download"></i>
+            <span>Mes téléchargements</span>
+        </div>
+        <div class="user-menu-divider"></div>
+        <div class="user-menu-item" id="logout-button">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Déconnexion</span>
+        </div>
+    </div>
+
+    <!-- Overlay pour menu burger -->
+    <div class="menu-overlay" id="menuOverlay"></div>
 
     <header>
         <div class="container">
@@ -2204,6 +2494,26 @@
                         <li><a href="#" class="nav-link" data-page="about">À propos</a></li>
                         <li><a href="#" class="nav-link" data-page="contact">Contact</a></li>
                     </ul>
+                    
+                    <!-- Boutons d'authentification (affichés quand non connecté) -->
+                    <div id="auth-buttons" style="margin-left: 1rem;">
+                        <button class="btn btn-secondary" id="login-button-header">
+                            <i class="fas fa-sign-in-alt"></i> Connexion
+                        </button>
+                        <button class="btn btn-primary" id="register-button-header">
+                            <i class="fas fa-user-plus"></i> Inscription
+                        </button>
+                    </div>
+                    
+                    <!-- Profil utilisateur (affiché quand connecté) -->
+                    <div id="user-profile" class="user-profile" style="display: none;">
+                        <div class="user-avatar" id="user-avatar">
+                            U
+                        </div>
+                        <div class="user-name" id="user-name">
+                            Utilisateur
+                        </div>
+                    </div>
                 </nav>
             </div>
         </div>
@@ -2215,6 +2525,15 @@
             <div class="page-title">
                 <i class="fas fa-folder-open"></i>
                 <h1>Épreuves Académiques - Votre Ressource Pédagogique</h1>
+            </div>
+
+            <!-- Message de bienvenue pour utilisateurs non connectés -->
+            <div id="welcome-message" class="alert alert-info" style="display: none;">
+                <i class="fas fa-info-circle"></i>
+                <div>
+                    <strong>Bienvenue sur PrimeAcademia !</strong>
+                    <p>Pour accéder aux épreuves académiques et télécharger des fichiers, veuillez vous connecter ou créer un compte gratuit.</p>
+                </div>
             </div>
 
             <!-- Section Introduction - Version Réduite -->
@@ -2239,6 +2558,15 @@
                     </button>
                 </h2>
                 <p>PrimeAcademia est la plateforme de référence pour l'accès aux ressources pédagogiques et épreuves académiques. Notre mission est de démocratiser l'accès à l'éducation en mettant à disposition des étudiants une collection organisée d'épreuves académiques passées.</p>
+                
+                <h3>Accès aux ressources</h3>
+                <p>Pour télécharger les épreuves académiques, vous devez créer un compte gratuit. Cette procédure nous permet de :</p>
+                <ul>
+                    <li>Personnaliser votre expérience selon votre filière et niveau d'études</li>
+                    <li>Suivre vos téléchargements et vos progrès</li>
+                    <li>Vous envoyer des recommandations personnalisées</li>
+                    <li>Assurer la sécurité et l'intégrité de notre plateforme</li>
+                </ul>
                 
                 <h3>Notre Vision Pédagogique</h3>
                 <p>PrimeAcademia a été créé dans le but de briser les barrières à l'accès à l'éducation. Nous comprenons que la préparation aux examens est une étape cruciale dans le parcours académique, et l'accès aux anciennes épreuves représente un avantage significatif pour les étudiants.</p>
@@ -2283,16 +2611,19 @@
             <div class="controls">
                 <div class="search-box">
                     <i class="fas fa-search"></i>
-                    <input type="text" id="search-input" placeholder="Rechercher un fichier...">
+                    <input type="text" id="search-input" placeholder="Rechercher un fichier..." disabled>
+                    <small style="color: var(--dark2); font-size: 0.85rem; display: block; margin-top: 5px;">
+                        Connectez-vous pour activer la recherche
+                    </small>
                 </div>
                 <div class="filter-group">
-                    <select id="filiere-filter">
+                    <select id="filiere-filter" disabled>
                         <option value="">Toutes les filières</option>
                         <option value="informatique">Informatique</option>
                         <option value="gestion">Gestion</option>
                         <option value="college">Collège</option>
                     </select>
-                    <select id="year-filter">
+                    <select id="year-filter" disabled>
                         <option value="">Toutes les années</option>
                         <option value="annee1">Année 1</option>
                         <option value="annee2">Année 2</option>
@@ -2305,7 +2636,7 @@
                         <option value="premiere">Première</option>
                         <option value="terminale">Terminale</option>
                     </select>
-                    <select id="semestre-filter">
+                    <select id="semestre-filter" disabled>
                         <option value="">Tous les semestres</option>
                         <option value="semestre1">Semestre 1</option>
                         <option value="semestre2">Semestre 2</option>
@@ -2325,14 +2656,28 @@
                     <p>Filières</p>
                 </div>
                 <div class="stat-card">
-                    <i class="fas fa-sync-alt"></i>
-                    <h3 id="update-time">24h</h3>
-                    <p>Prochaine mise à jour</p>
+                    <i class="fas fa-user-graduate"></i>
+                    <h3 id="total-users">0</h3>
+                    <p>Étudiants inscrits</p>
                 </div>
             </div>
 
             <div class="files-container">
-                <div id="loading" class="loading">
+                <div id="login-required" class="empty-state" style="display: block;">
+                    <i class="fas fa-lock"></i>
+                    <h2>Accès réservé aux membres</h2>
+                    <p>Connectez-vous ou créez un compte gratuit pour accéder aux épreuves académiques.</p>
+                    <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1.5rem; flex-wrap: wrap;">
+                        <button class="btn btn-primary" id="login-button-main">
+                            <i class="fas fa-sign-in-alt"></i> Se connecter
+                        </button>
+                        <button class="btn btn-secondary" id="register-button-main">
+                            <i class="fas fa-user-plus"></i> Créer un compte
+                        </button>
+                    </div>
+                </div>
+
+                <div id="loading" class="loading" style="display: none;">
                     <i class="fas fa-spinner fa-spin"></i>
                     <h2>Chargement des fichiers...</h2>
                     <p>Connexion à Google Drive en cours</p>
@@ -3127,23 +3472,31 @@
             
             <div class="copyright">
                 <p>&copy; 2025 PrimeAcademia. Tous droits réservés. | Plateforme éducative à but non lucratif</p>
+                <p style="margin-top: 0.5rem; font-size: 0.8rem; opacity: 0.7;">
+                    <span id="total-users-footer">0</span> étudiants inscrits
+                </p>
             </div>
         </div>
     </footer>
 
     <script>
         // =============================================
-        // CONFIGURATIONS
+        // CONFIGURATION SUPRABASE
         // =============================================
 
-        // Configuration EmailJS
-        const EMAILJS_CONFIG = {
-            serviceId: 'service_aowa00e',
-            templateId: 'iqdbi0c', 
-            publicKey: 'nI3VvKfhbDlDyp_cf'
+        // REMPLACEZ CES VALEURS PAR VOS CLÉS SUPRABASE
+        const SUPABASE_CONFIG = {
+            url: 'https://votre-projet.supabase.co', // Remplacez par votre URL Supabase
+            anonKey: 'votre-cle-anon-supabase' // Remplacez par votre clé anon
         };
 
-        // Configuration Google Drive pour les fichiers académiques
+        // Initialisation Supabase
+        const supabase = supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
+
+        // =============================================
+        // CONFIGURATION GOOGLE DRIVE
+        // =============================================
+
         const DRIVE_CONFIG = {
             apiKey: 'AIzaSyB7RFQGzSFAHRMhq5EA8XK50inK-nHHquA',
             folders: {
@@ -3231,18 +3584,11 @@
             'legal': 'legal-page'
         };
 
-        // Configuration du partage
-        const SHARE_CONFIG = {
-            url: window.location.href,
-            title: 'PrimeAcademia - Plateforme d\'Épreuves Académiques',
-            description: 'Accédez gratuitement à des épreuves académiques organisées par filière et année. Outils de préparation et conseils pour la réussite étudiante.',
-            hashtags: 'PrimeAcademia,Éducation,Gratuit,Épreuves,Étudiants,Réussite'
-        };
-
         // =============================================
         // VARIABLES GLOBALES
         // =============================================
 
+        let currentUser = null;
         let filesData = [];
         let booksData = [];
         let updateCounter = 24 * 60 * 60;
@@ -3252,55 +3598,139 @@
         const itemsPerPage = 12;
         let filteredFiles = [];
 
+        // Variables pour l'inscription
+        let registrationData = {
+            step1: {},
+            step2: {},
+            step3: {}
+        };
+
         // =============================================
         // ÉLÉMENTS DOM
         // =============================================
 
-        // Éléments principaux
-        const loadingElement = document.getElementById('loading');
-        const errorElement = document.getElementById('error');
-        const emptyStateElement = document.getElementById('empty-state');
-        const filesContentElement = document.getElementById('files-content');
+        // Modal d'authentification
+        const authModal = document.getElementById('authModal');
+        const closeAuthModal = document.getElementById('closeAuthModal');
+        
+        // Boutons d'authentification dans le header
+        const loginButtonHeader = document.getElementById('login-button-header');
+        const registerButtonHeader = document.getElementById('register-button-header');
+        
+        // Boutons d'authentification dans le main
+        const loginButtonMain = document.getElementById('login-button-main');
+        const registerButtonMain = document.getElementById('register-button-main');
+        
+        // Formulaires d'authentification
+        const loginForm = document.getElementById('login-form');
+        const registerStep1 = document.getElementById('register-step-1');
+        const registerStep2 = document.getElementById('register-step-2');
+        const registerStep3 = document.getElementById('register-step-3');
+        const registerStep4 = document.getElementById('register-step-4');
+        const forgotPasswordForm = document.getElementById('forgot-password-form');
+        
+        // Boutons de navigation entre formulaires
+        const switchToLogin = document.getElementById('switch-to-login');
+        const switchToRegister = document.getElementById('switch-to-register');
+        const backToLogin = document.getElementById('back-to-login');
+        const forgotPassword = document.getElementById('forgot-password');
+        
+        // Boutons de navigation entre étapes
+        const nextStep1 = document.getElementById('next-step-1');
+        const prevStep2 = document.getElementById('prev-step-2');
+        const nextStep2 = document.getElementById('next-step-2');
+        const prevStep3 = document.getElementById('prev-step-3');
+        const nextStep3 = document.getElementById('next-step-3');
+        const prevStep4 = document.getElementById('prev-step-4');
+        const completeRegistration = document.getElementById('complete-registration');
+        
+        // Boutons de soumission
+        const loginButton = document.getElementById('login-button');
+        const resetPasswordButton = document.getElementById('reset-password-button');
+        
+        // Champs de formulaire d'inscription
+        const registerNom = document.getElementById('register-nom');
+        const registerPrenom = document.getElementById('register-prenom');
+        const registerEmail = document.getElementById('register-email');
+        const registerPhone = document.getElementById('register-phone');
+        const registerBirthdate = document.getElementById('register-birthdate');
+        const registerGender = document.getElementById('register-gender');
+        const registerFiliere = document.getElementById('register-filiere');
+        const registerNiveau = document.getElementById('register-niveau');
+        const registerEtablissement = document.getElementById('register-etablissement');
+        const registerVille = document.getElementById('register-ville');
+        const registerObjectif = document.getElementById('register-objectif');
+        const registerMatieres = document.getElementById('register-matieres');
+        const registerPassword = document.getElementById('register-password');
+        const registerConfirmPassword = document.getElementById('register-confirm-password');
+        const registerNewsletter = document.getElementById('register-newsletter');
+        const registerTerms = document.getElementById('register-terms');
+        const registerInviteCode = document.getElementById('register-invite-code');
+        const registerConfirm = document.getElementById('register-confirm');
+        
+        // Champs de formulaire de connexion
+        const loginEmail = document.getElementById('login-email');
+        const loginPassword = document.getElementById('login-password');
+        const rememberMe = document.getElementById('remember-me');
+        
+        // Champs de formulaire de réinitialisation
+        const resetEmail = document.getElementById('reset-email');
+        
+        // Profil utilisateur
+        const userProfile = document.getElementById('user-profile');
+        const userAvatar = document.getElementById('user-avatar');
+        const userName = document.getElementById('user-name');
+        const userMenu = document.getElementById('user-menu');
+        const authButtons = document.getElementById('auth-buttons');
+        
+        // Boutons du menu utilisateur
+        const viewProfile = document.getElementById('view-profile');
+        const myDownloads = document.getElementById('my-downloads');
+        const logoutButton = document.getElementById('logout-button');
+        
+        // Message de bienvenue
+        const welcomeMessage = document.getElementById('welcome-message');
+        const loginRequired = document.getElementById('login-required');
+        
+        // Éléments des fichiers
+        const loading = document.getElementById('loading');
+        const error = document.getElementById('error');
+        const emptyState = document.getElementById('empty-state');
+        const filesContent = document.getElementById('files-content');
         const filesGrid = document.getElementById('files-grid');
         const totalFilesElement = document.getElementById('total-files');
         const totalFilieresElement = document.getElementById('total-filieres');
-        const updateTimeElement = document.getElementById('update-time');
-
+        const totalUsersElement = document.getElementById('total-users');
+        const totalUsersFooter = document.getElementById('total-users-footer');
+        
         // Filtres et recherche
         const searchInput = document.getElementById('search-input');
         const filiereFilter = document.getElementById('filiere-filter');
         const yearFilter = document.getElementById('year-filter');
         const semestreFilter = document.getElementById('semestre-filter');
         const retryBtn = document.getElementById('retry-btn');
-
+        
         // Navigation
         const navLinks = document.querySelectorAll('.nav-link');
         const pageSections = document.querySelectorAll('.page-section');
         const menuToggle = document.getElementById('menuToggle');
         const mainNav = document.getElementById('mainNav');
         const menuOverlay = document.getElementById('menuOverlay');
-
-        // Contact
-        const contactForm = document.getElementById('contactForm');
-        const contactAlert = document.getElementById('contact-alert');
-        const contactError = document.getElementById('contact-error');
-
+        const logo = document.querySelector('.logo');
+        
         // Librairie
         const booksGrid = document.getElementById('books-grid');
         const booksEmptyState = document.getElementById('books-empty-state');
         const booksLoading = document.getElementById('books-loading');
         const booksError = document.getElementById('books-error');
         const booksRetryBtn = document.getElementById('books-retry-btn');
-
+        
         // Introduction
         const introCollapsed = document.getElementById('intro-collapsed');
         const introExpanded = document.getElementById('intro-expanded');
         const introToggle = document.getElementById('intro-toggle');
         const introClose = document.getElementById('intro-close');
-
-        // Logo pour navigation
-        const logo = document.querySelector('.logo');
-
+        
         // Pagination
         const paginationElement = document.getElementById('pagination');
         const firstPageBtn = document.getElementById('first-page');
@@ -3308,176 +3738,758 @@
         const nextPageBtn = document.getElementById('next-page');
         const lastPageBtn = document.getElementById('last-page');
         const pageInfo = document.getElementById('page-info');
-
-        // Modal de partage
-        const shareModal = document.getElementById('shareModal');
-        const closeShareModal = document.getElementById('closeShareModal');
-        const shareUrl = document.getElementById('shareUrl');
-        const copyUrlBtn = document.getElementById('copyUrlBtn');
-        const closeModalBtn = document.getElementById('closeModalBtn');
-        const shareOptions = document.querySelectorAll('.share-option');
-
-        // =============================================
-        // PROTECTION DU CODE SOURCE
-        // =============================================
-
-        // Empêcher le clic droit
-        document.addEventListener('contextmenu', function(e) {
-            e.preventDefault();
-            showProtectionMessage();
-            return false;
-        });
-
-        // Empêcher les raccourcis clavier pour inspecter
-        document.addEventListener('keydown', function(e) {
-            // F12
-            if (e.keyCode === 123) {
-                e.preventDefault();
-                showProtectionMessage();
-                return false;
-            }
-            
-            // Ctrl+Shift+I
-            if (e.ctrlKey && e.shiftKey && e.keyCode === 73) {
-                e.preventDefault();
-                showProtectionMessage();
-                return false;
-            }
-            
-            // Ctrl+U (Voir le code source)
-            if (e.ctrlKey && e.keyCode === 85) {
-                e.preventDefault();
-                showProtectionMessage();
-                return false;
-            }
-            
-            // Ctrl+Shift+J
-            if (e.ctrlKey && e.shiftKey && e.keyCode === 74) {
-                e.preventDefault();
-                showProtectionMessage();
-                return false;
-            }
-            
-            // Ctrl+Shift+C
-            if (e.ctrlKey && e.shiftKey && e.keyCode === 67) {
-                e.preventDefault();
-                showProtectionMessage();
-                return false;
-            }
-            
-            // Alt+Shift+I
-            if (e.altKey && e.shiftKey && e.keyCode === 73) {
-                e.preventDefault();
-                showProtectionMessage();
-                return false;
-            }
-        });
-
-        // Empêcher la sélection de texte
-        document.addEventListener('selectstart', function(e) {
-            e.preventDefault();
-            return false;
-        });
-
-        // Empêcher le glisser-déposer
-        document.addEventListener('dragstart', function(e) {
-            e.preventDefault();
-            return false;
-        });
-
-        // Afficher un message d'avertissement
-        function showProtectionMessage() {
-            // Créer un overlay temporaire
-            const overlay = document.createElement('div');
-            overlay.style.cssText = `
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0, 0, 0, 0.95);
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                z-index: 100000;
-                color: white;
-                font-size: 1.2rem;
-                text-align: center;
-                flex-direction: column;
-                padding: 20px;
-            `;
-            
-            overlay.innerHTML = `
-                <div style="text-align: center; max-width: 500px;">
-                    <i class="fas fa-shield-alt" style="font-size: 4rem; margin-bottom: 1.5rem; color: var(--accent);"></i>
-                    <h2 style="color: white; margin-bottom: 1rem;">Protection du Contenu</h2>
-                    <p>L'inspection du code source est désactivée pour protéger les droits d'auteur et la propriété intellectuelle.</p>
-                    <p style="margin-top: 1rem; font-size: 1rem; opacity: 0.8;">Cette plateforme est protégée par PrimeAcademia.</p>
-                    <button id="closeProtectionMsg" style="margin-top: 2rem; padding: 10px 30px; background: var(--primary); color: white; border: none; border-radius: var(--radius); cursor: pointer; font-size: 1rem;">
-                        Compris
-                    </button>
-                </div>
-            `;
-            
-            document.body.appendChild(overlay);
-            document.body.style.overflow = 'hidden';
-            
-            // Fermer le message après 3 secondes ou au clic
-            setTimeout(() => {
-                if (overlay.parentNode) {
-                    overlay.remove();
-                    document.body.style.overflow = '';
-                }
-            }, 3000);
-            
-            // Fermer au clic
-            document.getElementById('closeProtectionMsg').addEventListener('click', function() {
-                overlay.remove();
-                document.body.style.overflow = '';
-            });
-        }
+        
+        // Contact
+        const contactForm = document.getElementById('contactForm');
+        const contactAlert = document.getElementById('contact-alert');
+        const contactError = document.getElementById('contact-error');
 
         // =============================================
         // INITIALISATION
         // =============================================
 
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log("🚀 Initialisation de PrimeAcademia...");
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log("🚀 Initialisation de PrimeAcademia avec authentification...");
             
-            // Initialisation des services
-            if (typeof emailjs !== 'undefined') {
-                emailjs.init(EMAILJS_CONFIG.publicKey);
-            }
+            // Vérifier l'état d'authentification
+            await checkAuth();
             
-            // Configuration de l'interface
-            setupEventListeners();
+            // Initialiser les écouteurs d'événements
+            setupAuthEventListeners();
+            setupAppEventListeners();
             
-            // Chargement des données
-            loadFiles();
+            // Charger les livres (accessible sans connexion)
             loadBooks();
-            
-            // Initialisation du menu burger
-            setupBurgerMenu();
-            
-            // Initialisation de la pagination
-            setupPagination();
-            
-            // Initialisation du modal de partage
-            setupShareModal();
             
             console.log("✅ PrimeAcademia initialisé avec succès");
         });
 
         // =============================================
-        // GESTION DES ÉVÉNEMENTS
+        // GESTION DE L'AUTHENTIFICATION
         // =============================================
 
-        function setupEventListeners() {
+        async function checkAuth() {
+            try {
+                // Vérifier la session Supabase
+                const { data: { session }, error } = await supabase.auth.getSession();
+                
+                if (error) throw error;
+                
+                if (session) {
+                    // Utilisateur connecté
+                    currentUser = session.user;
+                    await loadUserProfile();
+                    updateUIForLoggedInUser();
+                    loadFiles(); // Charger les fichiers seulement si connecté
+                } else {
+                    // Utilisateur non connecté
+                    updateUIForGuest();
+                }
+                
+                // Mettre à jour les statistiques
+                await updateUserStats();
+                
+            } catch (error) {
+                console.error('Erreur lors de la vérification de l\'authentification:', error);
+                updateUIForGuest();
+            }
+        }
+
+        async function loadUserProfile() {
+            if (!currentUser) return;
+            
+            try {
+                // Récupérer le profil utilisateur depuis Supabase
+                const { data: profile, error } = await supabase
+                    .from('profiles')
+                    .select('*')
+                    .eq('id', currentUser.id)
+                    .single();
+                
+                if (error && error.code !== 'PGRST116') throw error;
+                
+                if (profile) {
+                    // Mettre à jour l'affichage du profil
+                    const firstName = profile.prenom || '';
+                    const lastName = profile.nom || '';
+                    const displayName = `${firstName} ${lastName}`.trim() || 'Utilisateur';
+                    
+                    userName.textContent = displayName;
+                    userAvatar.textContent = (firstName[0] || lastName[0] || 'U').toUpperCase();
+                    
+                    // Stocker les informations du profil
+                    currentUser.profile = profile;
+                }
+                
+            } catch (error) {
+                console.error('Erreur lors du chargement du profil:', error);
+            }
+        }
+
+        async function updateUserStats() {
+            try {
+                // Compter le nombre total d'utilisateurs
+                const { count, error } = await supabase
+                    .from('profiles')
+                    .select('*', { count: 'exact', head: true });
+                
+                if (!error && count !== null) {
+                    totalUsersElement.textContent = count;
+                    totalUsersFooter.textContent = count;
+                }
+            } catch (error) {
+                console.error('Erreur lors de la mise à jour des statistiques:', error);
+            }
+        }
+
+        // =============================================
+        // INSCRIPTION EN 4 ÉTAPES
+        // =============================================
+
+        function setupAuthEventListeners() {
+            // Ouverture/fermeture du modal
+            [loginButtonHeader, registerButtonHeader, loginButtonMain, registerButtonMain].forEach(btn => {
+                if (btn) btn.addEventListener('click', openAuthModal);
+            });
+            
+            if (closeAuthModal) closeAuthModal.addEventListener('click', closeAuthModalHandler);
+            
+            // Navigation entre formulaires
+            if (switchToLogin) switchToLogin.addEventListener('click', () => showForm('login'));
+            if (switchToRegister) switchToRegister.addEventListener('click', () => showForm('register-step-1'));
+            if (backToLogin) backToLogin.addEventListener('click', () => showForm('login'));
+            if (forgotPassword) forgotPassword.addEventListener('click', () => showForm('forgot-password'));
+            
+            // Navigation entre étapes d'inscription
+            if (nextStep1) nextStep1.addEventListener('click', validateStep1);
+            if (prevStep2) prevStep2.addEventListener('click', () => showForm('register-step-1'));
+            if (nextStep2) nextStep2.addEventListener('click', validateStep2);
+            if (prevStep3) prevStep3.addEventListener('click', () => showForm('register-step-2'));
+            if (nextStep3) nextStep3.addEventListener('click', validateStep3);
+            if (prevStep4) prevStep4.addEventListener('click', () => showForm('register-step-3'));
+            if (completeRegistration) completeRegistration.addEventListener('click', completeRegistrationProcess);
+            
+            // Validation en temps réel
+            if (registerConfirm) registerConfirm.addEventListener('change', updateRegistrationSummary);
+            
+            // Soumission des formulaires
+            if (loginButton) loginButton.addEventListener('click', handleLogin);
+            if (resetPasswordButton) resetPasswordButton.addEventListener('click', handlePasswordReset);
+            
+            // Gestion du menu utilisateur
+            if (userAvatar) userAvatar.addEventListener('click', toggleUserMenu);
+            if (logoutButton) logoutButton.addEventListener('click', handleLogout);
+            if (viewProfile) viewProfile.addEventListener('click', viewUserProfile);
+            if (myDownloads) myDownloads.addEventListener('click', viewMyDownloads);
+            
+            // Fermer le menu utilisateur en cliquant ailleurs
+            document.addEventListener('click', (e) => {
+                if (userMenu && !userMenu.contains(e.target) && userAvatar && !userAvatar.contains(e.target)) {
+                    userMenu.classList.remove('active');
+                }
+            });
+            
+            // Fermer le modal avec la touche Echap
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && authModal.classList.contains('active')) {
+                    closeAuthModalHandler();
+                }
+            });
+            
+            // Fermer le modal en cliquant en dehors
+            authModal.addEventListener('click', (e) => {
+                if (e.target === authModal) {
+                    closeAuthModalHandler();
+                }
+            });
+        }
+
+        function openAuthModal() {
+            authModal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            showForm('login');
+        }
+
+        function closeAuthModalHandler() {
+            authModal.classList.remove('active');
+            document.body.style.overflow = '';
+            resetRegistrationForm();
+        }
+
+        function showForm(formId) {
+            // Masquer tous les formulaires
+            [loginForm, registerStep1, registerStep2, registerStep3, registerStep4, forgotPasswordForm].forEach(form => {
+                if (form) form.classList.remove('active');
+            });
+            
+            // Afficher le formulaire demandé
+            const formToShow = document.getElementById(formId);
+            if (formToShow) {
+                formToShow.classList.add('active');
+            }
+        }
+
+        // VALIDATION ÉTAPE 1: Informations personnelles
+        function validateStep1() {
+            // Validation des champs requis
+            if (!registerNom.value.trim()) {
+                showError('Veuillez entrer votre nom');
+                return;
+            }
+            
+            if (!registerPrenom.value.trim()) {
+                showError('Veuillez entrer votre prénom');
+                return;
+            }
+            
+            if (!registerEmail.value.trim()) {
+                showError('Veuillez entrer votre adresse email');
+                return;
+            }
+            
+            if (!isValidEmail(registerEmail.value)) {
+                showError('Veuillez entrer une adresse email valide');
+                return;
+            }
+            
+            if (!registerPhone.value.trim()) {
+                showError('Veuillez entrer votre numéro de téléphone');
+                return;
+            }
+            
+            // Stocker les données de l'étape 1
+            registrationData.step1 = {
+                nom: registerNom.value.trim(),
+                prenom: registerPrenom.value.trim(),
+                email: registerEmail.value.trim(),
+                phone: registerPhone.value.trim(),
+                birthdate: registerBirthdate.value,
+                gender: registerGender.value
+            };
+            
+            // Passer à l'étape 2
+            showForm('register-step-2');
+        }
+
+        // VALIDATION ÉTAPE 2: Informations académiques
+        function validateStep2() {
+            if (!registerFiliere.value) {
+                showError('Veuillez sélectionner votre filière d\'études');
+                return;
+            }
+            
+            if (!registerNiveau.value) {
+                showError('Veuillez sélectionner votre niveau d\'études');
+                return;
+            }
+            
+            // Stocker les données de l'étape 2
+            registrationData.step2 = {
+                filiere: registerFiliere.value,
+                niveau: registerNiveau.value,
+                etablissement: registerEtablissement.value.trim(),
+                ville: registerVille.value.trim(),
+                objectif: registerObjectif.value,
+                matieres: registerMatieres.value.trim()
+            };
+            
+            // Passer à l'étape 3
+            showForm('register-step-3');
+        }
+
+        // VALIDATION ÉTAPE 3: Sécurité
+        function validateStep3() {
+            if (!registerPassword.value) {
+                showError('Veuillez entrer un mot de passe');
+                return;
+            }
+            
+            if (registerPassword.value.length < 8) {
+                showError('Le mot de passe doit contenir au moins 8 caractères');
+                return;
+            }
+            
+            if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(registerPassword.value)) {
+                showError('Le mot de passe doit contenir au moins une majuscule, une minuscule et un chiffre');
+                return;
+            }
+            
+            if (registerPassword.value !== registerConfirmPassword.value) {
+                showError('Les mots de passe ne correspondent pas');
+                return;
+            }
+            
+            if (!registerTerms.checked) {
+                showError('Vous devez accepter les conditions d\'utilisation');
+                return;
+            }
+            
+            // Stocker les données de l'étape 3
+            registrationData.step3 = {
+                password: registerPassword.value,
+                newsletter: registerNewsletter.checked,
+                termsAccepted: true
+            };
+            
+            // Mettre à jour le récapitulatif et passer à l'étape 4
+            updateRegistrationSummary();
+            showForm('register-step-4');
+        }
+
+        function updateRegistrationSummary() {
+            const summaryContent = document.getElementById('summary-content');
+            if (!summaryContent) return;
+            
+            const data = registrationData;
+            
+            let html = `
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div><strong>Nom complet:</strong></div>
+                    <div>${data.step1.prenom} ${data.step1.nom}</div>
+                    
+                    <div><strong>Email:</strong></div>
+                    <div>${data.step1.email}</div>
+                    
+                    <div><strong>Téléphone:</strong></div>
+                    <div>${data.step1.phone}</div>
+                    
+                    <div><strong>Filière:</strong></div>
+                    <div>${formatFiliere(data.step2.filiere)}</div>
+                    
+                    <div><strong>Niveau:</strong></div>
+                    <div>${formatNiveau(data.step2.niveau)}</div>
+            `;
+            
+            if (data.step2.etablissement) {
+                html += `
+                    <div><strong>Établissement:</strong></div>
+                    <div>${data.step2.etablissement}</div>
+                `;
+            }
+            
+            if (data.step2.ville) {
+                html += `
+                    <div><strong>Ville:</strong></div>
+                    <div>${data.step2.ville}</div>
+                `;
+            }
+            
+            html += `
+                    <div><strong>Newsletter:</strong></div>
+                    <div>${data.step3.newsletter ? 'Oui' : 'Non'}</div>
+                </div>
+            `;
+            
+            summaryContent.innerHTML = html;
+            
+            // Activer/désactiver le bouton de finalisation
+            if (completeRegistration) {
+                completeRegistration.disabled = !registerConfirm.checked;
+            }
+        }
+
+        async function completeRegistrationProcess() {
+            const btn = completeRegistration;
+            const originalText = btn.innerHTML;
+            
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Création du compte...';
+            btn.disabled = true;
+            
+            try {
+                // Étape 1: Inscription avec Supabase Auth
+                const { data: authData, error: authError } = await supabase.auth.signUp({
+                    email: registrationData.step1.email,
+                    password: registrationData.step3.password,
+                    options: {
+                        data: {
+                            nom: registrationData.step1.nom,
+                            prenom: registrationData.step1.prenom,
+                            phone: registrationData.step1.phone
+                        }
+                    }
+                });
+                
+                if (authError) throw authError;
+                
+                if (authData.user) {
+                    // Étape 2: Création du profil utilisateur
+                    const profileData = {
+                        id: authData.user.id,
+                        email: registrationData.step1.email,
+                        nom: registrationData.step1.nom,
+                        prenom: registrationData.step1.prenom,
+                        phone: registrationData.step1.phone,
+                        birthdate: registrationData.step1.birthdate || null,
+                        gender: registrationData.step1.gender || null,
+                        filiere: registrationData.step2.filiere,
+                        niveau: registrationData.step2.niveau,
+                        etablissement: registrationData.step2.etablissement || null,
+                        ville: registrationData.step2.ville || null,
+                        objectif: registrationData.step2.objectif || null,
+                        matieres: registrationData.step2.matieres || null,
+                        newsletter: registrationData.step3.newsletter,
+                        invite_code: registerInviteCode.value || null,
+                        created_at: new Date().toISOString(),
+                        last_login: new Date().toISOString()
+                    };
+                    
+                    const { error: profileError } = await supabase
+                        .from('profiles')
+                        .insert([profileData]);
+                    
+                    if (profileError) throw profileError;
+                    
+                    // Succès
+                    showSuccess('Compte créé avec succès ! Vous êtes maintenant connecté.');
+                    
+                    // Mettre à jour l'interface
+                    currentUser = authData.user;
+                    currentUser.profile = profileData;
+                    updateUIForLoggedInUser();
+                    
+                    // Fermer le modal
+                    setTimeout(() => {
+                        closeAuthModalHandler();
+                        loadFiles(); // Charger les fichiers maintenant que l'utilisateur est connecté
+                    }, 1500);
+                    
+                } else {
+                    throw new Error('Erreur lors de la création du compte');
+                }
+                
+            } catch (error) {
+                console.error('Erreur lors de l\'inscription:', error);
+                showError(error.message || 'Une erreur est survenue lors de l\'inscription');
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        // =============================================
+        // CONNEXION UTILISATEUR
+        // =============================================
+
+        async function handleLogin() {
+            const btn = loginButton;
+            const originalText = btn.innerHTML;
+            
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connexion...';
+            btn.disabled = true;
+            
+            try {
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email: loginEmail.value.trim(),
+                    password: loginPassword.value
+                });
+                
+                if (error) throw error;
+                
+                if (data.user) {
+                    // Succès
+                    showSuccess('Connexion réussie !');
+                    
+                    // Mettre à jour l'utilisateur courant
+                    currentUser = data.user;
+                    await loadUserProfile();
+                    
+                    // Mettre à jour l'interface
+                    updateUIForLoggedInUser();
+                    
+                    // Fermer le modal
+                    setTimeout(() => {
+                        closeAuthModalHandler();
+                        loadFiles(); // Charger les fichiers maintenant que l'utilisateur est connecté
+                    }, 1000);
+                }
+                
+            } catch (error) {
+                console.error('Erreur lors de la connexion:', error);
+                showError(error.message || 'Email ou mot de passe incorrect');
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        // =============================================
+        // RÉINITIALISATION DE MOT DE PASSE
+        // =============================================
+
+        async function handlePasswordReset() {
+            const btn = resetPasswordButton;
+            const originalText = btn.innerHTML;
+            
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Envoi...';
+            btn.disabled = true;
+            
+            try {
+                const { error } = await supabase.auth.resetPasswordForEmail(resetEmail.value.trim(), {
+                    redirectTo: `${window.location.origin}/reset-password`
+                });
+                
+                if (error) throw error;
+                
+                showSuccess('Un email de réinitialisation a été envoyé à votre adresse.');
+                setTimeout(() => showForm('login'), 2000);
+                
+            } catch (error) {
+                console.error('Erreur lors de la réinitialisation:', error);
+                showError(error.message || 'Une erreur est survenue');
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        // =============================================
+        // DÉCONNEXION
+        // =============================================
+
+        async function handleLogout() {
+            try {
+                const { error } = await supabase.auth.signOut();
+                
+                if (error) throw error;
+                
+                // Réinitialiser l'utilisateur
+                currentUser = null;
+                
+                // Mettre à jour l'interface
+                updateUIForGuest();
+                
+                // Fermer le menu utilisateur
+                userMenu.classList.remove('active');
+                
+                showSuccess('Déconnexion réussie');
+                
+            } catch (error) {
+                console.error('Erreur lors de la déconnexion:', error);
+                showError('Erreur lors de la déconnexion');
+            }
+        }
+
+        // =============================================
+        // MISE À JOUR DE L'INTERFACE
+        // =============================================
+
+        function updateUIForLoggedInUser() {
+            // Afficher le profil utilisateur
+            userProfile.style.display = 'flex';
+            authButtons.style.display = 'none';
+            
+            // Masquer le message de bienvenue
+            welcomeMessage.style.display = 'none';
+            loginRequired.style.display = 'none';
+            
+            // Activer les filtres et la recherche
+            searchInput.disabled = false;
+            searchInput.placeholder = 'Rechercher un fichier...';
+            filiereFilter.disabled = false;
+            yearFilter.disabled = false;
+            semestreFilter.disabled = false;
+            
+            // Mettre à jour les infos utilisateur
+            if (currentUser && currentUser.profile) {
+                const profile = currentUser.profile;
+                const firstName = profile.prenom || '';
+                const lastName = profile.nom || '';
+                const displayName = `${firstName} ${lastName}`.trim() || 'Utilisateur';
+                
+                userName.textContent = displayName;
+                userAvatar.textContent = (firstName[0] || lastName[0] || 'U').toUpperCase();
+            }
+            
+            // Mettre à jour les statistiques
+            updateUserStats();
+        }
+
+        function updateUIForGuest() {
+            // Afficher les boutons d'authentification
+            userProfile.style.display = 'none';
+            authButtons.style.display = 'flex';
+            
+            // Afficher le message de bienvenue
+            welcomeMessage.style.display = 'flex';
+            loginRequired.style.display = 'block';
+            
+            // Désactiver les filtres et la recherche
+            searchInput.disabled = true;
+            filiereFilter.disabled = true;
+            yearFilter.disabled = true;
+            semestreFilter.disabled = true;
+            
+            // Masquer le contenu des fichiers
+            if (filesContent) filesContent.style.display = 'none';
+            if (loading) loading.style.display = 'none';
+            if (error) error.style.display = 'none';
+            if (emptyState) emptyState.style.display = 'none';
+            
+            // Réinitialiser les fichiers
+            filesData = [];
+            filteredFiles = [];
+            if (filesGrid) filesGrid.innerHTML = '';
+        }
+
+        // =============================================
+        // FONCTIONS UTILITAIRES
+        // =============================================
+
+        function isValidEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+
+        function showError(message) {
+            // Créer une notification toast
+            const toast = document.createElement('div');
+            toast.className = 'toast toast-error';
+            toast.innerHTML = `
+                <i class="fas fa-exclamation-circle"></i>
+                <span>${message}</span>
+            `;
+            
+            document.body.appendChild(toast);
+            
+            // Supprimer après 5 secondes
+            setTimeout(() => {
+                toast.remove();
+            }, 5000);
+        }
+
+        function showSuccess(message) {
+            // Créer une notification toast
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerHTML = `
+                <i class="fas fa-check-circle"></i>
+                <span>${message}</span>
+            `;
+            
+            document.body.appendChild(toast);
+            
+            // Supprimer après 5 secondes
+            setTimeout(() => {
+                toast.remove();
+            }, 5000);
+        }
+
+        function resetRegistrationForm() {
+            // Réinitialiser tous les champs du formulaire
+            if (registerNom) registerNom.value = '';
+            if (registerPrenom) registerPrenom.value = '';
+            if (registerEmail) registerEmail.value = '';
+            if (registerPhone) registerPhone.value = '';
+            if (registerBirthdate) registerBirthdate.value = '';
+            if (registerGender) registerGender.value = '';
+            if (registerFiliere) registerFiliere.value = '';
+            if (registerNiveau) registerNiveau.value = '';
+            if (registerEtablissement) registerEtablissement.value = '';
+            if (registerVille) registerVille.value = '';
+            if (registerObjectif) registerObjectif.value = '';
+            if (registerMatieres) registerMatieres.value = '';
+            if (registerPassword) registerPassword.value = '';
+            if (registerConfirmPassword) registerConfirmPassword.value = '';
+            if (registerNewsletter) registerNewsletter.checked = true;
+            if (registerTerms) registerTerms.checked = false;
+            if (registerInviteCode) registerInviteCode.value = '';
+            if (registerConfirm) registerConfirm.checked = false;
+            
+            // Réinitialiser les données d'inscription
+            registrationData = {
+                step1: {},
+                step2: {},
+                step3: {}
+            };
+            
+            // Retourner au formulaire de connexion
+            showForm('login');
+        }
+
+        function toggleUserMenu() {
+            userMenu.classList.toggle('active');
+        }
+
+        function viewUserProfile() {
+            showInfo('Cette fonctionnalité sera disponible prochainement.');
+            userMenu.classList.remove('active');
+        }
+
+        function viewMyDownloads() {
+            showInfo('Cette fonctionnalité sera disponible prochainement.');
+            userMenu.classList.remove('active');
+        }
+
+        function showInfo(message) {
+            // Créer une notification toast
+            const toast = document.createElement('div');
+            toast.className = 'toast toast-info';
+            toast.innerHTML = `
+                <i class="fas fa-info-circle"></i>
+                <span>${message}</span>
+            `;
+            
+            document.body.appendChild(toast);
+            
+            // Supprimer après 5 secondes
+            setTimeout(() => {
+                toast.remove();
+            }, 5000);
+        }
+
+        function formatFiliere(filiere) {
+            const filieres = {
+                'informatique': 'Informatique',
+                'gestion': 'Gestion',
+                'college': 'Collège (Secondaire)',
+                'autre': 'Autre'
+            };
+            return filieres[filiere] || filiere;
+        }
+
+        function formatNiveau(niveau) {
+            const niveaux = {
+                'annee1': 'Année 1 (Licence 1)',
+                'annee2': 'Année 2 (Licence 2)',
+                'annee3': 'Année 3 (Licence 3)',
+                'master1': 'Master 1',
+                'master2': 'Master 2',
+                'sixieme': '6ème',
+                'cinquieme': '5ème',
+                'quatrieme': '4ème',
+                'troisieme': '3ème',
+                'seconde': 'Seconde',
+                'premiere': 'Première',
+                'terminale': 'Terminale'
+            };
+            return niveaux[niveau] || niveau;
+        }
+
+        // =============================================
+        // GESTION DE L'APPLICATION
+        // =============================================
+
+        function setupAppEventListeners() {
+            // Navigation
             setupNavigation();
-            setupFilters();
+            
+            // Introduction
             setupIntroduction();
+            
+            // Articles
             setupArticles();
+            
+            // Filtres
+            setupFilters();
+            
+            // Contact form
             setupContactForm();
+            
+            // Menu burger
+            setupBurgerMenu();
+            
+            // Pagination
+            setupPagination();
         }
 
         function setupNavigation() {
@@ -3520,18 +4532,6 @@
                     if (mainNavLink) setActiveNavLink(mainNavLink);
                 });
             });
-        }
-
-        function setupFilters() {
-            // Recherche et filtres
-            searchInput.addEventListener('input', filterFiles);
-            filiereFilter.addEventListener('change', filterFiles);
-            yearFilter.addEventListener('change', filterFiles);
-            semestreFilter.addEventListener('change', filterFiles);
-
-            // Boutons de rechargement
-            retryBtn.addEventListener('click', loadFiles);
-            booksRetryBtn.addEventListener('click', loadBooks);
         }
 
         function setupIntroduction() {
@@ -3583,6 +4583,18 @@
             });
         }
 
+        function setupFilters() {
+            // Recherche et filtres
+            if (searchInput) searchInput.addEventListener('input', filterFiles);
+            if (filiereFilter) filiereFilter.addEventListener('change', filterFiles);
+            if (yearFilter) yearFilter.addEventListener('change', filterFiles);
+            if (semestreFilter) semestreFilter.addEventListener('change', filterFiles);
+
+            // Boutons de rechargement
+            if (retryBtn) retryBtn.addEventListener('click', loadFiles);
+            if (booksRetryBtn) booksRetryBtn.addEventListener('click', loadBooks);
+        }
+
         function setupContactForm() {
             if (contactForm) {
                 contactForm.addEventListener('submit', handleContactForm);
@@ -3617,82 +4629,15 @@
 
         function setupPagination() {
             // Boutons de pagination
-            firstPageBtn.addEventListener('click', () => goToPage(1));
-            prevPageBtn.addEventListener('click', () => goToPage(currentPage - 1));
-            nextPageBtn.addEventListener('click', () => goToPage(currentPage + 1));
-            lastPageBtn.addEventListener('click', () => {
+            if (firstPageBtn) firstPageBtn.addEventListener('click', () => goToPage(1));
+            if (prevPageBtn) prevPageBtn.addEventListener('click', () => goToPage(currentPage - 1));
+            if (nextPageBtn) nextPageBtn.addEventListener('click', () => goToPage(currentPage + 1));
+            if (lastPageBtn) lastPageBtn.addEventListener('click', () => {
                 const totalPages = Math.ceil(filteredFiles.length / itemsPerPage);
                 goToPage(totalPages);
             });
         }
 
-        function setupShareModal() {
-            // Bouton de fermeture (croix)
-            if (closeShareModal) {
-                closeShareModal.addEventListener('click', closeShareModalHandler);
-            }
-            
-            // Bouton copier URL
-            if (copyUrlBtn) {
-                copyUrlBtn.addEventListener('click', copyShareUrl);
-            }
-            
-            // Bouton fermer en bas
-            if (closeModalBtn) {
-                closeModalBtn.addEventListener('click', closeShareModalHandler);
-            }
-            
-            // Options de partage
-            shareOptions.forEach(option => {
-                option.addEventListener('click', function() {
-                    const platform = this.getAttribute('data-platform');
-                    shareOnPlatform(platform);
-                });
-            });
-            
-            // Fermer avec la touche Echap
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape' && shareModal.classList.contains('active')) {
-                    closeShareModalHandler();
-                }
-            });
-            
-            // Fermer en cliquant en dehors du modal
-            shareModal.addEventListener('click', function(e) {
-                if (e.target === shareModal) {
-                    closeShareModalHandler();
-                }
-            });
-            
-            // Mettre à jour l'URL dans le modal
-            if (shareUrl) {
-                shareUrl.value = SHARE_CONFIG.url;
-            }
-        }
-
-        // =============================================
-        // FONCTIONNALITÉS PRINCIPALES
-        // =============================================
-
-        // NAVIGATION
-        function switchPage(page) {
-            pageSections.forEach(section => {
-                section.classList.remove('active');
-            });
-            
-            const pageId = PAGES_CONFIG[page];
-            if (pageId && document.getElementById(pageId)) {
-                document.getElementById(pageId).classList.add('active');
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            }
-        }
-
-        function setActiveNavLink(activeLink) {
-            navLinks.forEach(link => link.classList.remove('active'));
-            activeLink.classList.add('active');
-        }
-
-        // MENU BURGER
         function toggleBurgerMenu() {
             if (mainNav.classList.contains('active')) {
                 closeBurgerMenu();
@@ -3715,16 +4660,39 @@
             document.body.style.overflow = '';
         }
 
+        function switchPage(page) {
+            pageSections.forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            const pageId = PAGES_CONFIG[page];
+            if (pageId && document.getElementById(pageId)) {
+                document.getElementById(pageId).classList.add('active');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        function setActiveNavLink(activeLink) {
+            navLinks.forEach(link => link.classList.remove('active'));
+            activeLink.classList.add('active');
+        }
+
         // =============================================
-        // GESTION DES FICHIERS ACADÉMIQUES
+        // GESTION DES FICHIERS
         // =============================================
 
         async function loadFiles() {
+            // Ne charger les fichiers que si l'utilisateur est connecté
+            if (!currentUser) {
+                updateUIForGuest();
+                return;
+            }
+            
             try {
                 showLoading();
                 await fetchDriveFiles();
                 filterFiles();
-                updateStats();
+                updateFileStats();
 
                 if (filesData.length === 0) {
                     showEmptyState();
@@ -3733,7 +4701,7 @@
                 }
             } catch (error) {
                 console.error('Erreur lors du chargement des fichiers:', error);
-                showError();
+                showFileError();
             }
         }
 
@@ -3786,8 +4754,9 @@
             }));
         }
 
-        // FILTRAGE ET AFFICHAGE
         function filterFiles() {
+            if (!currentUser) return;
+            
             const searchTerm = searchInput.value.toLowerCase();
             const selectedFiliere = filiereFilter.value;
             const selectedYear = yearFilter.value;
@@ -3816,6 +4785,8 @@
         }
 
         function displayFilesAsGrid(files) {
+            if (!filesGrid) return;
+            
             filesGrid.innerHTML = '';
 
             if (files.length === 0) {
@@ -3848,16 +4819,16 @@
                     <div class="file-content">
                         <h3>${file.name}</h3>
                         <div class="file-meta">
-                            <span><i class="fas fa-graduation-cap"></i> ${formatFiliere(file.filiere)}</span>
-                            <span><i class="fas fa-calendar-alt"></i> ${formatYear(file.year)}</span>
-                            <span><i class="fas fa-book"></i> ${formatSemestre(file.semestre)}</span>
+                            <span><i class="fas fa-graduation-cap"></i> ${formatFiliereForDisplay(file.filiere)}</span>
+                            <span><i class="fas fa-calendar-alt"></i> ${formatYearForDisplay(file.year)}</span>
+                            <span><i class="fas fa-book"></i> ${formatSemestreForDisplay(file.semestre)}</span>
                         </div>
                         <span class="file-type">${file.type}</span>
                         <div class="file-date">
                             <i class="far fa-calendar"></i> Ajouté le ${formattedDate}
                         </div>
                         <div class="file-actions">
-                            <button class="btn btn-primary" onclick="downloadAndShare('${file.id}', '${file.name}')">
+                            <button class="btn btn-primary" onclick="downloadFile('${file.id}', '${file.name.replace(/'/g, "\\'")}')">
                                 <i class="fas fa-download"></i> Télécharger
                             </button>
                         </div>
@@ -3869,6 +4840,8 @@
 
         // PAGINATION
         function updatePagination() {
+            if (!paginationElement) return;
+            
             const totalPages = Math.ceil(filteredFiles.length / itemsPerPage);
             
             if (totalPages > 1) {
@@ -3877,17 +4850,17 @@
                 paginationElement.style.display = 'none';
             }
             
-            pageInfo.textContent = `Page ${currentPage} sur ${totalPages}`;
+            if (pageInfo) pageInfo.textContent = `Page ${currentPage} sur ${totalPages}`;
             
-            firstPageBtn.disabled = currentPage === 1;
-            prevPageBtn.disabled = currentPage === 1;
-            nextPageBtn.disabled = currentPage === totalPages;
-            lastPageBtn.disabled = currentPage === totalPages;
+            if (firstPageBtn) firstPageBtn.disabled = currentPage === 1;
+            if (prevPageBtn) prevPageBtn.disabled = currentPage === 1;
+            if (nextPageBtn) nextPageBtn.disabled = currentPage === totalPages;
+            if (lastPageBtn) lastPageBtn.disabled = currentPage === totalPages;
             
-            firstPageBtn.classList.toggle('disabled', currentPage === 1);
-            prevPageBtn.classList.toggle('disabled', currentPage === 1);
-            nextPageBtn.classList.toggle('disabled', currentPage === totalPages);
-            lastPageBtn.classList.toggle('disabled', currentPage === totalPages);
+            if (firstPageBtn) firstPageBtn.classList.toggle('disabled', currentPage === 1);
+            if (prevPageBtn) prevPageBtn.classList.toggle('disabled', currentPage === 1);
+            if (nextPageBtn) nextPageBtn.classList.toggle('disabled', currentPage === totalPages);
+            if (lastPageBtn) lastPageBtn.classList.toggle('disabled', currentPage === totalPages);
         }
 
         function goToPage(page) {
@@ -3899,31 +4872,30 @@
             currentPage = page;
             displayFiles();
             
-            filesGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            if (filesGrid) {
+                filesGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
         }
 
-        // STATISTIQUES
-        function updateStats() {
-            totalFilesElement.textContent = filesData.length;
+        // STATISTIQUES DES FICHIERS
+        function updateFileStats() {
+            if (totalFilesElement) totalFilesElement.textContent = filesData.length;
             const uniqueFilieres = new Set(filesData.map(file => file.filiere));
-            totalFilieresElement.textContent = uniqueFilieres.size;
-            
-            updateCounter--;
-            if (updateCounter <= 0) {
-                updateCounter = 24 * 60 * 60;
-                loadFiles();
+            if (totalFilieresElement) totalFilieresElement.textContent = uniqueFilieres.size;
+        }
+
+        // =============================================
+        // TÉLÉCHARGEMENT DES FICHIERS
+        // =============================================
+
+        async function downloadFile(fileId, fileName) {
+            // Vérifier que l'utilisateur est connecté
+            if (!currentUser) {
+                showError('Veuillez vous connecter pour télécharger des fichiers');
+                openAuthModal();
+                return;
             }
             
-            const hours = Math.floor(updateCounter / 3600);
-            const minutes = Math.floor((updateCounter % 3600) / 60);
-            updateTimeElement.textContent = `${hours}h ${minutes}m`;
-        }
-
-        // =============================================
-        // FONCTIONNALITÉS DE TÉLÉCHARGEMENT AVEC PARTAGE
-        // =============================================
-
-        async function downloadAndShare(fileId, fileName) {
             try {
                 console.log(`📥 Téléchargement en cours: ${fileName}`);
                 
@@ -3936,18 +4908,13 @@
                 // Masquer l'indicateur de chargement
                 hideDownloadLoading();
                 
-                // Afficher le modal de partage après un court délai
-                setTimeout(() => {
-                    openShareModal();
-                }, 500);
+                // Afficher un message de succès
+                showSuccess('Téléchargement réussi !');
                 
             } catch (error) {
                 console.error('❌ Erreur lors du téléchargement:', error);
                 hideDownloadLoading();
-                // On peut quand même afficher le modal de partage
-                setTimeout(() => {
-                    openShareModal();
-                }, 500);
+                showError('Erreur lors du téléchargement');
             }
         }
 
@@ -4007,126 +4974,79 @@
             }
         }
 
-        // =============================================
-        // MODAL DE PARTAGE
-        // =============================================
-
-        function openShareModal() {
-            if (shareModal) {
-                shareModal.classList.add('active');
-                document.body.style.overflow = 'hidden';
-            }
-        }
-
-        function closeShareModalHandler() {
-            if (shareModal) {
-                shareModal.classList.remove('active');
-                document.body.style.overflow = '';
-            }
-        }
-
-        function shareOnPlatform(platform) {
-            const shareUrl = SHARE_CONFIG.url;
-            const shareTitle = SHARE_CONFIG.title;
-            const shareDescription = SHARE_CONFIG.description;
-            
-            let shareLink = '';
-            
-            switch(platform) {
-                case 'whatsapp':
-                    shareLink = `https://wa.me/?text=${encodeURIComponent(shareTitle + ' - ' + shareDescription + ' ' + shareUrl)}`;
-                    break;
-                    
-                case 'facebook':
-                    shareLink = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(shareDescription)}`;
-                    break;
-                    
-                case 'telegram':
-                    shareLink = `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareTitle + ' - ' + shareDescription)}`;
-                    break;
-                    
-                case 'twitter':
-                    shareLink = `https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareTitle)}&hashtags=${SHARE_CONFIG.hashtags}`;
-                    break;
-                    
-                case 'copy':
-                    copyShareUrl();
-                    return;
-            }
-            
-            if (shareLink) {
-                window.open(shareLink, '_blank', 'width=600,height=400');
-            }
-        }
-
-        function copyShareUrl() {
-            if (shareUrl) {
-                shareUrl.select();
-                shareUrl.setSelectionRange(0, 99999);
-                
-                try {
-                    navigator.clipboard.writeText(shareUrl.value).then(() => {
-                        showCopySuccess();
-                    }).catch(() => {
-                        fallbackCopy();
-                    });
-                } catch (error) {
-                    fallbackCopy();
-                }
-            }
-        }
-
-        function fallbackCopy() {
-            if (shareUrl) {
-                document.execCommand('copy');
-                showCopySuccess();
-            }
-        }
-
-        function showCopySuccess() {
-            const originalText = copyUrlBtn.innerHTML;
-            copyUrlBtn.innerHTML = '<i class="fas fa-check"></i> Copié !';
-            copyUrlBtn.style.background = 'var(--success)';
-            
-            // Afficher une notification
-            showToast('Lien copié dans le presse-papiers !', 'success');
-            
-            setTimeout(() => {
-                copyUrlBtn.innerHTML = originalText;
-                copyUrlBtn.style.background = '';
-            }, 2000);
-        }
-
-        function showToast(message, type = 'success') {
-            // Supprimer les anciens toasts
-            const existingToast = document.querySelector('.toast');
-            if (existingToast) {
-                existingToast.remove();
-            }
-            
-            // Créer le toast
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            toast.innerHTML = `
-                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
-                <span>${message}</span>
+        function showDownloadLoading(fileName) {
+            const loadingOverlay = document.createElement('div');
+            loadingOverlay.id = 'download-loading';
+            loadingOverlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.7);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 10000;
+                color: white;
+                font-size: 1rem;
+                flex-direction: column;
+                padding: 20px;
             `;
             
-            document.body.appendChild(toast);
+            loadingOverlay.innerHTML = `
+                <div style="text-align: center; max-width: 300px;">
+                    <i class="fas fa-spinner fa-spin" style="font-size: 2.5rem; margin-bottom: 1rem; color: var(--accent);"></i>
+                    <p>Téléchargement en cours...</p>
+                    <p style="word-break: break-word;"><strong>${fileName}</strong></p>
+                    <p style="font-size: 0.85rem; margin-top: 1rem; opacity: 0.8;">Veuillez patienter</p>
+                </div>
+            `;
             
-            // Supprimer le toast après 3 secondes
-            setTimeout(() => {
-                toast.classList.add('hidden');
-                setTimeout(() => {
-                    if (toast.parentNode) {
-                        toast.remove();
-                    }
-                }, 300);
-            }, 3000);
+            document.body.appendChild(loadingOverlay);
+        }
+
+        function hideDownloadLoading() {
+            const loadingOverlay = document.getElementById('download-loading');
+            if (loadingOverlay) {
+                loadingOverlay.remove();
+            }
         }
 
         // =============================================
-        // GESTION DE LA LIBRAIRIE
+        // GESTION DES ÉTATS D'AFFICHAGE
+        // =============================================
+
+        function showLoading() {
+            if (loading) loading.style.display = 'block';
+            if (error) error.style.display = 'none';
+            if (emptyState) emptyState.style.display = 'none';
+            if (filesContent) filesContent.style.display = 'none';
+        }
+
+        function showFileError() {
+            if (loading) loading.style.display = 'none';
+            if (error) error.style.display = 'block';
+            if (emptyState) emptyState.style.display = 'none';
+            if (filesContent) filesContent.style.display = 'none';
+        }
+
+        function showEmptyState() {
+            if (loading) loading.style.display = 'none';
+            if (error) error.style.display = 'none';
+            if (emptyState) emptyState.style.display = 'block';
+            if (filesContent) filesContent.style.display = 'none';
+        }
+
+        function showContent() {
+            if (loading) loading.style.display = 'none';
+            if (error) error.style.display = 'none';
+            if (emptyState) emptyState.style.display = 'none';
+            if (filesContent) filesContent.style.display = 'block';
+        }
+
+        // =============================================
+        // LIBRAIRIE
         // =============================================
 
         async function loadBooks() {
@@ -4184,6 +5104,8 @@
         }
 
         function displayBooks() {
+            if (!booksGrid) return;
+            
             booksGrid.innerHTML = '';
 
             booksData.forEach(book => {
@@ -4213,6 +5135,34 @@
                 `;
                 booksGrid.appendChild(bookCard);
             });
+        }
+
+        function showBooksLoading() {
+            if (booksLoading) booksLoading.style.display = 'block';
+            if (booksError) booksError.style.display = 'none';
+            if (booksEmptyState) booksEmptyState.style.display = 'none';
+            if (booksGrid) booksGrid.style.display = 'none';
+        }
+
+        function showBooksError() {
+            if (booksLoading) booksLoading.style.display = 'none';
+            if (booksError) booksError.style.display = 'block';
+            if (booksEmptyState) booksEmptyState.style.display = 'none';
+            if (booksGrid) booksGrid.style.display = 'none';
+        }
+
+        function showBooksEmptyState() {
+            if (booksLoading) booksLoading.style.display = 'none';
+            if (booksError) booksError.style.display = 'none';
+            if (booksEmptyState) booksEmptyState.style.display = 'block';
+            if (booksGrid) booksGrid.style.display = 'none';
+        }
+
+        function showBooksContent() {
+            if (booksLoading) booksLoading.style.display = 'none';
+            if (booksError) booksError.style.display = 'none';
+            if (booksEmptyState) booksEmptyState.style.display = 'none';
+            if (booksGrid) booksGrid.style.display = 'grid';
         }
 
         // =============================================
@@ -4259,7 +5209,7 @@
         }
 
         // =============================================
-        // UTILITAIRES
+        // FONCTIONS UTILITAIRES POUR LES FICHIERS
         // =============================================
 
         function getFileType(mimeType) {
@@ -4291,7 +5241,7 @@
             return diffDays <= 1;
         }
 
-        function formatFiliere(filiere) {
+        function formatFiliereForDisplay(filiere) {
             const filiereNames = {
                 'informatique': 'Informatique',
                 'gestion': 'Gestion',
@@ -4300,7 +5250,7 @@
             return filiereNames[filiere] || filiere;
         }
 
-        function formatYear(year) {
+        function formatYearForDisplay(year) {
             const yearNames = {
                 'annee1': 'Année 1',
                 'annee2': 'Année 2',
@@ -4316,7 +5266,7 @@
             return yearNames[year] || year;
         }
 
-        function formatSemestre(semestre) {
+        function formatSemestreForDisplay(semestre) {
             const semestreNames = {
                 'semestre1': 'Semestre 1',
                 'semestre2': 'Semestre 2'
@@ -4324,125 +5274,13 @@
             return semestreNames[semestre] || semestre;
         }
 
-        function showDownloadLoading(fileName) {
-            const loadingOverlay = document.createElement('div');
-            loadingOverlay.id = 'download-loading';
-            loadingOverlay.style.cssText = `
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0,0,0,0.7);
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                z-index: 10000;
-                color: white;
-                font-size: 1rem;
-                flex-direction: column;
-                padding: 20px;
-            `;
-            
-            loadingOverlay.innerHTML = `
-                <div style="text-align: center; max-width: 300px;">
-                    <i class="fas fa-spinner fa-spin" style="font-size: 2.5rem; margin-bottom: 1rem; color: var(--accent);"></i>
-                    <p>Téléchargement en cours...</p>
-                    <p style="word-break: break-word;"><strong>${fileName}</strong></p>
-                    <p style="font-size: 0.85rem; margin-top: 1rem; opacity: 0.8;">Veuillez patienter</p>
-                </div>
-            `;
-            
-            document.body.appendChild(loadingOverlay);
-        }
-
-        function hideDownloadLoading() {
-            const loadingOverlay = document.getElementById('download-loading');
-            if (loadingOverlay) {
-                loadingOverlay.remove();
-            }
-        }
-
-        // Gestion des états d'affichage
-        function showLoading() {
-            if (loadingElement) loadingElement.style.display = 'block';
-            if (errorElement) errorElement.style.display = 'none';
-            if (emptyStateElement) emptyStateElement.style.display = 'none';
-            if (filesContentElement) filesContentElement.style.display = 'none';
-        }
-
-        function showError() {
-            if (loadingElement) loadingElement.style.display = 'none';
-            if (errorElement) errorElement.style.display = 'block';
-            if (emptyStateElement) emptyStateElement.style.display = 'none';
-            if (filesContentElement) filesContentElement.style.display = 'none';
-        }
-
-        function showEmptyState() {
-            if (loadingElement) loadingElement.style.display = 'none';
-            if (errorElement) errorElement.style.display = 'none';
-            if (emptyStateElement) emptyStateElement.style.display = 'block';
-            if (filesContentElement) filesContentElement.style.display = 'none';
-        }
-
-        function showContent() {
-            if (loadingElement) loadingElement.style.display = 'none';
-            if (errorElement) errorElement.style.display = 'none';
-            if (emptyStateElement) emptyStateElement.style.display = 'none';
-            if (filesContentElement) filesContentElement.style.display = 'block';
-        }
-
-        function showBooksLoading() {
-            if (booksLoading) booksLoading.style.display = 'block';
-            if (booksError) booksError.style.display = 'none';
-            if (booksEmptyState) booksEmptyState.style.display = 'none';
-            if (booksGrid) booksGrid.style.display = 'none';
-        }
-
-        function showBooksError() {
-            if (booksLoading) booksLoading.style.display = 'none';
-            if (booksError) booksError.style.display = 'block';
-            if (booksEmptyState) booksEmptyState.style.display = 'none';
-            if (booksGrid) booksGrid.style.display = 'none';
-        }
-
-        function showBooksEmptyState() {
-            if (booksLoading) booksLoading.style.display = 'none';
-            if (booksError) booksError.style.display = 'none';
-            if (booksEmptyState) booksEmptyState.style.display = 'block';
-            if (booksGrid) booksGrid.style.display = 'none';
-        }
-
-        function showBooksContent() {
-            if (booksLoading) booksLoading.style.display = 'none';
-            if (booksError) booksError.style.display = 'none';
-            if (booksEmptyState) booksEmptyState.style.display = 'none';
-            if (booksGrid) booksGrid.style.display = 'grid';
-        }
-
         // =============================================
         // EXPORT DES FONCTIONS GLOBALES
         // =============================================
 
-        window.downloadAndShare = downloadAndShare;
+        window.downloadFile = downloadFile;
 
-        // =============================================
-        // MISE À JOUR AUTOMATIQUE
-        // =============================================
-
-        setInterval(updateStats, 1000);
-
-        // =============================================
-        // GESTION DU RESPONSIVE
-        // =============================================
-
-        window.addEventListener('resize', function() {
-            if (window.innerWidth > 768 && mainNav.classList.contains('active')) {
-                closeBurgerMenu();
-            }
-        });
-
-        console.log("✅ JavaScript PrimeAcademia chargé avec succès");
+        console.log("✅ Système d'authentification PrimeAcademia chargé avec succès");
     </script>
 </body>
 </html>
